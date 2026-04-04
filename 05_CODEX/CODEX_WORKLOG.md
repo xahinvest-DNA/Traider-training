@@ -330,3 +330,39 @@ The live trade loop is now materially stronger as a discipline trainer: one trad
 
 ### Recommended next step
 Run `T-110: Post-Initial-Trade-Protection Next-Slice Audit`.
+
+## 2026-04-04 - T-110 Post-Initial-Trade-Protection Next-Slice Audit
+
+### Goal
+Run one bounded managerial/product audit after Initial Trade Protection so the repository selects the next strongest local desktop product-facing slice without mechanically extending protection management, reopening review-derived micro-slices, or drifting into mentor, dashboard/media, workflow-engine, mobile, sync, or new-persistence scope.
+
+### Files created
+- `05_CODEX/CURRENT_TRADE_PLAN_CONTEXT.md`
+
+### Files updated
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Audited the frontier after `T-109` against user-visible gain, desktop-first/local-first boundaries, and anti-drift rules instead of continuing the protection lane by inertia.
+- Explicitly rejected weak candidates: trailing stops, break-even automation, SL/TP edit history, pending-order orchestration, add-on expansion, partial-close expansion, review/digest/evidence backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync/new-persistence drift.
+- Selected `Current Trade Plan Context` as the strongest next bounded slice because the live trade loop still loses the user's declared setup/thesis/risk plan after entry even though those local facts already exist in linked `PreTradeNote` records.
+- Added one new implementation-facing boundary document for the selected slice and promoted it into the active task packet as `T-111`.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop shell code was not changed.
+- Tests were not changed.
+- Module documents and tech schemas were not changed.
+- `DECISIONS.md` was not changed because no project-level decision was required.
+
+### Why this matters
+The strongest next gain is no longer more protection behavior. It is keeping the live trade anchored to the trader's own declared plan. That improves execution discipline and continuity inside the current desktop loop without creating a risk engine, mentor layer, or new owner of truth.
+
+### Remaining gap after this step
+- `Current Trade Plan Context` is now defined but not yet implemented in runtime, desktop projections, or tests.
+
+### Recommended next step
+Implement `T-111: Current Trade Plan Context Slice`.

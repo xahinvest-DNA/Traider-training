@@ -2,14 +2,14 @@
 
 Last updated: 2026-04-04
 Status: active
-Task ID: T-110
-Task type: audit
+Task ID: T-111
+Task type: implementation
 
 ## Goal
-Run one bounded `Post-Initial-Trade-Protection Next-Slice Audit` so the current desktop-first/local-first product can choose the next strongest user-visible slice after bounded initial `stopLoss` / `takeProfit` support landed, without mechanically expanding into a broader risk engine, protection-edit workflow, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
+Implement one bounded `Current Trade Plan Context` slice so the current desktop-first/local-first product can keep existing linked pre-trade setup/thesis/risk-plan facts visible inside the active/current trade loop, without creating a new owner of truth, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
 
 ## Why this task matters now
-`T-109` already strengthened the live trade loop by moving the product beyond `entry -> manual close` only. The next step should not be a reflexive extension into trailing stops, richer protection management, or other orchestration-heavy trade control. The repository now needs one disciplined frontier audit so the next slice is selected for product value rather than by local momentum inside the protection lane.
+`T-109` made the live trade loop stronger by adding bounded initial `stopLoss` / `takeProfit`. The next strongest gain is not deeper protection management. It is keeping the user inside the context of the already declared pre-trade plan while the trade is active and immediately after it closes, because the current workflow still loses that declared setup/thesis/risk-plan context after entry and forces the user to rely on memory or jump back into note authoring.
 
 ## Required source-of-truth documents
 - `00_INDEX.md`
@@ -22,11 +22,12 @@ Run one bounded `Post-Initial-Trade-Protection Next-Slice Audit` so the current 
 - `03_MODULES/TRADING_ENGINE.md`
 - `03_MODULES/DESKTOP_WORKSPACE.md`
 - `04_TECH/DATA_SCHEMA.md`
+- `04_TECH/JOURNAL_SCHEMA.md`
 - `05_CODEX/TASKS.md`
 - `05_CODEX/NEXT_TASK.md`
 - `05_CODEX/IMPLEMENTATION_RULES.md`
 - `05_CODEX/HANDOFF_TEMPLATE.md`
-- `05_CODEX/INITIAL_TRADE_PROTECTION.md`
+- `05_CODEX/CURRENT_TRADE_PLAN_CONTEXT.md`
 
 ## Read first
 1. `00_INDEX.md`
@@ -41,42 +42,44 @@ Run one bounded `Post-Initial-Trade-Protection Next-Slice Audit` so the current 
 10. `03_MODULES/TRADING_ENGINE.md`
 11. `03_MODULES/DESKTOP_WORKSPACE.md`
 12. `04_TECH/DATA_SCHEMA.md`
-13. `05_CODEX/INITIAL_TRADE_PROTECTION.md`
+13. `04_TECH/JOURNAL_SCHEMA.md`
+14. `05_CODEX/CURRENT_TRADE_PLAN_CONTEXT.md`
 
 ## Exact question to answer
-After bounded initial `stopLoss` / `takeProfit` support is implemented in the current one-trade replay workflow, what one strongest next local desktop product-facing slice should follow without expanding into a broader risk engine, richer trade-protection orchestration, review-loop backfill, mentor logic, dashboard/media scope, mobile, sync, or new persistence?
+How should the current desktop-first/local-first product expose one compact current-trade plan context from already linked `PreTradeNote` facts so the active/current trade loop keeps the user anchored to the declared setup, thesis, and risk plan without turning notes into a new owner of truth or drifting into mentor/workflow-engine behavior?
 
-## Expected audit outcome
-1. One explicit bounded next-step decision after initial trade protection.
-2. Clear rejection of weak candidates that would only continue protection management by inertia or drift into forbidden scope.
-3. Synchronization of `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` after the audit.
+## Expected implementation outcome
+1. One bounded derive-on-read current-trade plan context over existing linked `PreTradeNote` and trade facts.
+2. Desktop-facing exposure only through existing context/result/workflow surfaces.
+3. Runtime, desktop, and test updates only where required for compact current-trade plan visibility and restart recovery.
+4. Synchronization of `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` after implementation.
 
 ## Files allowed to change
+- runtime files strictly required for bounded current-trade plan context
+- desktop-shell files strictly required for bounded current-trade plan context
+- tests strictly required for bounded current-trade plan context
 - `01_MASTER/CURRENT_STATE.md`
 - `05_CODEX/TASKS.md`
 - `05_CODEX/NEXT_TASK.md`
 - `05_CODEX/CODEX_WORKLOG.md`
-- one new implementation-facing document in `05_CODEX/` only if the audit finds a clearly justified next slice
 
 ## Files not to change
 - `03_MODULES/*`
 - `04_TECH/*`
-- runtime code
-- desktop-shell code
-- tests
 - `01_MASTER/DECISIONS.md` unless a true project-level decision becomes unavoidable
 
 ## Constraints
 - Stay inside desktop-first local-first boundaries.
-- Do not mechanically continue the protection lane with trailing stops, break-even automation, SL/TP edit history, pending-order orchestration, add-on, or partial-close expansion.
-- Do not mechanically revive review-loop, digest, or evidence-layer micro-slices.
-- Do not drift into mentor logic, dashboard/media scope, mobile, sync, or new persistence.
-- Select exactly one next step only if it is materially stronger than any continuation of the bounded protection slice.
+- Reuse existing `PreTradeNote` ownership and trade linkage only.
+- Do not introduce a new persisted summary, plan-status machine, checklist engine, acknowledgment flow, or mentor layer.
+- Do not reopen protection-lane expansion such as trailing stops, break-even automation, SL/TP edit history, add-on, partial close, or pending-order orchestration.
+- Do not backfill review/digest/evidence micro-slices.
 
 ## Acceptance criteria
-- The audit identifies whether a stronger bounded next slice exists after `T-109` without relying on protection-lane inertia.
-- Weak candidates are explicitly rejected when they only deepen protection management, cosmetic polish, or forbidden scope.
-- `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` are synchronized to the audit result.
+- The implementation exposes one compact current-trade plan context from existing linked `PreTradeNote` facts only.
+- Existing desktop context/result/workflow surfaces can keep the declared plan visible without a new subsystem.
+- Restart recovery restores the same plan context from the same local note and trade facts.
+- `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` are synchronized to the implementation result.
 
 ## Required handoff format
 Use `05_CODEX/HANDOFF_TEMPLATE.md` exactly.

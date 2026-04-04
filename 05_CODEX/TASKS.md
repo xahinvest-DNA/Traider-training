@@ -882,8 +882,17 @@
 
 ### T-110
 
-- Status: active
+- Status: completed
 - Module: Post-Initial-Trade-Protection Next-Slice Audit
 - Goal: run one bounded managerial/product audit after Initial Trade Protection so the repository selects the next strongest local desktop product-facing slice without mechanically expanding protection management, reopening review-derived micro-slices, or drifting into mentor, dashboard/media, workflow-engine, mobile, sync, or new-persistence scope.
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/DATA_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/INITIAL_TRADE_PROTECTION.md`
 - Expected result: one explicit bounded next-step decision plus one new implementation-facing document only if the audit finds a clearly justified next slice.
+- Outcome: rejected further protection-lane continuation, review-loop backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync drift; selected `Current Trade Plan Context` as the strongest next bounded local desktop slice because the live trade loop still drops the user's declared setup/thesis/risk plan after entry.
+
+### T-111
+
+- Status: active
+- Module: Current Trade Plan Context Slice
+- Goal: implement one bounded current-trade plan-context slice so the current desktop-first/local-first product can keep linked pre-trade setup/thesis/risk-plan facts visible inside the active/current trade loop without turning notes into a new owner of truth, review into mentor logic, or desktop into a broader workflow engine.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/CURRENT_TRADE_PLAN_CONTEXT.md`
+- Expected result: one bounded derive-on-read current-trade plan context across existing context/result/workflow surfaces only.
