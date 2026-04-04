@@ -803,3 +803,19 @@
 - Goal: expose one bounded desktop authoring path for the already accepted local `ChartSnapshot` entity so users can create and link snapshot refs from the shell during note/review work without expanding into screenshot automation, gallery/media workflow, filesystem validation, sync, or broader UI platform scope.
 - Input documents: `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/CHART_SNAPSHOT_REFERENCES.md`, `05_CODEX/SNAPSHOT_TIMELINE_EXPOSURE.md`, `05_CODEX/SNAPSHOT_AWARE_REVIEW_OUTPUT.md`
 - Expected result: one bounded desktop snapshot-authoring layer over the current local ChartSnapshot/runtime flow plus compact controller, authoring, and projection visibility only.
+
+### T-101
+
+- Status: completed
+- Module: Variant 2 Sync and Next-Slice Audit
+- Goal: synchronize the new Variant 2 operating layer across the repository, run one bounded post-snapshot-authoring product-value audit, rank real next-slice candidates, and select one strongest implementation target without drifting into runtime churn, media workflow, dashboard scope, mentor logic, mobile, or sync.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/SSOT_MAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `03_MODULES/BILL_WILLIAMS_LAYER.md`, `03_MODULES/JOURNAL_ANALYTICS.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/VARIANT2_SYNC_AND_AUDIT.md`
+- Expected result: synchronized Variant 2 operating documents plus one implementation-facing document for the strongest next bounded slice.
+
+### T-102
+
+- Status: active
+- Module: Bill Williams Review Evidence Status Slice
+- Goal: expose one compact derive-on-read evidence-status layer so the current desktop-first review flow can show whether reviewed Bill Williams interpretation is backed by linked chart context, without drifting into gallery/media workflow, mentor scoring, dashboard expansion, mobile, sync, or new persistence entities.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `03_MODULES/BILL_WILLIAMS_LAYER.md`, `03_MODULES/JOURNAL_ANALYTICS.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_STATUS.md`, `05_CODEX/CHART_SNAPSHOT_REFERENCES.md`, `05_CODEX/SNAPSHOT_AWARE_REVIEW_OUTPUT.md`, `05_CODEX/SESSION_REVIEW_SUMMARY.md`
+- Expected result: one bounded Bill Williams review-evidence status projection across current review output, compact current-session summary exposure, and existing desktop result/history/context/workflow surfaces only.

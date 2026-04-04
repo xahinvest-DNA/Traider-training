@@ -1,9 +1,9 @@
-﻿# Current State
+# Current State
 
 Last updated: 2026-04-04
-Current stage: desktop chart snapshot authoring implemented across the existing local ChartSnapshot model, desktop authoring flow, and snapshot-aware review surfaces
-Active module: Desktop Chart Snapshot Authoring implemented
-Active question: which bounded post-snapshot-authoring step now gives the strongest product value inside the accepted desktop-first Bill Williams track without drifting into media workflow, dashboard scope, mentor logic, mobile, or sync
+Current stage: Variant 2 operating-layer sync and bounded next-slice audit completed after desktop chart snapshot authoring
+Active module: Bill Williams Review Evidence Status selected as the next bounded coding slice
+Active question: how to expose one compact Bill Williams review-evidence status inside the current local desktop workflow so reviewed method interpretation can show whether it is backed by linked chart context, without drifting into media workflow, dashboards, mentor logic, mobile, or sync
 
 ## Where the project is now
 
@@ -78,6 +78,7 @@ At this point:
 - dataset-quality recovery feedback is implemented across recovered finalized-session desktop action feedback and workflow guidance surfaces;
 - dataset-quality recovery acknowledgment is implemented as one compact persisted session-scoped state plus explicit desktop action so a reopened finalized warned session can mark recovery context as seen and stop repeating the active reminder;
 - desktop chart snapshot authoring is implemented through one bounded controller path plus explicit desktop note/review authoring actions so existing local ChartSnapshot refs can now be created and linked from the shell without screenshot automation, gallery UX, media validation, or sync scope;
+- the Variant 2 operating layer is now present through `01_MASTER/SSOT_MAP.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, and `05_CODEX/CODEX_WORKLOG.md`, so the repository can act as the live operating system for bounded Codex passes instead of depending on chat-only continuity;
 - derive-on-read Bill Williams review rule context is implemented across current trade review output, session summary, and desktop summary/history/workflow surfaces;
 - derive-on-read Bill Williams review discipline cue is implemented across session summary and desktop summary/history/workflow surfaces;
 - derive-on-read Bill Williams review discipline badge is implemented across session summary and desktop summary/history/workflow surfaces;
@@ -143,7 +144,7 @@ At this point:
 
 ## Next step
 
-The next working step is to run another bounded product-value audit now that desktop snapshot authoring is usable end-to-end, so the project returns to the strongest next Bill Williams/journal friction point instead of drifting into more snapshot/media or recovery-tail micro-slices.
+The next working step is to implement the bounded Bill Williams Review Evidence Status slice so the current desktop-first review flow can make one user-visible distinction between reviewed method interpretation that already has linked chart evidence, interpretation that is missing linked evidence, and cases where evidence status is not applicable, without introducing gallery/media management, dashboard expansion, mentor logic, mobile, sync, or new persistence entities.
 
 ## What must not be lost in a new chat
 
@@ -155,6 +156,8 @@ The next working step is to run another bounded product-value audit now that des
 - `DERIVED_REVIEW_OUTPUT.md`, `SNAPSHOT_TIMELINE_EXPOSURE.md`, `SNAPSHOT_AWARE_REVIEW_OUTPUT.md`, `SESSION_FINALIZATION.md`, `SESSION_REVIEW_SUMMARY.md`, `MVP_ACCEPTANCE_PASS.md`, `DESKTOP_SHELL_IMPLEMENTATION.md`, `DESKTOP_CHART_REPLAY_REFINEMENT.md`, `DESKTOP_SESSION_TRADE_CONTEXT_REFINEMENT.md`, `DESKTOP_NOTES_REVIEW_AUTHORING_REFINEMENT.md`, `DESKTOP_CURRENT_SESSION_HISTORY_RESULT_REFINEMENT.md`, `DESKTOP_WORKFLOW_GUIDANCE_ACTION_FEEDBACK.md`, `DESKTOP_SHELL_LAYOUT_USABILITY_POLISH.md`, `DESKTOP_MVP_ACCEPTANCE_SMOKE_PASS.md`, `DESKTOP_LAUNCH_PATH.md`, `DESKTOP_HANDOFF_READINESS.md`, `MVP_PAUSE_POINT.md`, `FIRST_POST_MVP_DIRECTION.md`, `BILL_WILLIAMS_REVIEW_DEPTH.md`, `BILL_WILLIAMS_REVIEW_DELTA.md`, `BILL_WILLIAMS_REVIEW_COMPLETENESS.md`, `BILL_WILLIAMS_REVIEW_PROMPTS.md`, `BILL_WILLIAMS_REVIEW_COVERAGE.md`, `BILL_WILLIAMS_REVIEW_SEQUENCE.md`, `BILL_WILLIAMS_REVIEW_WEAK_SPOTS.md`, `BILL_WILLIAMS_REVIEW_PROGRESS.md`, `BILL_WILLIAMS_REVIEW_MOMENTUM.md`, `BILL_WILLIAMS_REVIEW_STABILITY.md`, `BILL_WILLIAMS_REVIEW_SWINGS.md`, `BILL_WILLIAMS_REVIEW_FLOOR.md`, `BILL_WILLIAMS_REVIEW_CEILING.md`, `BILL_WILLIAMS_REVIEW_BAND.md`, `BILL_WILLIAMS_REVIEW_HEADROOM.md`, `BILL_WILLIAMS_REVIEW_PRESSURE.md`, `BILL_WILLIAMS_REVIEW_TARGET.md`, `BILL_WILLIAMS_REVIEW_FOCUS.md`, `BILL_WILLIAMS_REVIEW_CUE.md`, `BILL_WILLIAMS_REVIEW_BADGE.md`, `BILL_WILLIAMS_REVIEW_PILL.md`, `BILL_WILLIAMS_REVIEW_CHIP.md`, `BILL_WILLIAMS_REVIEW_TAG.md`, `BILL_WILLIAMS_REVIEW_TOKEN.md`, `BILL_WILLIAMS_REVIEW_MARKER.md`, `BILL_WILLIAMS_REVIEW_GLYPH.md`, `BILL_WILLIAMS_REVIEW_SIGIL.md`, `BILL_WILLIAMS_REVIEW_SEAL.md`, `BILL_WILLIAMS_REVIEW_CREST.md`, `BILL_WILLIAMS_REVIEW_EMBLEM.md`, `BILL_WILLIAMS_REVIEW_INSIGNIA.md`, `BILL_WILLIAMS_REVIEW_STANDARD.md`, `BILL_WILLIAMS_REVIEW_BANNER.md`, `BILL_WILLIAMS_REVIEW_PENNANT.md`, `BILL_WILLIAMS_REVIEW_STREAMER.md`, `BILL_WILLIAMS_REVIEW_RIBBON.md`, `BILL_WILLIAMS_REVIEW_RULE_CONTEXT.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_CUE.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_BADGE.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_TOKEN.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_MARKER.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_GLYPH.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_SIGIL.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_SEAL.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_CREST.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_EMBLEM.md`, and `BILL_WILLIAMS_REVIEW_DISCIPLINE_PAUSE_REALIGNMENT.md` already fix derive-on-read / bounded workflow boundaries; they must not silently expand into persisted cache, gallery, archive shell, dashboard subsystems, thick UI workflow state, signal-engine drift, packaging/platform scope, or broad later-phase drift.
 - `desktop_shell/` already exists as a thin UI layer over accepted runtime projections; the next step must not turn it into a new domain layer or large UI platform.
 - Any step beyond the bounded local-first desktop workflow requires a separate Project Brain fixation.
+
+
 
 
 
