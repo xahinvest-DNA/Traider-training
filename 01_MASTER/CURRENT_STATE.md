@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-04
-Current stage: Current Trade Review Digest implemented as one bounded derive-on-read takeaway layer for the latest/current closed trade
-Active module: Post-Digest Next-Slice Audit is the next bounded managerial step after Current Trade Review Digest
-Active question: after Current Trade Review Digest, which single bounded next slice gives the strongest user-visible value inside the current desktop-first/local-first review workflow without reopening digest layering, mentor/dashboard drift, workflow-engine logic, mobile, sync, or new persistence
+Current stage: Current Trade Review Digest is implemented; the post-digest audit found no stronger bounded next implementation slice inside the current review loop without scope creep
+Active module: Post-Review-Loop Frontier Audit is the next bounded managerial step after the recommend-only T-107 result
+Active question: if the current desktop-first/local-first review loop no longer has a strong bounded next slice, which broader local desktop product frontier should be evaluated next without drifting into mentor, dashboard, workflow-engine, mobile, sync, or new persistence scope
 
 ## Where the project is now
 
@@ -93,6 +93,7 @@ At this point:
 - derive-on-read Bill Williams review evidence status is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces using only existing review facts and linked snapshot refs, with restart recovery covered from existing local facts;
 - derive-on-read Bill Williams review evidence follow-up is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces so missing or partial chart evidence now maps to one compact next-step cue rebuilt from existing local facts after restart;
 - derive-on-read Current Trade Review Digest is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces so the latest/current closed trade now exposes one compact takeaway headline, primary gap, and next step rebuilt from existing local facts after restart;
+- the bounded post-digest audit rejects further digest layering, evidence layering, cosmetic polish, workflow-engine-style quick-action orchestration, dashboard/media expansion, mentor logic, and mobile/sync/new-persistence drift as the wrong current frontier, and records no strong bounded next implementation slice inside the current review loop;
 - the bounded post-evidence-follow-up audit rejects further evidence-chain continuation, recovery-tail micro-polish, dashboard/media expansion, mentor logic, queue/blocker orchestration, and mobile/sync drift as the wrong current frontier for the local desktop review loop;
 - the audit selects Current Trade Review Digest as the strongest next slice because the main remaining product gap is no longer evidence diagnosis or evidence actionability, but fragmented review feedback across many small signals;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
@@ -149,7 +150,7 @@ At this point:
 
 ## Next step
 
-The next working step is to run one bounded Post-Digest Next-Slice Audit so the repository chooses the single strongest product-facing slice after Current Trade Review Digest instead of continuing digest layering, reopening evidence-chain inertia, or drifting into mentor, dashboard, workflow-engine, mobile, sync, or new-persistence scope.
+The next working step is to run one bounded Post-Review-Loop Frontier Audit so the repository can choose the next real product-facing frontier beyond the now-completed current-trade review loop improvements instead of forcing another digest/evidence micro-slice or drifting into mentor, dashboard, workflow-engine, mobile, sync, or new-persistence scope.
 
 ## What must not be lost in a new chat
 
