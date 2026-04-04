@@ -24,7 +24,11 @@ from .bill_williams import (
     validate_violation_source,
 )
 from .errors import InvalidJournalValueError, SessionFinalizationError
-from .review_projection import build_session_review_output, build_session_review_summary
+from .review_projection import (
+    build_current_trade_plan_context,
+    build_session_review_output,
+    build_session_review_summary,
+)
 from .timeline_projection import build_session_timeline_projection
 from .replay_session import ReplaySession
 from .trading_loop import MinimalTradingLoop
@@ -432,6 +436,10 @@ class LocalJournalRuntime:
             "last_behavioral_flag": asdict(self.behavioral_flags[-1]) if self.behavioral_flags else None,
             "last_rule_violation": asdict(self.rule_violations[-1]) if self.rule_violations else None,
             "review_pending_trade_id": self.review_pending_trade_id,
+            "current_trade_plan_context": build_current_trade_plan_context(
+                self.trading_loop.state.trades,
+                self.pre_trade_notes,
+            ),
             "session_finalization": finalization_projection,
             "derived_review_output": review_output,
             "session_review_summary": session_review_summary,

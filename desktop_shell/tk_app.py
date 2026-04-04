@@ -340,7 +340,7 @@ class TraderTrainerDesktopApp:
 
     def _render_context_surface(self, trading_view: dict, journal_view: dict) -> None:
         self.session_context_label.configure(text="\n".join(build_session_context_lines(journal_view)))
-        self.trade_context_label.configure(text="\n".join(build_trade_context_lines(trading_view)))
+        self.trade_context_label.configure(text="\n".join(build_trade_context_lines(trading_view, journal_view)))
         self.review_summary_label.configure(text="\n".join(build_review_summary_lines(journal_view)))
         self.finalization_label.configure(text="\n".join(build_finalization_lines(journal_view)))
         self.latest_result_label.configure(text="\n".join(build_latest_result_lines(journal_view)))

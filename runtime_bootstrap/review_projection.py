@@ -101,6 +101,7 @@ def build_trade_review_result(
         review_evidence_status=review_evidence_status,
         review_evidence_follow_up=review_evidence_follow_up,
     )
+    current_trade_plan_context = _build_trade_plan_context(latest_note)
 
     return {
         "trade_id": trade.trade_id,
@@ -149,6 +150,7 @@ def build_trade_review_result(
         "current_trade_review_digest_headline": current_trade_review_digest["digest_headline"],
         "current_trade_review_digest_primary_gap": current_trade_review_digest["digest_primary_gap"],
         "current_trade_review_digest_next_step": current_trade_review_digest["digest_next_step"],
+        "current_trade_plan_context": current_trade_plan_context,
         "pre_trade_note_count": len(trade_notes),
         "post_trade_review_count": len(trade_reviews),
         "behavioral_flag_count": len(trade_flags),
@@ -166,6 +168,26 @@ def build_trade_review_result(
         "latest_post_trade_review_snapshots": latest_review_snapshots,
         "latest_pre_trade_note": asdict(latest_note) if latest_note else None,
         "latest_post_trade_review": asdict(latest_review) if latest_review else None,
+    }
+
+
+def build_current_trade_plan_context(
+    trades: list[TradeRecord],
+    pre_trade_notes: list[PreTradeNoteRecord],
+) -> dict | None:
+    active_trade = next((trade for trade in reversed(trades) if trade.status == "open"), None)
+    target_trade = active_trade or next((trade for trade in reversed(trades) if trade.status == "closed"), None)
+    if target_trade is None:
+        return None
+
+    trade_notes = [note for note in pre_trade_notes if note.trade_id == target_trade.trade_id]
+    latest_note = trade_notes[-1] if trade_notes else None
+    return {
+        **_build_trade_plan_context(latest_note),
+        "trade_id": target_trade.trade_id,
+        "trade_status": target_trade.status,
+        "is_active_trade": target_trade.status == "open",
+        "close_reason": target_trade.close_reason,
     }
 
 
@@ -2056,6 +2078,18 @@ def _build_bill_williams_review_evidence_follow_up(
         "follow_up_text": None,
     }
 
+
+
+def _build_trade_plan_context(latest_note: PreTradeNoteRecord | None) -> dict:
+    return {
+        "plan_present": latest_note is not None,
+        "plan_status": "present" if latest_note is not None else "absent",
+        "declared_setup_tag": latest_note.setup_tag if latest_note else None,
+        "thesis_summary": latest_note.thesis_summary if latest_note else None,
+        "risk_plan": latest_note.risk_plan if latest_note else None,
+        "note_id": latest_note.note_id if latest_note else None,
+        "note_timestamp": latest_note.note_timestamp if latest_note else None,
+    }
 
 
 def _build_current_trade_review_digest(

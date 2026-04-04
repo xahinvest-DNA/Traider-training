@@ -18,11 +18,12 @@ def build_session_context_lines(journal_view: dict[str, Any]) -> list[str]:
     ]
 
 
-def build_trade_context_lines(trading_view: dict[str, Any]) -> list[str]:
+def build_trade_context_lines(trading_view: dict[str, Any], journal_view: dict[str, Any] | None = None) -> list[str]:
     last_execution = trading_view.get("last_execution_outcome")
     execution_label = last_execution["execution_type"] if last_execution else "none"
     dataset_quality = trading_view.get("dataset_quality_context") or {}
-    return [
+    plan_context = (journal_view or {}).get("current_trade_plan_context") or {}
+    lines = [
         f"Lifecycle: {trading_view['lifecycle_state']}",
         f"Trade status: {trading_view['trade_status']}",
         f"Active trade: {'yes' if trading_view['active_trade_present'] else 'no'}",
@@ -33,9 +34,13 @@ def build_trade_context_lines(trading_view: dict[str, Any]) -> list[str]:
         f"Manual close available: {'yes' if trading_view['manual_close_available'] else 'no'}",
         f"Last execution: {execution_label}",
         f"Last close reason: {trading_view.get('last_close_reason') or '-'}",
+    ]
+    lines.extend(_build_plan_context_lines(plan_context))
+    lines.extend([
         f"Dataset quality context: {dataset_quality.get('context_status') or '-'}",
         f"Dataset quality text: {dataset_quality.get('context_text') or '-'}",
-    ]
+    ])
+    return lines
 
 
 def build_review_summary_lines(journal_view: dict[str, Any]) -> list[str]:
@@ -267,6 +272,7 @@ def build_latest_result_lines(journal_view: dict[str, Any]) -> list[str]:
     digest_headline = latest_trade_result.get("current_trade_review_digest_headline") or "-"
     digest_primary_gap = latest_trade_result.get("current_trade_review_digest_primary_gap") or "-"
     digest_next_step = latest_trade_result.get("current_trade_review_digest_next_step") or "-"
+    plan_context = latest_trade_result.get("current_trade_plan_context") or {}
     dataset_quality = journal_view.get("dataset_quality_context") or {}
     missing_parts = ", ".join(completeness["missing_parts"]) or "none"
     recommended_order = " -> ".join(review_sequence["recommended_missing_order"]) or "none"
@@ -278,6 +284,10 @@ def build_latest_result_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Close reason: {latest_trade_result['close_reason'] or '-'}",
         f"Protection present: {'yes' if latest_trade_result.get('has_initial_trade_protection') else 'no'}",
         f"Stop loss / take profit: {latest_trade_result.get('stop_loss') if latest_trade_result.get('stop_loss') is not None else '-'} / {latest_trade_result.get('take_profit') if latest_trade_result.get('take_profit') is not None else '-'}",
+        f"Declared plan: {'present' if plan_context.get('plan_present') else 'absent'}",
+        f"Declared setup: {plan_context.get('declared_setup_tag') or '-'}",
+        f"Thesis summary: {plan_context.get('thesis_summary') or '-'}",
+        f"Risk plan: {plan_context.get('risk_plan') or '-'}",
         f"Setup: {latest_trade_result['setup_tag'] or '-'}",
         f"Compliance: {latest_trade_result['compliance_label'] or '-'}",
         f"Intent delta: {delta['delta_status']}",
@@ -326,3 +336,14 @@ def build_latest_result_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Review status: {latest_trade_result['review_status']}",
     ]
 
+
+
+def _build_plan_context_lines(plan_context: dict[str, Any] | None) -> list[str]:
+    if plan_context is None or not plan_context:
+        return []
+    return [
+        f"Declared plan: {'present' if plan_context.get('plan_present') else 'absent'}",
+        f"Declared setup: {plan_context.get('declared_setup_tag') or '-'}",
+        f"Thesis summary: {plan_context.get('thesis_summary') or '-'}",
+        f"Risk plan: {plan_context.get('risk_plan') or '-'}",
+    ]

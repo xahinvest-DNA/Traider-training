@@ -31,18 +31,21 @@ def build_workflow_guidance_lines(
         return _append_dataset_quality_context(lines, dataset_quality)
 
     if trading_view["active_trade_present"]:
+        plan_context = journal_view.get("current_trade_plan_context")
         if replay_view["status"] == "paused":
             lines = [
                 "Workflow guidance:",
                 "Active trade is open. Advance replay or resume playback to manage it.",
                 "Close the trade before trying to finalize the session.",
             ]
+            _append_plan_context_lines(lines, plan_context)
             return _append_dataset_quality_context(lines, dataset_quality)
         lines = [
             "Workflow guidance:",
             "Active trade is open while replay is running.",
             "Monitor the trade and use manual close when you are ready.",
         ]
+        _append_plan_context_lines(lines, plan_context)
         return _append_dataset_quality_context(lines, dataset_quality)
 
     if summary["pending_review_trade_count"] > 0:
@@ -73,6 +76,7 @@ def build_workflow_guidance_lines(
                 "Latest Bill Williams review still needs linked chart evidence.",
                 f"Latest reviewed trade: {summary.get('latest_reviewed_trade_id') or latest_trade_id}",
             ]
+            _append_plan_context_lines(lines, latest_trade_result.get("current_trade_plan_context"))
             _append_review_messages(lines, summary, latest_trade_result)
             return _append_dataset_quality_context(lines, dataset_quality)
 
@@ -82,6 +86,7 @@ def build_workflow_guidance_lines(
             "The current session is review-complete and ready for standard finalization.",
             f"Latest reviewed trade: {summary.get('latest_reviewed_trade_id') or latest_trade_id}",
         ]
+        _append_plan_context_lines(lines, latest_trade_result.get("current_trade_plan_context") if latest_trade_result else None)
         _append_review_messages(lines, summary, latest_trade_result)
         return _append_dataset_quality_context(lines, dataset_quality)
 
@@ -119,6 +124,8 @@ def _build_review_prompt_lines(
     if latest_trade_result is None:
         prompt_lines.append("Use Force Finalize only if you intentionally want to close the session with pending review.")
         return _append_dataset_quality_context(prompt_lines, dataset_quality)
+
+    _append_plan_context_lines(prompt_lines, latest_trade_result.get("current_trade_plan_context"))
 
     intent_delta = latest_trade_result.get("intent_delta", {})
     completeness = latest_trade_result.get("review_completeness", {})
@@ -234,6 +241,18 @@ def _append_review_messages(lines: list[str], summary: dict[str, Any], latest_tr
         if message and message not in seen:
             lines.append(str(message))
             seen.add(str(message))
+
+
+def _append_plan_context_lines(lines: list[str], plan_context: dict[str, Any] | None) -> None:
+    if plan_context is None:
+        return
+    lines.append(f"Declared plan: {'present' if plan_context.get('plan_present') else 'absent'}")
+    if plan_context.get('declared_setup_tag') is not None:
+        lines.append(f"Declared setup: {plan_context.get('declared_setup_tag')}")
+    if plan_context.get('thesis_summary'):
+        lines.append(f"Thesis summary: {plan_context.get('thesis_summary')}")
+    if plan_context.get('risk_plan'):
+        lines.append(f"Risk plan: {plan_context.get('risk_plan')}")
 
 
 def build_finalization_blocker_lines(journal_view: dict[str, Any]) -> list[str]:

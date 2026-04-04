@@ -2956,3 +2956,101 @@ def test_desktop_shell_surfaces_bill_williams_review_evidence_status_after_reope
         line == "Link a pre-trade or review chart snapshot to back this Bill Williams review."
         for line in workflow_lines
     )
+
+
+
+def test_desktop_shell_surfaces_current_trade_plan_context_and_restart_recovery() -> None:
+    absent_storage = _reset_dir(TMP_ROOT / "plan_context_surfaces_absent")
+    controller_absent = DesktopShellController(dataset_handle=FIXTURE, storage_dir=absent_storage)
+    controller_absent.buy_market()
+    controller_absent.play()
+    controller_absent.advance_frame()
+
+    absent_active_workspace = controller_absent.get_workspace_view()
+    absent_trade_lines = build_trade_context_lines(absent_active_workspace["trading"], absent_active_workspace["journal"])
+    absent_workflow_lines = build_workflow_guidance_lines(
+        absent_active_workspace["replay"],
+        absent_active_workspace["trading"],
+        absent_active_workspace["journal"],
+    )
+    assert any(line == "Declared plan: absent" for line in absent_trade_lines)
+    assert any(line == "Declared plan: absent" for line in absent_workflow_lines)
+
+    controller_absent.manual_close()
+    controller_absent.advance_frame()
+    absent_closed_workspace = controller_absent.get_workspace_view()
+    absent_result_lines = build_latest_result_lines(absent_closed_workspace["journal"])
+    assert any(line == "Declared plan: absent" for line in absent_result_lines)
+
+    full_storage = _reset_dir(TMP_ROOT / "plan_context_surfaces_full")
+    controller_1 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=full_storage)
+    controller_1.create_pre_trade_note(
+        content="Full plan note",
+        setup_tag="BW_2WM_LONG",
+        thesis_summary="expect second wise man continuation",
+        risk_plan="protect below local pullback",
+    )
+    controller_1.buy_market()
+    controller_1.play()
+    controller_1.advance_frame()
+
+    active_workspace_1 = controller_1.get_workspace_view()
+    active_trade_lines_1 = build_trade_context_lines(active_workspace_1["trading"], active_workspace_1["journal"])
+    active_workflow_lines_1 = build_workflow_guidance_lines(
+        active_workspace_1["replay"],
+        active_workspace_1["trading"],
+        active_workspace_1["journal"],
+    )
+    assert any(line == "Declared plan: present" for line in active_trade_lines_1)
+    assert any(line == "Declared setup: BW_2WM_LONG" for line in active_trade_lines_1)
+    assert any(line == "Thesis summary: expect second wise man continuation" for line in active_trade_lines_1)
+    assert any(line == "Risk plan: protect below local pullback" for line in active_trade_lines_1)
+    assert any(line == "Declared plan: present" for line in active_workflow_lines_1)
+    assert any(line == "Declared setup: BW_2WM_LONG" for line in active_workflow_lines_1)
+
+    controller_2 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=full_storage)
+    active_workspace_2 = controller_2.get_workspace_view()
+    recovered_active_trade_lines = build_trade_context_lines(active_workspace_2["trading"], active_workspace_2["journal"])
+    recovered_active_workflow_lines = build_workflow_guidance_lines(
+        active_workspace_2["replay"],
+        active_workspace_2["trading"],
+        active_workspace_2["journal"],
+    )
+    assert active_workspace_2["journal"]["recovered"] is True
+    assert any(line == "Declared plan: present" for line in recovered_active_trade_lines)
+    assert any(line == "Declared setup: BW_2WM_LONG" for line in recovered_active_trade_lines)
+    assert any(line == "Declared plan: present" for line in recovered_active_workflow_lines)
+
+    controller_2.manual_close()
+    controller_2.advance_frame()
+    closed_workspace = controller_2.get_workspace_view()
+    closed_result_lines = build_latest_result_lines(closed_workspace["journal"])
+    closed_workflow_lines = build_workflow_guidance_lines(
+        closed_workspace["replay"],
+        closed_workspace["trading"],
+        closed_workspace["journal"],
+    )
+    assert any(line == "Declared plan: present" for line in closed_result_lines)
+    assert any(line == "Declared setup: BW_2WM_LONG" for line in closed_result_lines)
+    assert any(line == "Thesis summary: expect second wise man continuation" for line in closed_result_lines)
+    assert any(line == "Risk plan: protect below local pullback" for line in closed_result_lines)
+    assert any(line == "Declared plan: present" for line in closed_workflow_lines)
+    assert any(line == "Declared setup: BW_2WM_LONG" for line in closed_workflow_lines)
+
+    controller_3 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=full_storage)
+    recovered_closed_workspace = controller_3.get_workspace_view()
+    recovered_closed_trade_lines = build_trade_context_lines(recovered_closed_workspace["trading"], recovered_closed_workspace["journal"])
+    recovered_closed_result_lines = build_latest_result_lines(recovered_closed_workspace["journal"])
+    recovered_closed_workflow_lines = build_workflow_guidance_lines(
+        recovered_closed_workspace["replay"],
+        recovered_closed_workspace["trading"],
+        recovered_closed_workspace["journal"],
+    )
+    assert recovered_closed_workspace["journal"]["recovered"] is True
+    assert any(line == "Declared plan: present" for line in recovered_closed_trade_lines)
+    assert any(line == "Declared setup: BW_2WM_LONG" for line in recovered_closed_trade_lines)
+    assert any(line == "Declared plan: present" for line in recovered_closed_result_lines)
+    assert any(line == "Declared setup: BW_2WM_LONG" for line in recovered_closed_result_lines)
+    assert any(line == "Thesis summary: expect second wise man continuation" for line in recovered_closed_result_lines)
+    assert any(line == "Risk plan: protect below local pullback" for line in recovered_closed_result_lines)
+    assert any(line == "Declared plan: present" for line in recovered_closed_workflow_lines)

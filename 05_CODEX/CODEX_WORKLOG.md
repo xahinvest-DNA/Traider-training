@@ -366,3 +366,27 @@ The strongest next gain is no longer more protection behavior. It is keeping the
 
 ### Recommended next step
 Implement `T-111: Current Trade Plan Context Slice`.
+
+## 2026-04-04 - T-111 Current Trade Plan Context Slice
+
+### What was done
+- Implemented one bounded derive-on-read current-trade plan-context layer in `runtime_bootstrap/review_projection.py` and `runtime_bootstrap/journal_runtime.py` so linked `PreTradeNote` setup/thesis/risk-plan facts can be rebuilt from existing note and trade records without creating a new owner of truth or persisted summary.
+- Surfaced the compact factual plan context only through existing desktop `context`, `result`, and `workflow` helpers in `desktop_shell/context_surface.py`, `desktop_shell/workflow_surface.py`, and the existing context render path in `desktop_shell/tk_app.py`.
+- Kept the contract factual and compact: plan presence/absence plus declared `setupTag`, `thesisSummary`, and `riskPlan` when present, with active-trade and just-closed continuity from the same linked local facts.
+- Added targeted runtime and desktop tests for plan-absent, setup-only, setup-plus-thesis, full setup/thesis/risk-plan, active-trade continuity, just-closed continuity, and restart recovery during both active and closed states.
+- Synchronized project state and promoted a bounded post-plan-context audit into the next active task packet as `T-112`.
+
+### What was not changed
+- Module documents and tech schemas were not changed.
+- No new persistence entities, plan-status machine, checklist engine, acknowledgment flow, or note-management workflow were introduced.
+- No mentor advice, semantic grading, workflow-engine behavior, protection-lane expansion, dashboard/media scope, mobile, or sync behavior was introduced.
+- `DECISIONS.md` was not changed because no project-level decision was required.
+
+### Why this matters
+The live/current trade loop now keeps the trader anchored to the trader's own declared plan instead of dropping that context after entry. This strengthens continuity and discipline inside the current desktop-first/local-first workflow without turning notes into a new summary owner or turning the UI into a coach.
+
+### Remaining gap after this step
+- The repository now needs a bounded post-Current-Trade-Plan-Context audit so the next slice is selected by product value instead of continuing plan visibility by inertia.
+
+### Recommended next step
+Run `T-112: Post-Current-Trade-Plan-Context Next-Slice Audit`.

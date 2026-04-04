@@ -3330,3 +3330,112 @@ def test_bill_williams_review_evidence_status_derives_from_review_and_snapshot_c
     assert summary_2["latest_bill_williams_review_evidence_follow_up_text"] == (
         "Link a review-context snapshot to complete the Bill Williams review evidence."
     )
+
+
+
+def test_current_trade_plan_context_derives_from_linked_notes_and_recovers() -> None:
+    session_absent = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_absent = MinimalTradingLoop(session_absent)
+    journal_absent = LocalJournalRuntime(session_absent, trading_absent, _reset_dir(TMP_ROOT / "plan_context_absent"))
+
+    trading_absent.buy_market(volume=1.0)
+    session_absent.play()
+    session_absent.advance_frame()
+
+    active_absent_view = build_desktop_journal_view(journal_absent)
+    active_absent_context = active_absent_view["current_trade_plan_context"]
+    assert active_absent_context["trade_status"] == "open"
+    assert active_absent_context["plan_present"] is False
+    assert active_absent_context["declared_setup_tag"] is None
+    assert active_absent_context["thesis_summary"] is None
+    assert active_absent_context["risk_plan"] is None
+
+    trading_absent.manual_close()
+    session_absent.advance_frame()
+
+    closed_absent_result = build_desktop_journal_view(journal_absent)["derived_review_output"]["latest_trade_result"]
+    assert closed_absent_result["current_trade_plan_context"]["plan_present"] is False
+    assert closed_absent_result["current_trade_plan_context"]["declared_setup_tag"] is None
+
+    session_setup = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_setup = MinimalTradingLoop(session_setup)
+    journal_setup = LocalJournalRuntime(session_setup, trading_setup, _reset_dir(TMP_ROOT / "plan_context_setup_only"))
+    journal_setup.create_pre_trade_note(content="Setup-only note", setup_tag="BW_FRACTAL_LONG")
+    trading_setup.buy_market(volume=1.0)
+    session_setup.play()
+    session_setup.advance_frame()
+
+    setup_context = build_desktop_journal_view(journal_setup)["current_trade_plan_context"]
+    assert setup_context["plan_present"] is True
+    assert setup_context["declared_setup_tag"] == "BW_FRACTAL_LONG"
+    assert setup_context["thesis_summary"] is None
+    assert setup_context["risk_plan"] is None
+
+    session_thesis = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_thesis = MinimalTradingLoop(session_thesis)
+    journal_thesis = LocalJournalRuntime(session_thesis, trading_thesis, _reset_dir(TMP_ROOT / "plan_context_setup_thesis"))
+    journal_thesis.create_pre_trade_note(
+        content="Setup and thesis note",
+        setup_tag="BW_1WM_LONG",
+        thesis_summary="wait for continuation after breakout",
+    )
+    trading_thesis.buy_market(volume=1.0)
+    session_thesis.play()
+    session_thesis.advance_frame()
+
+    thesis_context = build_desktop_journal_view(journal_thesis)["current_trade_plan_context"]
+    assert thesis_context["plan_present"] is True
+    assert thesis_context["declared_setup_tag"] == "BW_1WM_LONG"
+    assert thesis_context["thesis_summary"] == "wait for continuation after breakout"
+    assert thesis_context["risk_plan"] is None
+
+    active_storage = _reset_dir(TMP_ROOT / "plan_context_active_recovery")
+    session_active_1 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_active_1 = MinimalTradingLoop(session_active_1)
+    journal_active_1 = LocalJournalRuntime(session_active_1, trading_active_1, active_storage)
+    journal_active_1.create_pre_trade_note(
+        content="Full plan note",
+        setup_tag="BW_2WM_LONG",
+        thesis_summary="expect second wise man continuation",
+        risk_plan="protect below local pullback",
+    )
+    trading_active_1.buy_market(volume=1.0)
+    session_active_1.play()
+    session_active_1.advance_frame()
+
+    active_context_1 = build_desktop_journal_view(journal_active_1)["current_trade_plan_context"]
+    assert active_context_1["trade_status"] == "open"
+    assert active_context_1["plan_present"] is True
+    assert active_context_1["declared_setup_tag"] == "BW_2WM_LONG"
+    assert active_context_1["thesis_summary"] == "expect second wise man continuation"
+    assert active_context_1["risk_plan"] == "protect below local pullback"
+
+    session_active_2 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_active_2 = MinimalTradingLoop(session_active_2)
+    journal_active_2 = LocalJournalRuntime(session_active_2, trading_active_2, active_storage)
+
+    recovered_active_context = build_desktop_journal_view(journal_active_2)["current_trade_plan_context"]
+    assert recovered_active_context == active_context_1
+
+    trading_active_2.manual_close()
+    session_active_2.advance_frame()
+
+    closed_result_1 = build_desktop_journal_view(journal_active_2)["derived_review_output"]["latest_trade_result"]
+    assert closed_result_1["current_trade_plan_context"]["plan_present"] is True
+    assert closed_result_1["current_trade_plan_context"]["declared_setup_tag"] == "BW_2WM_LONG"
+    assert closed_result_1["current_trade_plan_context"]["thesis_summary"] == "expect second wise man continuation"
+    assert closed_result_1["current_trade_plan_context"]["risk_plan"] == "protect below local pullback"
+
+    session_active_3 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_active_3 = MinimalTradingLoop(session_active_3)
+    journal_active_3 = LocalJournalRuntime(session_active_3, trading_active_3, active_storage)
+
+    recovered_closed_view = build_desktop_journal_view(journal_active_3)
+    recovered_closed_context = recovered_closed_view["current_trade_plan_context"]
+    recovered_closed_result = recovered_closed_view["derived_review_output"]["latest_trade_result"]
+    assert recovered_closed_context["trade_status"] == "closed"
+    assert recovered_closed_context["plan_present"] is True
+    assert recovered_closed_context["declared_setup_tag"] == "BW_2WM_LONG"
+    assert recovered_closed_context["thesis_summary"] == "expect second wise man continuation"
+    assert recovered_closed_context["risk_plan"] == "protect below local pullback"
+    assert recovered_closed_result["current_trade_plan_context"] == closed_result_1["current_trade_plan_context"]
