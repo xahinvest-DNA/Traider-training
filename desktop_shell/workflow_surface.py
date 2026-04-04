@@ -65,6 +65,17 @@ def build_workflow_guidance_lines(
                 dataset_quality=dataset_quality,
             )
 
+    if latest_trade_result is not None:
+        follow_up_status = latest_trade_result.get("bill_williams_review_evidence_follow_up_status")
+        if follow_up_status in {"link_any_chart_evidence", "link_pre_trade_snapshot", "link_review_snapshot"}:
+            lines = [
+                "Workflow guidance:",
+                "Latest Bill Williams review still needs linked chart evidence.",
+                f"Latest reviewed trade: {summary.get('latest_reviewed_trade_id') or latest_trade_id}",
+            ]
+            _append_review_messages(lines, summary, latest_trade_result)
+            return _append_dataset_quality_context(lines, dataset_quality)
+
     if summary["closed_trade_count"] > 0 and finalization["can_finalize_without_force"]:
         lines = [
             "Workflow guidance:",
@@ -133,7 +144,11 @@ def _build_review_prompt_lines(
     if pending_review:
         prompt_lines.append("Use Force Finalize only if you intentionally want to close the session with pending review.")
     else:
-        prompt_lines.append("Review detail is sufficient. Standard Finalize is available when you are ready.")
+        follow_up_status = latest_trade_result.get("bill_williams_review_evidence_follow_up_status")
+        if follow_up_status in {"link_any_chart_evidence", "link_pre_trade_snapshot", "link_review_snapshot"}:
+            prompt_lines.append("Complete the linked chart evidence step before treating this review as fully backed.")
+        elif not missing_parts:
+            prompt_lines.append("Review detail is sufficient. Standard Finalize is available when you are ready.")
     return _append_dataset_quality_context(prompt_lines, dataset_quality)
 
 
@@ -181,7 +196,7 @@ def _append_review_messages(lines: list[str], summary: dict[str, Any], latest_tr
         (summary.get("review_discipline_emblem") or {}).get("emblem_text"),
         (summary.get("review_discipline_reason") or {}).get("reason_text"),
         (summary.get("review_dataset_quality_link") or {}).get("link_text"),
-        summary.get("latest_bill_williams_review_evidence_text"),
+        summary.get("latest_bill_williams_review_evidence_follow_up_text"),
     ]
     weak_spots = summary.get("review_weak_spots") or {}
     top_weak_spot_fields = list(weak_spots.get("top_weak_spot_fields") or [])
@@ -206,7 +221,7 @@ def _append_review_messages(lines: list[str], summary: dict[str, Any], latest_tr
             (latest_trade_result.get("review_discipline_emblem") or {}).get("emblem_text"),
             (latest_trade_result.get("review_discipline_reason") or {}).get("reason_text"),
             (latest_trade_result.get("review_dataset_quality_link") or {}).get("link_text"),
-            latest_trade_result.get("bill_williams_review_evidence_text"),
+            latest_trade_result.get("bill_williams_review_evidence_follow_up_text"),
         ])
     seen: set[str] = set()
     for message in message_fields:

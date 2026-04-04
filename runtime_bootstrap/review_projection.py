@@ -86,6 +86,11 @@ def build_trade_review_result(
         linked_snapshot_summaries=linked_snapshot_summaries,
         method_facets=method_facets,
     )
+    review_evidence_follow_up = _build_bill_williams_review_evidence_follow_up(
+        evidence_status=review_evidence_status["evidence_status"],
+        latest_note_snapshot=latest_note_snapshot,
+        latest_review_snapshots=latest_review_snapshots,
+    )
 
     return {
         "trade_id": trade.trade_id,
@@ -125,6 +130,8 @@ def build_trade_review_result(
         "bill_williams_review_evidence_status": review_evidence_status["evidence_status"],
         "bill_williams_review_evidence_text": review_evidence_status["evidence_text"],
         "has_bill_williams_review_evidence": review_evidence_status["has_bill_williams_review_evidence"],
+        "bill_williams_review_evidence_follow_up_status": review_evidence_follow_up["follow_up_status"],
+        "bill_williams_review_evidence_follow_up_text": review_evidence_follow_up["follow_up_text"],
         "pre_trade_note_count": len(trade_notes),
         "post_trade_review_count": len(trade_reviews),
         "behavioral_flag_count": len(trade_flags),
@@ -211,6 +218,12 @@ def build_session_review_output(
             1
             for result in trade_results
             if result["bill_williams_review_evidence_status"] in {"linked_evidence_missing", "linked_evidence_partial"}
+        ),
+        "reviewed_trades_requiring_bw_evidence_follow_up_count": sum(
+            1
+            for result in trade_results
+            if result["bill_williams_review_evidence_follow_up_status"]
+            in {"link_any_chart_evidence", "link_pre_trade_snapshot", "link_review_snapshot"}
         ),
         "trades_with_method_facets_count": sum(
             1 for result in trade_results if result["has_method_facets"]
@@ -365,6 +378,7 @@ def build_session_review_summary(
         "can_finalize_with_force": finalization_projection["can_finalize_with_force"],
         "reviewed_trades_with_bw_evidence_count": review_output["reviewed_trades_with_bw_evidence_count"],
         "reviewed_trades_missing_bw_evidence_count": review_output["reviewed_trades_missing_bw_evidence_count"],
+        "reviewed_trades_requiring_bw_evidence_follow_up_count": review_output["reviewed_trades_requiring_bw_evidence_follow_up_count"],
         "latest_trade_id": latest_trade_result["trade_id"] if latest_trade_result else None,
         "latest_trade_outcome_label": latest_trade_result["outcome_label"] if latest_trade_result else None,
         "latest_review_status": latest_trade_result["review_status"] if latest_trade_result else None,
@@ -379,6 +393,14 @@ def build_session_review_summary(
         ),
         "latest_bill_williams_review_evidence_text": (
             latest_trade_result["bill_williams_review_evidence_text"] if latest_trade_result else None
+        ),
+        "latest_bill_williams_review_evidence_follow_up_status": (
+            latest_trade_result["bill_williams_review_evidence_follow_up_status"]
+            if latest_trade_result
+            else "not_applicable"
+        ),
+        "latest_bill_williams_review_evidence_follow_up_text": (
+            latest_trade_result["bill_williams_review_evidence_follow_up_text"] if latest_trade_result else None
         ),
         "latest_linked_chart_snapshot_count": (
             latest_trade_result["linked_chart_snapshot_count"] if latest_trade_result else 0
@@ -1960,6 +1982,51 @@ def _build_bill_williams_review_evidence_status(
         "evidence_text": "Bill Williams review is backed by linked chart context.",
         "has_bill_williams_review_evidence": True,
     }
+
+def _build_bill_williams_review_evidence_follow_up(
+    evidence_status: str,
+    latest_note_snapshot: dict | None,
+    latest_review_snapshots: list[dict],
+) -> dict:
+    if evidence_status == "not_applicable":
+        return {
+            "follow_up_status": "not_applicable",
+            "follow_up_text": None,
+        }
+
+    if evidence_status == "linked_evidence_present":
+        return {
+            "follow_up_status": "follow_up_not_needed",
+            "follow_up_text": None,
+        }
+
+    if evidence_status == "linked_evidence_missing":
+        return {
+            "follow_up_status": "link_any_chart_evidence",
+            "follow_up_text": "Link a pre-trade or review chart snapshot to back this Bill Williams review.",
+        }
+
+    if evidence_status == "linked_evidence_partial":
+        if latest_note_snapshot is None:
+            return {
+                "follow_up_status": "link_pre_trade_snapshot",
+                "follow_up_text": "Link a pre-trade chart snapshot to complete the Bill Williams review evidence.",
+            }
+        if not latest_review_snapshots:
+            return {
+                "follow_up_status": "link_review_snapshot",
+                "follow_up_text": "Link a review-context snapshot to complete the Bill Williams review evidence.",
+            }
+        return {
+            "follow_up_status": "link_any_chart_evidence",
+            "follow_up_text": "Link the missing chart snapshot context to complete the Bill Williams review evidence.",
+        }
+
+    return {
+        "follow_up_status": "not_applicable",
+        "follow_up_text": None,
+    }
+
 
 def _build_review_field_coverage(trade_results: list[dict]) -> dict:
     reviewed_results = [result for result in trade_results if result["review_status"] == "reviewed"]

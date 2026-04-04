@@ -3027,19 +3027,36 @@ def test_bill_williams_review_evidence_status_derives_from_review_and_snapshot_c
         "linked_evidence_missing",
         "linked_evidence_partial",
     ]
+    assert [result["bill_williams_review_evidence_follow_up_status"] for result in trade_results_1] == [
+        "follow_up_not_needed",
+        "link_any_chart_evidence",
+        "link_review_snapshot",
+    ]
     assert trade_results_1[0]["bill_williams_review_evidence_text"] == "Bill Williams review is backed by linked chart context."
     assert trade_results_1[1]["bill_williams_review_evidence_text"] == "Bill Williams review is filled, but no linked chart evidence is attached yet."
     assert trade_results_1[2]["bill_williams_review_evidence_text"] == (
         "Bill Williams review has partial chart evidence; still missing review context."
+    )
+    assert trade_results_1[0]["bill_williams_review_evidence_follow_up_text"] is None
+    assert trade_results_1[1]["bill_williams_review_evidence_follow_up_text"] == (
+        "Link a pre-trade or review chart snapshot to back this Bill Williams review."
+    )
+    assert trade_results_1[2]["bill_williams_review_evidence_follow_up_text"] == (
+        "Link a review-context snapshot to complete the Bill Williams review evidence."
     )
     assert trade_results_1[0]["has_bill_williams_review_evidence"] is True
     assert trade_results_1[1]["has_bill_williams_review_evidence"] is False
     assert trade_results_1[2]["has_bill_williams_review_evidence"] is False
     assert summary_1["reviewed_trades_with_bw_evidence_count"] == 1
     assert summary_1["reviewed_trades_missing_bw_evidence_count"] == 2
+    assert summary_1["reviewed_trades_requiring_bw_evidence_follow_up_count"] == 2
     assert summary_1["latest_bill_williams_review_evidence_status"] == "linked_evidence_partial"
     assert summary_1["latest_bill_williams_review_evidence_text"] == (
         "Bill Williams review has partial chart evidence; still missing review context."
+    )
+    assert summary_1["latest_bill_williams_review_evidence_follow_up_status"] == "link_review_snapshot"
+    assert summary_1["latest_bill_williams_review_evidence_follow_up_text"] == (
+        "Link a review-context snapshot to complete the Bill Williams review evidence."
     )
 
     session_2 = create_replay_session(str(dataset_dir), replay_mode="training")
@@ -3054,9 +3071,19 @@ def test_bill_williams_review_evidence_status_derives_from_review_and_snapshot_c
         "linked_evidence_missing",
         "linked_evidence_partial",
     ]
+    assert [result["bill_williams_review_evidence_follow_up_status"] for result in trade_results_2] == [
+        "follow_up_not_needed",
+        "link_any_chart_evidence",
+        "link_review_snapshot",
+    ]
     assert summary_2["reviewed_trades_with_bw_evidence_count"] == 1
     assert summary_2["reviewed_trades_missing_bw_evidence_count"] == 2
+    assert summary_2["reviewed_trades_requiring_bw_evidence_follow_up_count"] == 2
     assert summary_2["latest_bill_williams_review_evidence_status"] == "linked_evidence_partial"
     assert summary_2["latest_bill_williams_review_evidence_text"] == (
         "Bill Williams review has partial chart evidence; still missing review context."
+    )
+    assert summary_2["latest_bill_williams_review_evidence_follow_up_status"] == "link_review_snapshot"
+    assert summary_2["latest_bill_williams_review_evidence_follow_up_text"] == (
+        "Link a review-context snapshot to complete the Bill Williams review evidence."
     )

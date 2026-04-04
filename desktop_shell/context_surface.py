@@ -84,6 +84,8 @@ def build_review_summary_lines(journal_view: dict[str, Any]) -> list[str]:
     review_dataset_quality_link = summary.get("review_dataset_quality_link") or {}
     latest_evidence_status = summary.get("latest_bill_williams_review_evidence_status") or "-"
     latest_evidence_text = summary.get("latest_bill_williams_review_evidence_text") or "-"
+    latest_follow_up_status = summary.get("latest_bill_williams_review_evidence_follow_up_status") or "-"
+    latest_follow_up_text = summary.get("latest_bill_williams_review_evidence_follow_up_text") or "-"
     dataset_quality = journal_view.get("dataset_quality_context") or {}
     coverage = summary.get("review_field_coverage") or {}
     completed_facets = sum(1 for value in latest_method_facets.values() if value)
@@ -102,6 +104,7 @@ def build_review_summary_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Snapshot-linked trades: {summary['trades_with_linked_chart_snapshots_count']}",
         f"Reviewed trades with BW evidence: {summary.get('reviewed_trades_with_bw_evidence_count', 0)}",
         f"Reviewed trades missing BW evidence: {summary.get('reviewed_trades_missing_bw_evidence_count', 0)}",
+        f"Reviewed trades needing BW evidence follow-up: {summary.get('reviewed_trades_requiring_bw_evidence_follow_up_count', 0)}",
         f"Method-facet trades: {summary['trades_with_method_facets_count']}",
         f"Intent confirmed/refined/changed: {summary['intent_confirmed_count']} / {summary['intent_refined_count']} / {summary['intent_changed_count']}",
         f"Intent missing / review missing: {summary['intent_missing_count']} / {summary['review_missing_count']}",
@@ -193,6 +196,8 @@ def build_review_summary_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Review dataset link text: {review_dataset_quality_link.get('link_text') or '-'}",
         f"Latest BW evidence: {latest_evidence_status}",
         f"Latest BW evidence text: {latest_evidence_text}",
+        f"Latest BW evidence follow-up: {latest_follow_up_status}",
+        f"Latest BW evidence next step: {latest_follow_up_text}",
         f"Dataset quality context: {dataset_quality.get('context_status') or '-'}",
         f"Dataset quality text: {dataset_quality.get('context_text') or '-'}",
         f"Latest review status: {summary['latest_review_status'] or '-'}",
@@ -245,6 +250,8 @@ def build_latest_result_lines(journal_view: dict[str, Any]) -> list[str]:
     review_dataset_quality_link = latest_trade_result.get("review_dataset_quality_link", {})
     review_evidence_status = latest_trade_result.get("bill_williams_review_evidence_status") or "-"
     review_evidence_text = latest_trade_result.get("bill_williams_review_evidence_text") or "-"
+    review_follow_up_status = latest_trade_result.get("bill_williams_review_evidence_follow_up_status") or "-"
+    review_follow_up_text = latest_trade_result.get("bill_williams_review_evidence_follow_up_text") or "-"
     dataset_quality = journal_view.get("dataset_quality_context") or {}
     missing_parts = ", ".join(completeness["missing_parts"]) or "none"
     recommended_order = " -> ".join(review_sequence["recommended_missing_order"]) or "none"
@@ -290,6 +297,8 @@ def build_latest_result_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Review dataset link text: {review_dataset_quality_link.get('link_text') or '-'}",
         f"Review evidence: {review_evidence_status}",
         f"Review evidence text: {review_evidence_text}",
+        f"Review evidence follow-up: {review_follow_up_status}",
+        f"Review evidence next step: {review_follow_up_text}",
         f"Dataset quality context: {dataset_quality.get('context_status') or '-'}",
         f"Dataset quality text: {dataset_quality.get('context_text') or '-'}",
         f"Review status: {latest_trade_result['review_status']}",

@@ -2852,19 +2852,36 @@ def test_desktop_shell_surfaces_bill_williams_review_evidence_status_after_reope
         line == "Review evidence text: Bill Williams review is filled, but no linked chart evidence is attached yet."
         for line in latest_result_lines
     )
+    assert any(line == "Review evidence follow-up: link_any_chart_evidence" for line in latest_result_lines)
+    assert any(
+        line == "Review evidence next step: Link a pre-trade or review chart snapshot to back this Bill Williams review."
+        for line in latest_result_lines
+    )
     assert any(line == "Review evidence: linked_evidence_missing" for line in history_lines)
     assert any(
         line == "Review evidence text: Bill Williams review is filled, but no linked chart evidence is attached yet."
         for line in history_lines
     )
+    assert any(line == "Review evidence follow-up: link_any_chart_evidence" for line in history_lines)
+    assert any(
+        line == "Review evidence next step: Link a pre-trade or review chart snapshot to back this Bill Williams review."
+        for line in history_lines
+    )
     assert any(line == "Reviewed trades with BW evidence: 0" for line in summary_lines)
     assert any(line == "Reviewed trades missing BW evidence: 1" for line in summary_lines)
+    assert any(line == "Reviewed trades needing BW evidence follow-up: 1" for line in summary_lines)
     assert any(line == "Latest BW evidence: linked_evidence_missing" for line in summary_lines)
     assert any(
         line == "Latest BW evidence text: Bill Williams review is filled, but no linked chart evidence is attached yet."
         for line in summary_lines
     )
+    assert any(line == "Latest BW evidence follow-up: link_any_chart_evidence" for line in summary_lines)
     assert any(
-        line == "Bill Williams review is filled, but no linked chart evidence is attached yet."
+        line == "Latest BW evidence next step: Link a pre-trade or review chart snapshot to back this Bill Williams review."
+        for line in summary_lines
+    )
+    assert not any(line == "Review detail is sufficient. Standard Finalize is available when you are ready." for line in workflow_lines)
+    assert any(
+        line == "Link a pre-trade or review chart snapshot to back this Bill Williams review."
         for line in workflow_lines
     )

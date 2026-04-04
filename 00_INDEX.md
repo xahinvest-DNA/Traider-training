@@ -2,8 +2,8 @@
 
 Last updated: 2026-04-04
 Project status: replay bootstrap, minimal trading loop, local-first session/journal loop, minimum Bill Williams review hooks, manual flags/violations, derived review output, session result metrics, session timeline projection, chart snapshot references, snapshot timeline exposure, snapshot-aware review output, session finalization, compact session review summary, MVP acceptance pass, desktop shell implementation boundary, first desktop shell coding slice, chart/replay refinement, session/trade context refinement, notes/review authoring refinement, current-session history/result refinement, workflow guidance/action feedback refinement, desktop shell layout/usability polish, desktop MVP acceptance/smoke pass, desktop launch path, desktop handoff/readiness, MVP pause point, first post-MVP direction selection, Bill Williams review-depth boundary, Bill Williams review-depth coding slice, Bill Williams review-delta slice, Bill Williams review-completeness slice, Bill Williams review-prompts slice, Bill Williams review-coverage slice, Bill Williams review-sequence slice, Bill Williams review-weak-spots slice, Bill Williams review-progress slice, Bill Williams review-momentum slice, Bill Williams review-stability slice, Bill Williams review-swings slice, Bill Williams review-floor slice, Bill Williams review-ceiling slice, Bill Williams review-band slice, Bill Williams review-headroom slice, Bill Williams review-pressure slice, Bill Williams review-target slice, Bill Williams review-focus slice, Bill Williams review-cue slice, Bill Williams review-badge slice, Bill Williams review-pill slice, Bill Williams review-chip slice, Bill Williams review-tag slice, Bill Williams review-token slice, Bill Williams review-marker slice, Bill Williams review-glyph slice, Bill Williams review-sigil slice, Bill Williams review-seal slice, Bill Williams review-crest slice, Bill Williams review-emblem slice, Bill Williams review-insignia slice, Bill Williams review-standard slice, Bill Williams review-banner slice, Bill Williams review-pennant slice, and Bill Williams review-streamer slice are implemented; bounded raw-dataset import, dataset-import hardening, dataset-quality context, dataset-quality review link, dataset-quality finalization link, dataset-quality restart-recovery note, dataset-quality recovery feedback, dataset-quality recovery acknowledgment, desktop chart snapshot authoring, and review-discipline-reason slices are implemented
-Active module: bounded post-evidence-status audit completed; next bounded slice selected as Bill Williams review evidence follow-up
-Current focus: implement one compact Bill Williams review evidence-follow-up slice so the current desktop-first journal/review flow can show the safest next evidence-completion step when reviewed method interpretation still lacks linked chart context, without drifting into media workflow, dashboard scope, mentor logic, mobile, or sync
+Active module: Bill Williams review evidence follow-up implemented; next bounded step returns to a post-implementation audit
+Current focus: run one bounded post-evidence-follow-up audit so the repository selects the next strongest product-facing slice instead of continuing the evidence chain by inertia or drifting into media workflow, dashboard scope, mentor logic, mobile, or sync
 
 ## Purpose
 
@@ -150,8 +150,8 @@ A new chat must start by reading:
 
 ## Next steps
 
-1. Implement the bounded `Bill Williams Review Evidence Follow-Up` slice selected by the post-evidence-status audit.
-2. Prefer one compact evidence-follow-up cue over any further symbolic evidence labels or snapshot/recovery micro-polish.
+1. Run the bounded post-evidence-follow-up audit to select the next strongest product-facing slice.
+2. Do not continue the evidence chain with more labels, follow-up states, or snapshot/recovery micro-polish unless a later audit proves real product value.
 3. Keep snapshot support local-first and reference-only; do not reopen screenshot automation, gallery/media workflow, validation, sync, or dashboard scope.
 4. Do not break replay-centered bootstrap, the working trading loop, local journal runtime, thin desktop-shell boundary, accepted launch/readiness behavior, or the current recovery/finalization and snapshot-aware review flows.
 

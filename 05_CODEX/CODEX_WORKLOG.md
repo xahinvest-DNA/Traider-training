@@ -154,3 +154,45 @@ Run one bounded managerial audit after `Bill Williams Review Evidence Status` so
 
 ### Recommended next step
 Implement `T-104: Bill Williams Review Evidence Follow-Up Slice`.
+
+
+## 2026-04-04 ? T-104 Bill Williams Review Evidence Follow-Up
+
+### Goal
+Implement one bounded derive-on-read follow-up layer so the current desktop-first review flow can show the safest next evidence-completion step when reviewed Bill Williams interpretation still has missing or partial linked chart context, without adding persistence, queueing, blocker state, media workflow, dashboards, mentor logic, mobile, or sync.
+
+### Files updated
+- `runtime_bootstrap/review_projection.py`
+- `desktop_shell/context_surface.py`
+- `desktop_shell/history_surface.py`
+- `desktop_shell/workflow_surface.py`
+- `tests/test_replay_bootstrap.py`
+- `tests/test_desktop_shell.py`
+- `00_INDEX.md`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Added one derive-on-read evidence follow-up in `runtime_bootstrap/review_projection.py` on top of the existing evidence-status layer.
+- Kept the follow-up action-oriented instead of diagnostic-only: missing evidence now maps to `link_any_chart_evidence`, and partial evidence maps to the specific missing snapshot side when existing facts allow it.
+- Added lightweight current-session follow-up-needed counts and latest follow-up status/text to session review summary output.
+- Surfaced the new signal only through existing result/history/context/workflow helpers.
+- Adjusted workflow guidance so it no longer implies the review is fully ready when an evidence follow-up step is still needed.
+- Covered restart recovery in runtime and desktop tests using the same existing local storage facts after reopen.
+
+### What was not changed
+- No new persistence entities, queues, acknowledgments, blockers, or workflow-engine state were introduced.
+- `runtime_bootstrap/desktop_projection.py` was not expanded into a new owner of state.
+- No new desktop subsystem, gallery/media flow, dashboard behavior, mentor logic, mobile layer, or sync behavior was introduced.
+- No module docs or schema docs were changed.
+
+### Why this matters
+`T-102` solved diagnosis and `T-104` solved actionability: the user now sees the next useful evidence-completion step instead of just another passive evidence status. No further evidence-layer continuation is needed right now because the product gap has shifted away from evidence visibility/actionability and back to selecting the next strongest bounded frontier.
+
+### Remaining gap after this step
+- The repository now needs a bounded audit to choose the next strongest post-MVP slice after evidence follow-up instead of extending the evidence chain further.
+
+### Recommended next step
+Run `T-105: Post-Evidence-Follow-Up Next-Slice Audit`.

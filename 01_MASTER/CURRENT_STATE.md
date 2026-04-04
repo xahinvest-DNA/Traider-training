@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-04
-Current stage: bounded post-implementation audit completed after Bill Williams Review Evidence Status
-Active module: Bill Williams Review Evidence Follow-Up selected as the next bounded coding slice
-Active question: how to turn the new Bill Williams review evidence status into one clear review-facing next step when chart context is still missing or partial, without turning the workflow into a new engine, dashboard, media layer, mentor system, mobile, or sync feature
+Current stage: Bill Williams Review Evidence Follow-Up implemented after the bounded post-evidence-status audit
+Active module: Bill Williams Review Evidence Follow-Up implemented; next bounded step returns to a post-implementation audit
+Active question: which single bounded post-MVP slice now gives the strongest user-visible gain after Bill Williams review evidence follow-up, without restarting another evidence-layer chain or drifting into media workflow, dashboards, mentor logic, mobile, sync, or new persistence
 
 ## Where the project is now
 
@@ -91,6 +91,7 @@ At this point:
 - derive-on-read Bill Williams review discipline emblem is implemented across current trade review output, session summary, and desktop context/history/workflow surfaces;
 - derive-on-read Bill Williams review discipline reason is implemented across current trade review output, session summary, and desktop context/history/workflow surfaces;
 - derive-on-read Bill Williams review evidence status is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces using only existing review facts and linked snapshot refs, with restart recovery covered from existing local facts;
+- derive-on-read Bill Williams review evidence follow-up is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces so missing or partial chart evidence now maps to one compact next-step cue rebuilt from existing local facts after restart;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
 - desktop launch now accepts raw dataset files, auto-imports them into local normalized artifacts before controller bootstrap, auto-relaunches through the ASCII-path Tk-capable interpreter `C:\Python311\python.exe` when the current Python cannot initialize Tk/Tcl, and still falls back to a non-GUI readiness report if no working Tk runtime is available;
 - compact dataset-quality status and raw-import warning previews are now surfaced in replay headers and non-GUI readiness reports without adding new persistence or provider-management layers;
@@ -145,7 +146,7 @@ At this point:
 
 ## Next step
 
-The next working step is to implement the bounded Bill Williams Review Evidence Follow-Up slice so the current desktop-first review flow can turn missing or partial chart evidence into one compact next-step cue, without adding persistence, media workflow, dashboard scope, mentor logic, mobile, sync, or a new workflow engine.
+The next working step is to run one bounded post-implementation audit after Bill Williams Review Evidence Follow-Up so the repository selects one strongest next product-facing slice instead of continuing the evidence chain with more labels, follow-up states, or micro-polish.
 
 ## What must not be lost in a new chat
 

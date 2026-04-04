@@ -830,8 +830,16 @@
 
 ### T-104
 
-- Status: active
+- Status: completed
 - Module: Bill Williams Review Evidence Follow-Up Slice
 - Goal: expose one compact derive-on-read follow-up cue so the current desktop-first review flow can show the safest next evidence-completion step when reviewed Bill Williams interpretation still has missing or partial linked chart context, without expanding into mentor logic, scoring, dashboards, media workflow, mobile, sync, or new persistence.
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/BILL_WILLIAMS_LAYER.md`, `03_MODULES/JOURNAL_ANALYTICS.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_STATUS.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_FOLLOW_UP.md`
 - Expected result: one bounded Bill Williams review-evidence-follow-up projection across current review output, compact current-session summary exposure, and existing desktop result/history/context/workflow surfaces only.
+
+### T-105
+
+- Status: active
+- Module: Post-Evidence-Follow-Up Next-Slice Audit
+- Goal: run one bounded managerial audit after Bill Williams Review Evidence Follow-Up so the repository selects the single strongest next product-facing slice instead of continuing the evidence chain with more labels, extra follow-up states, recovery-tail polish, or drift into media workflow, dashboards, mentor logic, mobile, sync, or new persistence.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/BILL_WILLIAMS_LAYER.md`, `03_MODULES/JOURNAL_ANALYTICS.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_STATUS.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_FOLLOW_UP.md`
+- Expected result: one explicit bounded next-step decision plus one implementation-facing document only if the audit finds a clearly justified next slice.
