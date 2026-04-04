@@ -2811,3 +2811,60 @@ def test_desktop_shell_controller_exposes_chart_snapshot_authoring_flow() -> Non
     latest_result = journal_view["derived_review_output"]["latest_trade_result"]
     assert latest_result["linked_chart_snapshot_count"] == 2
     assert latest_result["linked_chart_snapshot_ids"] == [pre_snapshot_id, review_snapshot_id]
+
+def test_desktop_shell_surfaces_bill_williams_review_evidence_status_after_reopen() -> None:
+    storage_dir = _reset_dir(TMP_ROOT / "review_evidence_status_surfaces_state")
+
+    controller_1 = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=storage_dir,
+    )
+    controller_1.buy_market()
+    controller_1.play()
+    controller_1.advance_frame()
+    controller_1.manual_close()
+    controller_1.advance_frame()
+    controller_1.pause()
+    controller_1.create_post_trade_review(
+        content="Reviewed method without chart evidence",
+        setup_tag="BW_FRACTAL_LONG",
+        compliance_label="valid_setup",
+    )
+
+    controller_2 = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=storage_dir,
+    )
+    reopened_workspace = controller_2.get_workspace_view()
+    journal_view = reopened_workspace["journal"]
+    latest_result_lines = build_latest_result_lines(journal_view)
+    history_lines = build_latest_trade_result_lines(journal_view)
+    summary_lines = build_review_summary_lines(journal_view)
+    workflow_lines = build_workflow_guidance_lines(
+        reopened_workspace["replay"],
+        reopened_workspace["trading"],
+        journal_view,
+    )
+
+    assert reopened_workspace["journal"]["recovered"] is True
+    assert any(line == "Review evidence: linked_evidence_missing" for line in latest_result_lines)
+    assert any(
+        line == "Review evidence text: Bill Williams review is filled, but no linked chart evidence is attached yet."
+        for line in latest_result_lines
+    )
+    assert any(line == "Review evidence: linked_evidence_missing" for line in history_lines)
+    assert any(
+        line == "Review evidence text: Bill Williams review is filled, but no linked chart evidence is attached yet."
+        for line in history_lines
+    )
+    assert any(line == "Reviewed trades with BW evidence: 0" for line in summary_lines)
+    assert any(line == "Reviewed trades missing BW evidence: 1" for line in summary_lines)
+    assert any(line == "Latest BW evidence: linked_evidence_missing" for line in summary_lines)
+    assert any(
+        line == "Latest BW evidence text: Bill Williams review is filled, but no linked chart evidence is attached yet."
+        for line in summary_lines
+    )
+    assert any(
+        line == "Bill Williams review is filled, but no linked chart evidence is attached yet."
+        for line in workflow_lines
+    )

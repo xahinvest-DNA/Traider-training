@@ -77,3 +77,42 @@ The project had already closed the recovery-tail and made chart snapshots usable
 
 ### Recommended next step
 Implement `T-102: Bill Williams Review Evidence Status Slice`.
+
+## 2026-04-04 — T-102 Bill Williams Review Evidence Status
+
+### Goal
+Implement one bounded derive-on-read evidence-status layer so the current desktop-first review flow can show whether reviewed Bill Williams interpretation is backed by linked chart context, without adding persistence, media workflow, dashboards, mentor logic, mobile, or sync.
+
+### Files updated
+- `runtime_bootstrap/review_projection.py`
+- `desktop_shell/context_surface.py`
+- `desktop_shell/history_surface.py`
+- `desktop_shell/workflow_surface.py`
+- `tests/test_replay_bootstrap.py`
+- `tests/test_desktop_shell.py`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Added derive-on-read Bill Williams review evidence status in `runtime_bootstrap/review_projection.py` from existing `PostTradeReview` method facts plus linked chart snapshot refs already stored in notes/reviews.
+- Surfaced the new signal through existing desktop result, history, context, and workflow helpers without introducing a new UI subsystem.
+- Added lightweight current-session evidence-present vs evidence-missing counts to session review output and summary.
+- Covered restart recovery in runtime and desktop tests by rebuilding controllers/runtime from the same local storage and asserting the same evidence status after reopen.
+- Fixed one summary/history-surface regression caught by the full suite before closing the slice.
+
+### What was not changed
+- No new persistence entities were introduced.
+- `runtime_bootstrap/desktop_projection.py` was not expanded with a new state model.
+- No new module docs or schema docs were changed.
+- No new desktop subsystem or workflow owner was introduced.
+
+### Why this matters
+Snapshot authoring now has direct training value inside the review loop: the user can see when a reviewed Bill Williams interpretation is actually backed by linked chart context and when it is not.
+
+### Remaining gap after this step
+- The repository now needs a bounded audit to select the next strongest post-MVP slice after evidence-status, rather than continuing the evidence chain by inertia.
+
+### Recommended next step
+Run `T-103: Post-Evidence-Status Next-Slice Audit`.

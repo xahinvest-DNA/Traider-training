@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from typing import Any
 
@@ -181,6 +181,7 @@ def _append_review_messages(lines: list[str], summary: dict[str, Any], latest_tr
         (summary.get("review_discipline_emblem") or {}).get("emblem_text"),
         (summary.get("review_discipline_reason") or {}).get("reason_text"),
         (summary.get("review_dataset_quality_link") or {}).get("link_text"),
+        summary.get("latest_bill_williams_review_evidence_text"),
     ]
     weak_spots = summary.get("review_weak_spots") or {}
     top_weak_spot_fields = list(weak_spots.get("top_weak_spot_fields") or [])
@@ -205,6 +206,7 @@ def _append_review_messages(lines: list[str], summary: dict[str, Any], latest_tr
             (latest_trade_result.get("review_discipline_emblem") or {}).get("emblem_text"),
             (latest_trade_result.get("review_discipline_reason") or {}).get("reason_text"),
             (latest_trade_result.get("review_dataset_quality_link") or {}).get("link_text"),
+            latest_trade_result.get("bill_williams_review_evidence_text"),
         ])
     seen: set[str] = set()
     for message in message_fields:

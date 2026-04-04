@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from typing import Any
 
@@ -23,6 +23,8 @@ def build_latest_trade_result_lines(journal_view: dict[str, Any]) -> list[str]:
     discipline_emblem = latest.get("review_discipline_emblem", {})
     discipline_reason = latest.get("review_discipline_reason", {})
     dataset_quality_link = latest.get("review_dataset_quality_link", {})
+    review_evidence_status = latest.get("bill_williams_review_evidence_status") or "-"
+    review_evidence_text = latest.get("bill_williams_review_evidence_text") or "-"
     missing_parts = ", ".join(completeness["missing_parts"]) or "none"
     recommended_order = " -> ".join(review_sequence["recommended_missing_order"]) or "none"
     return [
@@ -66,8 +68,8 @@ def build_latest_trade_result_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Discipline reason text: {discipline_reason.get('reason_text') or '-'}",
         f"Review dataset link: {dataset_quality_link.get('link_status') or '-'}",
         f"Review dataset link text: {dataset_quality_link.get('link_text') or '-'}",
-        f"Review dataset link: {dataset_quality_link.get('link_status') or '-'}",
-        f"Review dataset link text: {dataset_quality_link.get('link_text') or '-'}",
+        f"Review evidence: {review_evidence_status}",
+        f"Review evidence text: {review_evidence_text}",
     ]
 
 
@@ -127,6 +129,8 @@ def build_history_status_lines(journal_view: dict[str, Any]) -> list[str]:
     discipline_emblem = summary.get("review_discipline_emblem") or {}
     discipline_reason = summary.get("review_discipline_reason") or {}
     dataset_quality_link = summary.get("review_dataset_quality_link") or {}
+    latest_evidence_status = summary.get("latest_bill_williams_review_evidence_status") or "-"
+    latest_evidence_text = summary.get("latest_bill_williams_review_evidence_text") or "-"
     latest_trade_result = derived.get("latest_trade_result") or {}
     latest_review_sequence = latest_trade_result.get("review_sequence", {})
     weak_spot_fields = ", ".join(weak_spots.get("top_weak_spot_fields", [])) or "none"
@@ -137,6 +141,8 @@ def build_history_status_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Closed trades: {derived['closed_trade_count']}",
         f"Reviewed / pending: {derived['reviewed_trade_count']} / {derived['pending_review_trade_count']}",
         f"Method-facet trades: {derived['trades_with_method_facets_count']}",
+        f"Reviewed trades with BW evidence: {derived.get('reviewed_trades_with_bw_evidence_count', 0)}",
+        f"Reviewed trades missing BW evidence: {derived.get('reviewed_trades_missing_bw_evidence_count', 0)}",
         f"Intent confirmed/refined/changed: {derived['intent_confirmed_count']} / {derived['intent_refined_count']} / {derived['intent_changed_count']}",
         f"Intent missing / review missing: {derived['intent_missing_count']} / {derived['review_missing_count']}",
         f"Review complete/partial/sparse: {derived['review_complete_count']} / {derived['review_partial_count']} / {derived['review_sparse_count']}",
@@ -223,9 +229,12 @@ def build_history_status_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Discipline reason text: {discipline_reason.get('reason_text') or '-'}",
         f"Review dataset link: {dataset_quality_link.get('link_status') or '-'}",
         f"Review dataset link text: {dataset_quality_link.get('link_text') or '-'}",
+        f"Latest BW evidence: {latest_evidence_status}",
+        f"Latest BW evidence text: {latest_evidence_text}",
         f"Coverage setup/compliance: {coverage.get('setup_tag_coverage_count', 0)}/{coverage.get('total_reviewed_trades', 0)} / {coverage.get('compliance_label_coverage_count', 0)}/{coverage.get('total_reviewed_trades', 0)}",
         f"Coverage entry/context: {coverage.get('entry_timing_coverage_count', 0)}/{coverage.get('total_reviewed_trades', 0)} / {coverage.get('market_context_coverage_count', 0)}/{coverage.get('total_reviewed_trades', 0)}",
         f"Coverage exit/clarity: {coverage.get('exit_quality_coverage_count', 0)}/{coverage.get('total_reviewed_trades', 0)} / {coverage.get('review_clarity_coverage_count', 0)}/{coverage.get('total_reviewed_trades', 0)}",
         f"Timeline items: {timeline['timeline_item_count']}",
         f"Latest timeline event: {latest['title'] if latest else '-'}",
     ]
+

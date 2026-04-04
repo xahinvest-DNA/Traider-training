@@ -814,8 +814,16 @@
 
 ### T-102
 
-- Status: active
+- Status: completed
 - Module: Bill Williams Review Evidence Status Slice
 - Goal: expose one compact derive-on-read evidence-status layer so the current desktop-first review flow can show whether reviewed Bill Williams interpretation is backed by linked chart context, without drifting into gallery/media workflow, mentor scoring, dashboard expansion, mobile, sync, or new persistence entities.
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `03_MODULES/BILL_WILLIAMS_LAYER.md`, `03_MODULES/JOURNAL_ANALYTICS.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_STATUS.md`, `05_CODEX/CHART_SNAPSHOT_REFERENCES.md`, `05_CODEX/SNAPSHOT_AWARE_REVIEW_OUTPUT.md`, `05_CODEX/SESSION_REVIEW_SUMMARY.md`
 - Expected result: one bounded Bill Williams review-evidence status projection across current review output, compact current-session summary exposure, and existing desktop result/history/context/workflow surfaces only.
+
+### T-103
+
+- Status: active
+- Module: Post-Evidence-Status Next-Slice Audit
+- Goal: run one bounded managerial audit after Bill Williams Review Evidence Status so the repository selects the single strongest next product-facing slice instead of mechanically extending the evidence chain, reopening recovery-tail polish, or drifting into media workflow, dashboards, mentor logic, mobile, sync, or new persistence.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/BILL_WILLIAMS_LAYER.md`, `03_MODULES/JOURNAL_ANALYTICS.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_STATUS.md`
+- Expected result: one explicit bounded next-step decision plus one implementation-facing document only if the audit finds a clearly justified next slice.

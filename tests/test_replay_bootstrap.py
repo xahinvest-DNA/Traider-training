@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import shutil
 from pathlib import Path
@@ -2939,3 +2939,124 @@ def test_dataset_quality_recovery_acknowledgment_is_not_exposed_without_warned_r
 
     assert recovery_ack["acknowledgment_status"] == "not_applicable"
     assert recovery_ack["status_text"] is None
+
+def test_bill_williams_review_evidence_status_derives_from_review_and_snapshot_context_and_recovers() -> None:
+    from runtime_bootstrap import import_raw_dataset
+
+    raw_dir = _reset_dir(TMP_ROOT / "bw_review_evidence_status_dataset")
+    raw_path = raw_dir / "eurusd_long.csv"
+    raw_path.write_text(
+        "timestamp,bid,ask\n"
+        "2025-01-02T10:00:00Z,1.10345,1.10357\n"
+        "2025-01-02T10:00:01Z,1.10348,1.10360\n"
+        "2025-01-02T10:00:02Z,1.10350,1.10362\n"
+        "2025-01-02T10:00:03Z,1.10353,1.10365\n"
+        "2025-01-02T10:00:04Z,1.10355,1.10367\n"
+        "2025-01-02T10:00:05Z,1.10357,1.10369\n"
+        "2025-01-02T10:00:06Z,1.10359,1.10371\n"
+        "2025-01-02T10:00:07Z,1.10361,1.10373\n",
+        encoding="utf-8",
+    )
+    dataset_dir = import_raw_dataset(raw_path, raw_dir / "normalized", instrument_id="EURUSD")
+    storage_dir = _reset_dir(TMP_ROOT / "bw_review_evidence_status_state")
+
+    session_1 = create_replay_session(str(dataset_dir), replay_mode="training")
+    trading_1 = MinimalTradingLoop(session_1)
+    journal_1 = LocalJournalRuntime(session_1, trading_1, storage_dir)
+
+    pre_snapshot = journal_1.create_chart_snapshot(
+        artifact_ref="snapshots/evidence/pre-present.png",
+        snapshot_role="pre_entry_context",
+    )
+    journal_1.create_pre_trade_note(
+        content="Evidence-backed note",
+        setup_tag="BW_FRACTAL_LONG",
+        chart_snapshot_ref=pre_snapshot.snapshot_id,
+    )
+    trading_1.buy_market(volume=1.0)
+    session_1.play()
+    session_1.advance_frame()
+    trading_1.manual_close()
+    session_1.advance_frame()
+    review_snapshot = journal_1.create_chart_snapshot(
+        artifact_ref="snapshots/evidence/review-present.png",
+        snapshot_role="review_context",
+    )
+    journal_1.create_post_trade_review(
+        content="Evidence-backed review",
+        setup_tag="BW_FRACTAL_LONG",
+        compliance_label="valid_setup",
+        chart_snapshot_refs=(review_snapshot.snapshot_id,),
+    )
+
+    trading_1.buy_market(volume=1.0)
+    session_1.advance_frame()
+    trading_1.manual_close()
+    session_1.advance_frame()
+    journal_1.create_post_trade_review(
+        content="Review without chart evidence",
+        setup_tag="BW_1WM_LONG",
+        compliance_label="valid_setup",
+    )
+
+    partial_snapshot = journal_1.create_chart_snapshot(
+        artifact_ref="snapshots/evidence/pre-partial.png",
+        snapshot_role="pre_entry_context",
+    )
+    journal_1.create_pre_trade_note(
+        content="Partial evidence note",
+        setup_tag="BW_2WM_LONG",
+        chart_snapshot_ref=partial_snapshot.snapshot_id,
+    )
+    trading_1.buy_market(volume=1.0)
+    session_1.advance_frame()
+    trading_1.manual_close()
+    session_1.advance_frame()
+    journal_1.create_post_trade_review(
+        content="Review with only pre-trade evidence",
+        setup_tag="BW_2WM_LONG",
+        compliance_label="valid_setup",
+    )
+
+    journal_view_1 = build_desktop_journal_view(journal_1)
+    trade_results_1 = journal_view_1["derived_review_output"]["trade_results"]
+    summary_1 = journal_view_1["session_review_summary"]
+
+    assert [result["bill_williams_review_evidence_status"] for result in trade_results_1] == [
+        "linked_evidence_present",
+        "linked_evidence_missing",
+        "linked_evidence_partial",
+    ]
+    assert trade_results_1[0]["bill_williams_review_evidence_text"] == "Bill Williams review is backed by linked chart context."
+    assert trade_results_1[1]["bill_williams_review_evidence_text"] == "Bill Williams review is filled, but no linked chart evidence is attached yet."
+    assert trade_results_1[2]["bill_williams_review_evidence_text"] == (
+        "Bill Williams review has partial chart evidence; still missing review context."
+    )
+    assert trade_results_1[0]["has_bill_williams_review_evidence"] is True
+    assert trade_results_1[1]["has_bill_williams_review_evidence"] is False
+    assert trade_results_1[2]["has_bill_williams_review_evidence"] is False
+    assert summary_1["reviewed_trades_with_bw_evidence_count"] == 1
+    assert summary_1["reviewed_trades_missing_bw_evidence_count"] == 2
+    assert summary_1["latest_bill_williams_review_evidence_status"] == "linked_evidence_partial"
+    assert summary_1["latest_bill_williams_review_evidence_text"] == (
+        "Bill Williams review has partial chart evidence; still missing review context."
+    )
+
+    session_2 = create_replay_session(str(dataset_dir), replay_mode="training")
+    trading_2 = MinimalTradingLoop(session_2)
+    journal_2 = LocalJournalRuntime(session_2, trading_2, storage_dir)
+    journal_view_2 = build_desktop_journal_view(journal_2)
+    trade_results_2 = journal_view_2["derived_review_output"]["trade_results"]
+    summary_2 = journal_view_2["session_review_summary"]
+
+    assert [result["bill_williams_review_evidence_status"] for result in trade_results_2] == [
+        "linked_evidence_present",
+        "linked_evidence_missing",
+        "linked_evidence_partial",
+    ]
+    assert summary_2["reviewed_trades_with_bw_evidence_count"] == 1
+    assert summary_2["reviewed_trades_missing_bw_evidence_count"] == 2
+    assert summary_2["latest_bill_williams_review_evidence_status"] == "linked_evidence_partial"
+    assert summary_2["latest_bill_williams_review_evidence_text"] == (
+        "Bill Williams review has partial chart evidence; still missing review context."
+    )

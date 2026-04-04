@@ -78,6 +78,14 @@ def build_trade_review_result(
         review_discipline_emblem,
     )
     review_dataset_quality_link = _build_review_dataset_quality_link(trade_executions)
+    review_evidence_status = _build_bill_williams_review_evidence_status(
+        latest_note=latest_note,
+        latest_review=latest_review,
+        latest_note_snapshot=latest_note_snapshot,
+        latest_review_snapshots=latest_review_snapshots,
+        linked_snapshot_summaries=linked_snapshot_summaries,
+        method_facets=method_facets,
+    )
 
     return {
         "trade_id": trade.trade_id,
@@ -114,6 +122,9 @@ def build_trade_review_result(
         "review_discipline_emblem": review_discipline_emblem,
         "review_discipline_reason": review_discipline_reason,
         "review_dataset_quality_link": review_dataset_quality_link,
+        "bill_williams_review_evidence_status": review_evidence_status["evidence_status"],
+        "bill_williams_review_evidence_text": review_evidence_status["evidence_text"],
+        "has_bill_williams_review_evidence": review_evidence_status["has_bill_williams_review_evidence"],
         "pre_trade_note_count": len(trade_notes),
         "post_trade_review_count": len(trade_reviews),
         "behavioral_flag_count": len(trade_flags),
@@ -192,6 +203,14 @@ def build_session_review_output(
         "rule_violation_count": len(rule_violations),
         "trades_with_linked_chart_snapshots_count": sum(
             1 for result in trade_results if result["has_linked_chart_snapshots"]
+        ),
+        "reviewed_trades_with_bw_evidence_count": sum(
+            1 for result in trade_results if result["bill_williams_review_evidence_status"] == "linked_evidence_present"
+        ),
+        "reviewed_trades_missing_bw_evidence_count": sum(
+            1
+            for result in trade_results
+            if result["bill_williams_review_evidence_status"] in {"linked_evidence_missing", "linked_evidence_partial"}
         ),
         "trades_with_method_facets_count": sum(
             1 for result in trade_results if result["has_method_facets"]
@@ -344,6 +363,8 @@ def build_session_review_summary(
         "requires_force_to_finalize": finalization_projection["requires_force_to_finalize"],
         "can_finalize_without_force": finalization_projection["can_finalize_without_force"],
         "can_finalize_with_force": finalization_projection["can_finalize_with_force"],
+        "reviewed_trades_with_bw_evidence_count": review_output["reviewed_trades_with_bw_evidence_count"],
+        "reviewed_trades_missing_bw_evidence_count": review_output["reviewed_trades_missing_bw_evidence_count"],
         "latest_trade_id": latest_trade_result["trade_id"] if latest_trade_result else None,
         "latest_trade_outcome_label": latest_trade_result["outcome_label"] if latest_trade_result else None,
         "latest_review_status": latest_trade_result["review_status"] if latest_trade_result else None,
@@ -353,6 +374,12 @@ def build_session_review_summary(
         "latest_intent_delta": latest_trade_result["intent_delta"] if latest_trade_result else None,
         "latest_review_completeness": latest_trade_result["review_completeness"] if latest_trade_result else None,
         "latest_review_sequence": latest_trade_result["review_sequence"] if latest_trade_result else None,
+        "latest_bill_williams_review_evidence_status": (
+            latest_trade_result["bill_williams_review_evidence_status"] if latest_trade_result else "not_applicable"
+        ),
+        "latest_bill_williams_review_evidence_text": (
+            latest_trade_result["bill_williams_review_evidence_text"] if latest_trade_result else None
+        ),
         "latest_linked_chart_snapshot_count": (
             latest_trade_result["linked_chart_snapshot_count"] if latest_trade_result else 0
         ),
@@ -1872,6 +1899,67 @@ def _review_sequence_weakest_fields(coverage: dict) -> list[str]:
         for field_name, _ in sorted(field_map.items(), key=lambda item: ((item[1] if item[1] is not None else 1.0), item[0]))
     ]
 
+
+
+def _build_bill_williams_review_evidence_status(
+    latest_note: PreTradeNoteRecord | None,
+    latest_review: PostTradeReviewRecord | None,
+    latest_note_snapshot: dict | None,
+    latest_review_snapshots: list[dict],
+    linked_snapshot_summaries: list[dict],
+    method_facets: dict,
+) -> dict:
+    has_review_interpretation = (
+        latest_review is not None
+        and any(
+            value is not None and value != ()
+            for value in [
+                latest_review.setup_tag,
+                latest_review.compliance_label,
+                *method_facets.values(),
+            ]
+        )
+    )
+    if not has_review_interpretation:
+        return {
+            "evidence_status": "not_applicable",
+            "evidence_text": None,
+            "has_bill_williams_review_evidence": False,
+        }
+
+    has_any_linked_evidence = bool(linked_snapshot_summaries)
+    has_note_context = latest_note is not None
+    has_review_context = latest_review is not None
+    has_note_evidence = latest_note_snapshot is not None
+    has_review_evidence = bool(latest_review_snapshots)
+
+    if not has_any_linked_evidence:
+        return {
+            "evidence_status": "linked_evidence_missing",
+            "evidence_text": "Bill Williams review is filled, but no linked chart evidence is attached yet.",
+            "has_bill_williams_review_evidence": False,
+        }
+
+    if has_note_context and has_review_context and (not has_note_evidence or not has_review_evidence):
+        missing_parts = []
+        if not has_note_evidence:
+            missing_parts.append("pre-trade context")
+        if not has_review_evidence:
+            missing_parts.append("review context")
+        return {
+            "evidence_status": "linked_evidence_partial",
+            "evidence_text": (
+                "Bill Williams review has partial chart evidence; still missing "
+                f"{' and '.join(missing_parts)}."
+            ),
+            "has_bill_williams_review_evidence": False,
+        }
+
+    return {
+        "evidence_status": "linked_evidence_present",
+        "evidence_text": "Bill Williams review is backed by linked chart context.",
+        "has_bill_williams_review_evidence": True,
+    }
 
 def _build_review_field_coverage(trade_results: list[dict]) -> dict:
     reviewed_results = [result for result in trade_results if result["review_status"] == "reviewed"]
