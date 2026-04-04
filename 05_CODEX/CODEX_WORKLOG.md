@@ -116,3 +116,41 @@ Snapshot authoring now has direct training value inside the review loop: the use
 
 ### Recommended next step
 Run `T-103: Post-Evidence-Status Next-Slice Audit`.
+
+## 2026-04-04 — T-103 Post-Evidence-Status Next-Slice Audit
+
+### Goal
+Run one bounded managerial audit after `Bill Williams Review Evidence Status` so the repository selects the single strongest next product-facing slice instead of continuing the evidence chain mechanically or drifting into recovery-tail polish, media workflow, dashboards, mentor logic, mobile, sync, or new persistence.
+
+### Files created
+- `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_FOLLOW_UP.md`
+
+### Files updated
+- `00_INDEX.md`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Audited the current frontier after `T-102` against product value, scope control, and current desktop-first/local-first boundaries.
+- Rejected low-value candidates such as more evidence labels, recovery-tail micro-polish, and broader dashboard-like summary expansion.
+- Selected `Bill Williams Review Evidence Follow-Up` as the strongest next slice because the real remaining friction is not visibility of missing evidence anymore, but actionability inside the review loop.
+- Added one bounded implementation-facing document for the selected slice and promoted it into the active task packet as `T-104`.
+- Synchronized project state so repository documents now point to the selected next coding slice instead of the completed audit.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop shell code was not changed.
+- Tests were not changed.
+- Module contracts and tech schemas were not changed.
+- `DECISIONS.md` was not changed because no project-level decision was required.
+
+### Why this matters
+`T-102` solved diagnosis. The strongest remaining user-visible gain is to make that diagnosis actionable with one bounded next-step cue, rather than adding more passive evidence-related signals.
+
+### Remaining gap after this step
+- `Bill Williams Review Evidence Follow-Up` is now defined but not yet implemented in runtime, desktop projections, or tests.
+
+### Recommended next step
+Implement `T-104: Bill Williams Review Evidence Follow-Up Slice`.
