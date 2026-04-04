@@ -1,0 +1,2 @@
+# Traider-training
+Тренажер трейдера
