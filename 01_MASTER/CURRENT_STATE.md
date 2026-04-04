@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-04
-Current stage: Bill Williams Review Evidence Follow-Up implemented after the bounded post-evidence-status audit
-Active module: Bill Williams Review Evidence Follow-Up implemented; next bounded step returns to a post-implementation audit
-Active question: which single bounded post-MVP slice now gives the strongest user-visible gain after Bill Williams review evidence follow-up, without restarting another evidence-layer chain or drifting into media workflow, dashboards, mentor logic, mobile, sync, or new persistence
+Current stage: Bill Williams Review Evidence Follow-Up implemented; Current Trade Review Digest selected by the bounded post-evidence-follow-up audit
+Active module: Current Trade Review Digest is the next bounded product-facing slice after Bill Williams Review Evidence Follow-Up
+Active question: how should the current desktop-first/local-first review workflow expose one compact current-trade digest from existing review signals without reopening the evidence chain, dashboard scope, mentor logic, mobile, sync, or new persistence
 
 ## Where the project is now
 
@@ -92,6 +92,8 @@ At this point:
 - derive-on-read Bill Williams review discipline reason is implemented across current trade review output, session summary, and desktop context/history/workflow surfaces;
 - derive-on-read Bill Williams review evidence status is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces using only existing review facts and linked snapshot refs, with restart recovery covered from existing local facts;
 - derive-on-read Bill Williams review evidence follow-up is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces so missing or partial chart evidence now maps to one compact next-step cue rebuilt from existing local facts after restart;
+- the bounded post-evidence-follow-up audit rejects further evidence-chain continuation, recovery-tail micro-polish, dashboard/media expansion, mentor logic, queue/blocker orchestration, and mobile/sync drift as the wrong current frontier for the local desktop review loop;
+- the audit selects Current Trade Review Digest as the strongest next slice because the main remaining product gap is no longer evidence diagnosis or evidence actionability, but fragmented review feedback across many small signals;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
 - desktop launch now accepts raw dataset files, auto-imports them into local normalized artifacts before controller bootstrap, auto-relaunches through the ASCII-path Tk-capable interpreter `C:\Python311\python.exe` when the current Python cannot initialize Tk/Tcl, and still falls back to a non-GUI readiness report if no working Tk runtime is available;
 - compact dataset-quality status and raw-import warning previews are now surfaced in replay headers and non-GUI readiness reports without adding new persistence or provider-management layers;
@@ -146,7 +148,7 @@ At this point:
 
 ## Next step
 
-The next working step is to run one bounded post-implementation audit after Bill Williams Review Evidence Follow-Up so the repository selects one strongest next product-facing slice instead of continuing the evidence chain with more labels, follow-up states, or micro-polish.
+The next working step is to implement one bounded Current Trade Review Digest slice so the current desktop-first/local-first review workflow can turn existing review, evidence, and discipline signals into one compact user-facing takeaway without adding mentor logic, queue/blocker state, dashboard scope, or new persistence.
 
 ## What must not be lost in a new chat
 
@@ -158,6 +160,7 @@ The next working step is to run one bounded post-implementation audit after Bill
 - `DERIVED_REVIEW_OUTPUT.md`, `SNAPSHOT_TIMELINE_EXPOSURE.md`, `SNAPSHOT_AWARE_REVIEW_OUTPUT.md`, `SESSION_FINALIZATION.md`, `SESSION_REVIEW_SUMMARY.md`, `MVP_ACCEPTANCE_PASS.md`, `DESKTOP_SHELL_IMPLEMENTATION.md`, `DESKTOP_CHART_REPLAY_REFINEMENT.md`, `DESKTOP_SESSION_TRADE_CONTEXT_REFINEMENT.md`, `DESKTOP_NOTES_REVIEW_AUTHORING_REFINEMENT.md`, `DESKTOP_CURRENT_SESSION_HISTORY_RESULT_REFINEMENT.md`, `DESKTOP_WORKFLOW_GUIDANCE_ACTION_FEEDBACK.md`, `DESKTOP_SHELL_LAYOUT_USABILITY_POLISH.md`, `DESKTOP_MVP_ACCEPTANCE_SMOKE_PASS.md`, `DESKTOP_LAUNCH_PATH.md`, `DESKTOP_HANDOFF_READINESS.md`, `MVP_PAUSE_POINT.md`, `FIRST_POST_MVP_DIRECTION.md`, `BILL_WILLIAMS_REVIEW_DEPTH.md`, `BILL_WILLIAMS_REVIEW_DELTA.md`, `BILL_WILLIAMS_REVIEW_COMPLETENESS.md`, `BILL_WILLIAMS_REVIEW_PROMPTS.md`, `BILL_WILLIAMS_REVIEW_COVERAGE.md`, `BILL_WILLIAMS_REVIEW_SEQUENCE.md`, `BILL_WILLIAMS_REVIEW_WEAK_SPOTS.md`, `BILL_WILLIAMS_REVIEW_PROGRESS.md`, `BILL_WILLIAMS_REVIEW_MOMENTUM.md`, `BILL_WILLIAMS_REVIEW_STABILITY.md`, `BILL_WILLIAMS_REVIEW_SWINGS.md`, `BILL_WILLIAMS_REVIEW_FLOOR.md`, `BILL_WILLIAMS_REVIEW_CEILING.md`, `BILL_WILLIAMS_REVIEW_BAND.md`, `BILL_WILLIAMS_REVIEW_HEADROOM.md`, `BILL_WILLIAMS_REVIEW_PRESSURE.md`, `BILL_WILLIAMS_REVIEW_TARGET.md`, `BILL_WILLIAMS_REVIEW_FOCUS.md`, `BILL_WILLIAMS_REVIEW_CUE.md`, `BILL_WILLIAMS_REVIEW_BADGE.md`, `BILL_WILLIAMS_REVIEW_PILL.md`, `BILL_WILLIAMS_REVIEW_CHIP.md`, `BILL_WILLIAMS_REVIEW_TAG.md`, `BILL_WILLIAMS_REVIEW_TOKEN.md`, `BILL_WILLIAMS_REVIEW_MARKER.md`, `BILL_WILLIAMS_REVIEW_GLYPH.md`, `BILL_WILLIAMS_REVIEW_SIGIL.md`, `BILL_WILLIAMS_REVIEW_SEAL.md`, `BILL_WILLIAMS_REVIEW_CREST.md`, `BILL_WILLIAMS_REVIEW_EMBLEM.md`, `BILL_WILLIAMS_REVIEW_INSIGNIA.md`, `BILL_WILLIAMS_REVIEW_STANDARD.md`, `BILL_WILLIAMS_REVIEW_BANNER.md`, `BILL_WILLIAMS_REVIEW_PENNANT.md`, `BILL_WILLIAMS_REVIEW_STREAMER.md`, `BILL_WILLIAMS_REVIEW_RIBBON.md`, `BILL_WILLIAMS_REVIEW_RULE_CONTEXT.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_CUE.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_BADGE.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_TOKEN.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_MARKER.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_GLYPH.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_SIGIL.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_SEAL.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_CREST.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_EMBLEM.md`, and `BILL_WILLIAMS_REVIEW_DISCIPLINE_PAUSE_REALIGNMENT.md` already fix derive-on-read / bounded workflow boundaries; they must not silently expand into persisted cache, gallery, archive shell, dashboard subsystems, thick UI workflow state, signal-engine drift, packaging/platform scope, or broad later-phase drift.
 - `desktop_shell/` already exists as a thin UI layer over accepted runtime projections; the next step must not turn it into a new domain layer or large UI platform.
 - Any step beyond the bounded local-first desktop workflow requires a separate Project Brain fixation.
+
 
 
 

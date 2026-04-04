@@ -838,8 +838,17 @@
 
 ### T-105
 
-- Status: active
+- Status: completed
 - Module: Post-Evidence-Follow-Up Next-Slice Audit
 - Goal: run one bounded managerial audit after Bill Williams Review Evidence Follow-Up so the repository selects the single strongest next product-facing slice instead of continuing the evidence chain with more labels, extra follow-up states, recovery-tail polish, or drift into media workflow, dashboards, mentor logic, mobile, sync, or new persistence.
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/BILL_WILLIAMS_LAYER.md`, `03_MODULES/JOURNAL_ANALYTICS.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_STATUS.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_FOLLOW_UP.md`
 - Expected result: one explicit bounded next-step decision plus one implementation-facing document only if the audit finds a clearly justified next slice.
+- Outcome: rejected further evidence-chain continuation, recovery-tail polish, dashboard/media expansion, mentor logic, and queue/blocker orchestration; selected `Current Trade Review Digest` as the strongest next bounded product-facing slice.
+
+### T-106
+
+- Status: active
+- Module: Current Trade Review Digest Slice
+- Goal: expose one bounded derive-on-read current-trade review digest so the current desktop-first/local-first review workflow can turn fragmented review signals into one compact user-facing takeaway without adding mentor logic, dashboards, queue/blocker orchestration, mobile, sync, or new persistence.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/BILL_WILLIAMS_LAYER.md`, `03_MODULES/JOURNAL_ANALYTICS.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/DERIVED_REVIEW_OUTPUT.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_STATUS.md`, `05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_FOLLOW_UP.md`, `05_CODEX/CURRENT_TRADE_REVIEW_DIGEST.md`
+- Expected result: one bounded current-trade review digest projection across existing review/result/history/context/workflow surfaces only.

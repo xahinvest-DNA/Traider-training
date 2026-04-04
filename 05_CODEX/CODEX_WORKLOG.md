@@ -1,4 +1,4 @@
-﻿# CODEX WORKLOG
+# CODEX WORKLOG
 
 Purpose: append one compact entry after each Codex pass so future sessions can reconstruct what changed without relying on chat history.
 
@@ -196,3 +196,41 @@ Implement one bounded derive-on-read follow-up layer so the current desktop-firs
 
 ### Recommended next step
 Run `T-105: Post-Evidence-Follow-Up Next-Slice Audit`.
+
+## 2026-04-04 — T-105 Post-Evidence-Follow-Up Next-Slice Audit
+
+### Goal
+Run one bounded managerial audit after `Bill Williams Review Evidence Follow-Up` so the repository selects the single strongest next product-facing slice instead of continuing the evidence chain with more labels, extra follow-up states, recovery-tail polish, or drift into media workflow, dashboards, mentor logic, mobile, sync, or new persistence.
+
+### Files created
+- `05_CODEX/CURRENT_TRADE_REVIEW_DIGEST.md`
+
+### Files updated
+- `00_INDEX.md`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Audited the frontier after `T-104` using the current desktop-first/local-first workflow and explicitly rejected low-value candidates that would continue the evidence chain, reopen recovery-tail polish, expand dashboards/media, drift into mentor logic, or introduce queue/blocker orchestration.
+- Selected `Current Trade Review Digest` as the strongest next bounded slice because the main remaining user-visible gap is fragmented feedback across many existing review signals, not missing evidence diagnosis or evidence actionability.
+- Added one new implementation-facing boundary document for the selected digest slice.
+- Promoted the digest slice into the active task packet as `T-106`.
+- Synchronized project state so the repository now points to the chosen next implementation target instead of the completed audit.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop shell code was not changed.
+- Tests were not changed.
+- Module contracts and tech schemas were not changed.
+- `DECISIONS.md` was not changed because no project-level decision was required.
+
+### Why this matters
+`T-102` and `T-104` already closed the evidence diagnosis/actionability gap. The strongest next user-visible gain is now to package the existing review signals into one compact trade-level takeaway, which improves the usefulness of the current review loop without creating new architecture or reopening drift areas.
+
+### Remaining gap after this step
+- `Current Trade Review Digest` is now defined but not yet implemented in runtime, desktop projections, or tests.
+
+### Recommended next step
+Implement `T-106: Current Trade Review Digest Slice`.
