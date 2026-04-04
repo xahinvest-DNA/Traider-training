@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-04
-Current stage: Current Trade Review Digest is implemented; the post-digest audit found no stronger bounded next implementation slice inside the current review loop without scope creep
-Active module: Post-Review-Loop Frontier Audit is the next bounded managerial step after the recommend-only T-107 result
-Active question: if the current desktop-first/local-first review loop no longer has a strong bounded next slice, which broader local desktop product frontier should be evaluated next without drifting into mentor, dashboard, workflow-engine, mobile, sync, or new persistence scope
+Current stage: broader post-review-loop audit completed; Initial Trade Protection selected as the next bounded local desktop frontier
+Active module: Initial Trade Protection is the next implementation slice after the review-loop lane was intentionally closed
+Active question: how should the current desktop-first/local-first product support one bounded initial stop-loss / take-profit protection path without expanding into a risk engine, pending-order orchestration, mentor logic, dashboard growth, mobile, sync, or new persistence
 
 ## Where the project is now
 
@@ -94,6 +94,7 @@ At this point:
 - derive-on-read Bill Williams review evidence follow-up is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces so missing or partial chart evidence now maps to one compact next-step cue rebuilt from existing local facts after restart;
 - derive-on-read Current Trade Review Digest is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces so the latest/current closed trade now exposes one compact takeaway headline, primary gap, and next step rebuilt from existing local facts after restart;
 - the bounded post-digest audit rejects further digest layering, evidence layering, cosmetic polish, workflow-engine-style quick-action orchestration, dashboard/media expansion, mentor logic, and mobile/sync/new-persistence drift as the wrong current frontier, and records no strong bounded next implementation slice inside the current review loop;
+- the broader post-review-loop audit rejects further review-derived layering, replay garnish, import hardening as the main next frontier, add-on/partial-close expansion, and replay-mode polishing as weaker candidates, and selects Initial Trade Protection as the strongest next local desktop product lane because it improves active trade discipline inside the core training loop;
 - the bounded post-evidence-follow-up audit rejects further evidence-chain continuation, recovery-tail micro-polish, dashboard/media expansion, mentor logic, queue/blocker orchestration, and mobile/sync drift as the wrong current frontier for the local desktop review loop;
 - the audit selects Current Trade Review Digest as the strongest next slice because the main remaining product gap is no longer evidence diagnosis or evidence actionability, but fragmented review feedback across many small signals;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
@@ -150,7 +151,7 @@ At this point:
 
 ## Next step
 
-The next working step is to run one bounded Post-Review-Loop Frontier Audit so the repository can choose the next real product-facing frontier beyond the now-completed current-trade review loop improvements instead of forcing another digest/evidence micro-slice or drifting into mentor, dashboard, workflow-engine, mobile, sync, or new-persistence scope.
+The next working step is to implement one bounded Initial Trade Protection slice so the current desktop-first/local-first product can move from `entry -> manual close` only toward a stronger active-trade discipline loop through optional initial `stopLoss` / `takeProfit`, without expanding into a broader risk engine, pending-order orchestration, dashboard scope, mentor logic, mobile, sync, or new persistence.
 
 ## What must not be lost in a new chat
 

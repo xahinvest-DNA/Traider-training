@@ -2,14 +2,14 @@
 
 Last updated: 2026-04-04
 Status: active
-Task ID: T-108
-Task type: audit
+Task ID: T-109
+Task type: implementation
 
 ## Goal
-Run one bounded `Post-Review-Loop Frontier Audit` so the repository can choose the next real product-facing frontier after the now-completed current-trade review loop improvements, instead of forcing another digest/evidence micro-slice or drifting into mentor, dashboard/media, workflow-engine, mobile, sync, or new-persistence scope.
+Implement one bounded `Initial Trade Protection` slice so the current desktop-first/local-first product can support optional initial `stopLoss` / `takeProfit` inside the one-trade replay workflow, strengthening live trade discipline without expanding into a broader risk engine, pending-order orchestration, mentor logic, dashboard scope, mobile, sync, or new persistence.
 
 ## Why this task matters now
-`T-102`, `T-104`, and `T-106` already solved the main diagnosis, actionability, and fragmentation gaps inside the current review loop. The `T-107` audit found that additional review-loop micro-slices would now mostly become decorative layering or workflow orchestration. The next step is therefore to re-evaluate the broader local desktop frontier instead of continuing the same lane by inertia.
+`T-108` confirmed that the review-loop lane is exhausted: further review-derived slices would now be weaker than opening a new productive lane in the product. The strongest broader local desktop frontier is active-trade protection, because the current workflow still relies too heavily on `entry -> manual close` and under-trains bounded protective execution discipline compared with the value already gained from diagnosis, actionability, and digesting after the trade.
 
 ## Required source-of-truth documents
 - `00_INDEX.md`
@@ -19,16 +19,14 @@ Run one bounded `Post-Review-Loop Frontier Audit` so the repository can choose t
 - `01_MASTER/PRODUCT_SCOPE.md`
 - `01_MASTER/MVP_vs_FULL.md`
 - `01_MASTER/SSOT_MAP.md`
+- `03_MODULES/TRADING_ENGINE.md`
 - `03_MODULES/DESKTOP_WORKSPACE.md`
-- `03_MODULES/JOURNAL_ANALYTICS.md`
-- `03_MODULES/BILL_WILLIAMS_LAYER.md`
-- `04_TECH/JOURNAL_SCHEMA.md`
+- `04_TECH/DATA_SCHEMA.md`
 - `05_CODEX/TASKS.md`
 - `05_CODEX/NEXT_TASK.md`
 - `05_CODEX/IMPLEMENTATION_RULES.md`
 - `05_CODEX/HANDOFF_TEMPLATE.md`
-- `05_CODEX/DERIVED_REVIEW_OUTPUT.md`
-- `05_CODEX/CURRENT_TRADE_REVIEW_DIGEST.md`
+- `05_CODEX/INITIAL_TRADE_PROTECTION.md`
 
 ## Read first
 1. `00_INDEX.md`
@@ -40,44 +38,45 @@ Run one bounded `Post-Review-Loop Frontier Audit` so the repository can choose t
 7. `05_CODEX/NEXT_TASK.md`
 8. `05_CODEX/IMPLEMENTATION_RULES.md`
 9. `05_CODEX/HANDOFF_TEMPLATE.md`
-10. `05_CODEX/DERIVED_REVIEW_OUTPUT.md`
-11. `05_CODEX/CURRENT_TRADE_REVIEW_DIGEST.md`
+10. `03_MODULES/TRADING_ENGINE.md`
+11. `03_MODULES/DESKTOP_WORKSPACE.md`
+12. `04_TECH/DATA_SCHEMA.md`
+13. `05_CODEX/INITIAL_TRADE_PROTECTION.md`
 
 ## Exact question to answer
-If the current desktop-first/local-first review loop no longer has a strong bounded next implementation slice, which one broader local desktop product frontier should be selected next without drifting into mentor logic, dashboard/media expansion, workflow-engine state, mobile, sync, or new persistence?
+How should the current desktop-first/local-first product expose one bounded initial trade-protection path with optional initial `stopLoss` / `takeProfit` so the active trade loop becomes more useful than `entry -> manual close` only, without expanding into a broader risk engine, pending-order orchestration, mentor logic, dashboard/media scope, mobile, sync, or new persistence?
 
-## Expected outcome
-1. One short, hard managerial/product audit of the broader local desktop frontier after the review-loop lane is exhausted.
-2. Explicit rejection of weak candidates that merely continue review-derived layering or reopen forbidden drift areas.
-3. Exactly one bounded next-step decision, or one explicit recommend-only result if no strong slice exists without scope creep.
-4. Synchronization of `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` after the audit result.
+## Expected implementation outcome
+1. One bounded active-trade protection path over existing trading and storage contracts.
+2. Desktop-facing exposure only through existing trading/context/result surfaces.
+3. Runtime, desktop, and test updates only where required for bounded initial protection.
+4. Synchronization of `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` after implementation.
 
 ## Files allowed to change
+- runtime files strictly required for bounded initial protection
+- desktop-shell files strictly required for bounded initial protection
+- tests strictly required for bounded initial protection
 - `01_MASTER/CURRENT_STATE.md`
 - `05_CODEX/TASKS.md`
 - `05_CODEX/NEXT_TASK.md`
 - `05_CODEX/CODEX_WORKLOG.md`
-- one new implementation-facing document in `05_CODEX/` only if the audit selects a clearly justified next slice
 
 ## Files not to change
 - `03_MODULES/*`
 - `04_TECH/*`
-- runtime code
-- desktop shell code
-- tests
 - `01_MASTER/DECISIONS.md` unless a true project-level decision becomes unavoidable
 
 ## Constraints
 - Stay inside desktop-first local-first boundaries.
-- Do not continue review-loop work through more digest layers, evidence layers, labels, or cosmetic wording passes.
-- Do not introduce mentor logic, dashboard/media expansion, workflow-engine logic, queue/blocker/acknowledgment state, mobile, sync, or new persistence.
-- Choose one next step only, not a menu of ideas.
+- Keep the slice bounded to initial `stopLoss` / `takeProfit` support only.
+- Do not expand into trailing stops, risk scoring, add-on, partial close, pending-order expiry orchestration, mentor logic, dashboards, mobile, sync, or new persistence.
+- Do not move ownership of trade facts into desktop helpers.
 
 ## Acceptance criteria
-- The audit identifies whether a stronger frontier now exists beyond the exhausted current review-loop lane.
-- Weak or decorative candidates are explicitly rejected.
-- Exactly one bounded next-step decision is made, or one explicit recommend-only result is recorded.
-- `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` are synchronized to the audit result.
+- The implementation supports one bounded active-trade protection path with optional initial `stopLoss` / `takeProfit`.
+- Existing desktop trading/context/result surfaces can show the protection state without a new subsystem.
+- Protective closes follow the accepted trading/storage contracts and remain restart-recoverable.
+- `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` are synchronized to the implementation result.
 
 ## Required handoff format
 Use `05_CODEX/HANDOFF_TEMPLATE.md` exactly.

@@ -864,8 +864,17 @@
 
 ### T-108
 
-- Status: active
+- Status: completed
 - Module: Post-Review-Loop Frontier Audit
 - Goal: run one bounded managerial/product audit beyond the now-completed current-trade review loop improvements so the repository can choose the next real desktop-first/local-first product-facing frontier without forcing another review-derived micro-slice or drifting into mentor, dashboard/media, workflow-engine, mobile, sync, or new persistence scope.
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/JOURNAL_ANALYTICS.md`, `03_MODULES/BILL_WILLIAMS_LAYER.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/DERIVED_REVIEW_OUTPUT.md`, `05_CODEX/CURRENT_TRADE_REVIEW_DIGEST.md`
 - Expected result: one explicit bounded next-step decision plus one implementation-facing document only if the audit finds a clearly justified next slice outside the exhausted review-loop micro-layer.
+- Outcome: selected `Initial Trade Protection` as the strongest broader local desktop frontier; rejected further review/digest layering, cosmetic polish, mentor/dashboard/media/workflow-engine drift, replay-garnish candidates, add-on/partial-close expansion, and import hardening as weaker next steps.
+
+### T-109
+
+- Status: active
+- Module: Initial Trade Protection Slice
+- Goal: implement one bounded active-trade protection slice so the current desktop-first/local-first product can support optional initial `stopLoss` / `takeProfit` inside the one-trade replay workflow, strengthening live trade discipline without expanding into a broader risk engine, pending-order orchestration, mentor logic, dashboard scope, mobile, sync, or new persistence.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/DATA_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/INITIAL_TRADE_PROTECTION.md`
+- Expected result: one bounded initial trade-protection path across existing runtime and desktop trading/context/result surfaces only.

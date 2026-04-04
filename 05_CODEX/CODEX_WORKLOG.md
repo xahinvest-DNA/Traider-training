@@ -282,3 +282,27 @@ The review loop already has bounded diagnosis, actionability, and compact synthe
 ### Recommended next step
 Run `T-108: Post-Review-Loop Frontier Audit`.
 
+## 2026-04-04 - T-108 Post-Review-Loop Frontier Audit
+
+### What was done
+- Audited the broader local desktop frontier after the review-loop lane was intentionally closed and compared broader candidates instead of reviving review-derived micro-slices.
+- Considered and rejected weaker candidates: more review/digest/evidence layering, cosmetic polish, mentor logic, dashboard/media expansion, workflow-engine/queue/blocker drift, replay-garnish work, raw-import hardening as the main next frontier, and add-on/partial-close expansion.
+- Selected `Initial Trade Protection` as the strongest next frontier because it improves the active trade loop itself and opens a new productive lane beyond post-trade presentation work.
+- Added one new implementation-facing boundary document for the selected frontier and promoted it into the active task packet as `T-109`.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop shell code was not changed.
+- Tests were not changed.
+- Module documents and tech schemas were not changed.
+- `DECISIONS.md` was not changed because no project-level decision was required.
+
+### Why this matters
+The strongest remaining user-visible gain is no longer inside post-trade review. It is inside the live trade loop: the product still over-relies on `entry -> manual close`, while accepted trading contracts already allow bounded protective structure. Implementing initial trade protection extends the core training value more than any further review-derived cue.
+
+### Remaining gap after this step
+- `Initial Trade Protection` is now defined but not yet implemented in runtime, desktop projections, or tests.
+
+### Recommended next step
+Implement `T-109: Initial Trade Protection Slice`.
+
