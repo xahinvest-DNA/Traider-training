@@ -873,8 +873,17 @@
 
 ### T-109
 
-- Status: active
+- Status: completed
 - Module: Initial Trade Protection Slice
 - Goal: implement one bounded active-trade protection slice so the current desktop-first/local-first product can support optional initial `stopLoss` / `takeProfit` inside the one-trade replay workflow, strengthening live trade discipline without expanding into a broader risk engine, pending-order orchestration, mentor logic, dashboard scope, mobile, sync, or new persistence.
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/DATA_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/INITIAL_TRADE_PROTECTION.md`
 - Expected result: one bounded initial trade-protection path across existing runtime and desktop trading/context/result surfaces only.
+- Outcome: implemented optional initial `stopLoss` / `takeProfit` entry support, protective threshold closes, existing-surface visibility, and restart recovery from the same persisted trade facts without introducing a broader risk engine or new persistence.
+
+### T-110
+
+- Status: active
+- Module: Post-Initial-Trade-Protection Next-Slice Audit
+- Goal: run one bounded managerial/product audit after Initial Trade Protection so the repository selects the next strongest local desktop product-facing slice without mechanically expanding protection management, reopening review-derived micro-slices, or drifting into mentor, dashboard/media, workflow-engine, mobile, sync, or new-persistence scope.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/DATA_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/INITIAL_TRADE_PROTECTION.md`
+- Expected result: one explicit bounded next-step decision plus one new implementation-facing document only if the audit finds a clearly justified next slice.

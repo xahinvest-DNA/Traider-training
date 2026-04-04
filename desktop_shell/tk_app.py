@@ -67,6 +67,8 @@ class TraderTrainerDesktopApp:
         self.flag_code = tk.StringVar(value="premature_exit")
         self.violation_code = tk.StringVar(value="manual_plan_deviation")
         self.speed_value = tk.StringVar(value="1.0")
+        self.initial_stop_loss_value = tk.StringVar()
+        self.initial_take_profit_value = tk.StringVar()
         self.pending_note_snapshot_id: str | None = None
         self.pending_review_snapshot_ids: list[str] = []
         self.last_action_feedback: dict[str, str] | None = {
@@ -128,9 +130,13 @@ class TraderTrainerDesktopApp:
         speed_button = ttk.Button(controls, text="Set Speed", command=self._action_set_speed)
         speed_button.grid(row=0, column=len(button_specs) + 2, padx=4)
         self.control_buttons["set_speed"] = speed_button
+        ttk.Label(controls, text="Initial SL").grid(row=0, column=len(button_specs) + 3, padx=(16, 4))
+        ttk.Entry(controls, textvariable=self.initial_stop_loss_value, width=12).grid(row=0, column=len(button_specs) + 4, padx=4)
+        ttk.Label(controls, text="Initial TP").grid(row=0, column=len(button_specs) + 5, padx=(12, 4))
+        ttk.Entry(controls, textvariable=self.initial_take_profit_value, width=12).grid(row=0, column=len(button_specs) + 6, padx=4)
 
         self.control_hint_label = ttk.Label(controls, justify="left", anchor="w")
-        self.control_hint_label.grid(row=1, column=0, columnspan=len(button_specs) + 3, sticky="ew", pady=(6, 0))
+        self.control_hint_label.grid(row=1, column=0, columnspan=len(button_specs) + 7, sticky="ew", pady=(6, 0))
 
         left_top = ttk.LabelFrame(root, text="Chart / Replay Surface", padding=8)
         left_top.grid(row=1, column=0, sticky="nsew", padx=8, pady=8)
@@ -372,6 +378,17 @@ class TraderTrainerDesktopApp:
         if value:
             widget.insert("1.0", value)
 
+    @staticmethod
+    def _parse_optional_float(value: str) -> float | None:
+        stripped = value.strip()
+        if not stripped:
+            return None
+        return float(stripped)
+
+    def _clear_trade_protection_inputs(self) -> None:
+        self.initial_stop_loss_value.set("")
+        self.initial_take_profit_value.set("")
+
     def _clear_note_form(self) -> None:
         self._set_text(self.note_text)
         self.note_thesis.set("")
@@ -420,10 +437,24 @@ class TraderTrainerDesktopApp:
         self._run_action(lambda: self.controller.set_speed(float(self.speed_value.get() or "1.0")), f"Replay speed set to {self.speed_value.get() or '1.0'}x")
 
     def _action_buy(self) -> None:
-        self._run_action(self.controller.buy_market, "BuyMarket submitted")
+        def submit() -> None:
+            self.controller.buy_market(
+                stop_loss=self._parse_optional_float(self.initial_stop_loss_value.get()),
+                take_profit=self._parse_optional_float(self.initial_take_profit_value.get()),
+            )
+            self._clear_trade_protection_inputs()
+
+        self._run_action(submit, "BuyMarket submitted")
 
     def _action_sell(self) -> None:
-        self._run_action(self.controller.sell_market, "SellMarket submitted")
+        def submit() -> None:
+            self.controller.sell_market(
+                stop_loss=self._parse_optional_float(self.initial_stop_loss_value.get()),
+                take_profit=self._parse_optional_float(self.initial_take_profit_value.get()),
+            )
+            self._clear_trade_protection_inputs()
+
+        self._run_action(submit, "SellMarket submitted")
 
     def _action_close(self) -> None:
         self._run_action(self.controller.manual_close, "Manual close requested")

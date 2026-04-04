@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-04
-Current stage: broader post-review-loop audit completed; Initial Trade Protection selected as the next bounded local desktop frontier
-Active module: Initial Trade Protection is the next implementation slice after the review-loop lane was intentionally closed
-Active question: how should the current desktop-first/local-first product support one bounded initial stop-loss / take-profit protection path without expanding into a risk engine, pending-order orchestration, mentor logic, dashboard growth, mobile, sync, or new persistence
+Current stage: bounded Initial Trade Protection implementation completed; the next frontier must be selected without mechanically expanding trade protection into a broader risk engine
+Active module: Post-Initial-Trade-Protection audit is the next active packet after bounded initial stop-loss / take-profit support landed in the live trade loop
+Active question: after bounded initial stop-loss / take-profit support is in place, what one strongest next local desktop product slice should follow without drifting into richer risk orchestration, mentor logic, dashboard/media scope, mobile, sync, or new persistence
 
 ## Where the project is now
 
@@ -95,6 +95,7 @@ At this point:
 - derive-on-read Current Trade Review Digest is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces so the latest/current closed trade now exposes one compact takeaway headline, primary gap, and next step rebuilt from existing local facts after restart;
 - the bounded post-digest audit rejects further digest layering, evidence layering, cosmetic polish, workflow-engine-style quick-action orchestration, dashboard/media expansion, mentor logic, and mobile/sync/new-persistence drift as the wrong current frontier, and records no strong bounded next implementation slice inside the current review loop;
 - the broader post-review-loop audit rejects further review-derived layering, replay garnish, import hardening as the main next frontier, add-on/partial-close expansion, and replay-mode polishing as weaker candidates, and selects Initial Trade Protection as the strongest next local desktop product lane because it improves active trade discipline inside the core training loop;
+- bounded Initial Trade Protection is implemented across runtime trading contracts, desktop trading/context/result surfaces, and restart recovery so the current one-trade replay workflow now supports optional initial `stopLoss` / `takeProfit` without creating a broader risk engine, new persistence, or a new workflow owner;
 - the bounded post-evidence-follow-up audit rejects further evidence-chain continuation, recovery-tail micro-polish, dashboard/media expansion, mentor logic, queue/blocker orchestration, and mobile/sync drift as the wrong current frontier for the local desktop review loop;
 - the audit selects Current Trade Review Digest as the strongest next slice because the main remaining product gap is no longer evidence diagnosis or evidence actionability, but fragmented review feedback across many small signals;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
@@ -146,12 +147,12 @@ At this point:
 - Whether a later mentor-grade taxonomy is needed over the current reference layer.
 - Whether a separate media manifest schema is needed for `ChartSnapshot` artifacts.
 - Whether a severity-weighted scoring model for `BehavioralFlag` and `RuleViolation` is needed in v1.
-- Whether minimal initial stopLoss/takeProfit should be added in the trading slice or left for a later sub-slice.
+- How far any later trade-protection work should go beyond bounded initial `stopLoss` / `takeProfit` before it becomes risk-engine drift.
 - How far the bounded raw-dataset import slice should go beyond the current CSV/TSV/JSON path before a separate acceptance/hardening step is required.
 
 ## Next step
 
-The next working step is to implement one bounded Initial Trade Protection slice so the current desktop-first/local-first product can move from `entry -> manual close` only toward a stronger active-trade discipline loop through optional initial `stopLoss` / `takeProfit`, without expanding into a broader risk engine, pending-order orchestration, dashboard scope, mentor logic, mobile, sync, or new persistence.
+The next working step is to run one bounded post-Initial-Trade-Protection audit so the repository can choose the next strongest local desktop product-facing slice without mechanically extending protection management into trailing stops, edit workflows, broader orchestration, dashboard/media scope, mentor logic, mobile, sync, or new persistence.
 
 ## What must not be lost in a new chat
 
@@ -162,6 +163,7 @@ The next working step is to implement one bounded Initial Trade Protection slice
 - Derived outputs, timelines, and metrics must not replace primary entities.
 - `DERIVED_REVIEW_OUTPUT.md`, `SNAPSHOT_TIMELINE_EXPOSURE.md`, `SNAPSHOT_AWARE_REVIEW_OUTPUT.md`, `SESSION_FINALIZATION.md`, `SESSION_REVIEW_SUMMARY.md`, `MVP_ACCEPTANCE_PASS.md`, `DESKTOP_SHELL_IMPLEMENTATION.md`, `DESKTOP_CHART_REPLAY_REFINEMENT.md`, `DESKTOP_SESSION_TRADE_CONTEXT_REFINEMENT.md`, `DESKTOP_NOTES_REVIEW_AUTHORING_REFINEMENT.md`, `DESKTOP_CURRENT_SESSION_HISTORY_RESULT_REFINEMENT.md`, `DESKTOP_WORKFLOW_GUIDANCE_ACTION_FEEDBACK.md`, `DESKTOP_SHELL_LAYOUT_USABILITY_POLISH.md`, `DESKTOP_MVP_ACCEPTANCE_SMOKE_PASS.md`, `DESKTOP_LAUNCH_PATH.md`, `DESKTOP_HANDOFF_READINESS.md`, `MVP_PAUSE_POINT.md`, `FIRST_POST_MVP_DIRECTION.md`, `BILL_WILLIAMS_REVIEW_DEPTH.md`, `BILL_WILLIAMS_REVIEW_DELTA.md`, `BILL_WILLIAMS_REVIEW_COMPLETENESS.md`, `BILL_WILLIAMS_REVIEW_PROMPTS.md`, `BILL_WILLIAMS_REVIEW_COVERAGE.md`, `BILL_WILLIAMS_REVIEW_SEQUENCE.md`, `BILL_WILLIAMS_REVIEW_WEAK_SPOTS.md`, `BILL_WILLIAMS_REVIEW_PROGRESS.md`, `BILL_WILLIAMS_REVIEW_MOMENTUM.md`, `BILL_WILLIAMS_REVIEW_STABILITY.md`, `BILL_WILLIAMS_REVIEW_SWINGS.md`, `BILL_WILLIAMS_REVIEW_FLOOR.md`, `BILL_WILLIAMS_REVIEW_CEILING.md`, `BILL_WILLIAMS_REVIEW_BAND.md`, `BILL_WILLIAMS_REVIEW_HEADROOM.md`, `BILL_WILLIAMS_REVIEW_PRESSURE.md`, `BILL_WILLIAMS_REVIEW_TARGET.md`, `BILL_WILLIAMS_REVIEW_FOCUS.md`, `BILL_WILLIAMS_REVIEW_CUE.md`, `BILL_WILLIAMS_REVIEW_BADGE.md`, `BILL_WILLIAMS_REVIEW_PILL.md`, `BILL_WILLIAMS_REVIEW_CHIP.md`, `BILL_WILLIAMS_REVIEW_TAG.md`, `BILL_WILLIAMS_REVIEW_TOKEN.md`, `BILL_WILLIAMS_REVIEW_MARKER.md`, `BILL_WILLIAMS_REVIEW_GLYPH.md`, `BILL_WILLIAMS_REVIEW_SIGIL.md`, `BILL_WILLIAMS_REVIEW_SEAL.md`, `BILL_WILLIAMS_REVIEW_CREST.md`, `BILL_WILLIAMS_REVIEW_EMBLEM.md`, `BILL_WILLIAMS_REVIEW_INSIGNIA.md`, `BILL_WILLIAMS_REVIEW_STANDARD.md`, `BILL_WILLIAMS_REVIEW_BANNER.md`, `BILL_WILLIAMS_REVIEW_PENNANT.md`, `BILL_WILLIAMS_REVIEW_STREAMER.md`, `BILL_WILLIAMS_REVIEW_RIBBON.md`, `BILL_WILLIAMS_REVIEW_RULE_CONTEXT.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_CUE.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_BADGE.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_TOKEN.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_MARKER.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_GLYPH.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_SIGIL.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_SEAL.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_CREST.md`, `BILL_WILLIAMS_REVIEW_DISCIPLINE_EMBLEM.md`, and `BILL_WILLIAMS_REVIEW_DISCIPLINE_PAUSE_REALIGNMENT.md` already fix derive-on-read / bounded workflow boundaries; they must not silently expand into persisted cache, gallery, archive shell, dashboard subsystems, thick UI workflow state, signal-engine drift, packaging/platform scope, or broad later-phase drift.
 - `desktop_shell/` already exists as a thin UI layer over accepted runtime projections; the next step must not turn it into a new domain layer or large UI platform.
+- `INITIAL_TRADE_PROTECTION.md` now fixes the bounded live-trade protection contract; follow-up work must not silently turn that slice into a broader risk-management subsystem.
 - Any step beyond the bounded local-first desktop workflow requires a separate Project Brain fixation.
 
 

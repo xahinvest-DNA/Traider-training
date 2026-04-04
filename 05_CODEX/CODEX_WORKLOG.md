@@ -306,3 +306,27 @@ The strongest remaining user-visible gain is no longer inside post-trade review.
 ### Recommended next step
 Implement `T-109: Initial Trade Protection Slice`.
 
+
+## 2026-04-04 - T-109 Initial Trade Protection Slice
+
+### What was done
+- Implemented bounded initial `stopLoss` / `takeProfit` support across the existing trading contracts so `BuyMarket` and `SellMarket` can open one trade with optional initial protection but without creating a broader risk-management owner.
+- Added protective threshold handling in the post-tick replay loop so open protected trades close through the accepted trading/storage contract with `stop_loss_hit` or `take_profit_hit` when the next replay snapshots reach the configured threshold.
+- Surfaced protection presence, current `stopLoss`, current `takeProfit`, and protective close reason through the existing desktop trading/context/result/history surfaces only, plus one minimal Tk input path for initial SL/TP entry.
+- Added targeted runtime and desktop coverage for unprotected entry, SL-only, TP-only, both-protection, protective close, active protected-trade recovery, and closed protected-trade recovery from the same local trade facts after restart.
+- Synchronized project state and promoted a bounded post-protection audit into the next active task packet as `T-110`.
+
+### What was not changed
+- Module documents and tech schemas were not changed.
+- No new persistence entities or trade-protection history were introduced.
+- No trailing stop, break-even automation, edit workflow, add-on, partial close, pending-order orchestration, dashboard/media scope, mentor logic, mobile, or sync behavior was introduced.
+- `DECISIONS.md` was not changed because no project-level decision was required.
+
+### Why this matters
+The live trade loop is now materially stronger as a discipline trainer: one trade can be opened with bounded initial protection and can close for a protective reason from the same local replay facts, instead of relying only on `entry -> manual close`.
+
+### Remaining gap after this step
+- The repository now needs a bounded post-Initial-Trade-Protection audit so the next slice is chosen by product value rather than by reflexive extension of the protection lane.
+
+### Recommended next step
+Run `T-110: Post-Initial-Trade-Protection Next-Slice Audit`.

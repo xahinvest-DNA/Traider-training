@@ -58,12 +58,22 @@ class DesktopShellController:
         self.replay_session.seek_to(target_timestamp)
         return self.get_workspace_view()
 
-    def buy_market(self, volume: float = 1.0) -> dict[str, Any]:
-        self.trading_loop.buy_market(volume=volume)
+    def buy_market(
+        self,
+        volume: float = 1.0,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
+    ) -> dict[str, Any]:
+        self.trading_loop.buy_market(volume=volume, stop_loss=stop_loss, take_profit=take_profit)
         return self.get_workspace_view()
 
-    def sell_market(self, volume: float = 1.0) -> dict[str, Any]:
-        self.trading_loop.sell_market(volume=volume)
+    def sell_market(
+        self,
+        volume: float = 1.0,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
+    ) -> dict[str, Any]:
+        self.trading_loop.sell_market(volume=volume, stop_loss=stop_loss, take_profit=take_profit)
         return self.get_workspace_view()
 
     def manual_close(self) -> dict[str, Any]:

@@ -3036,6 +3036,153 @@ def test_current_trade_review_digest_derives_statuses_and_recovers() -> None:
     assert gap_summary_2["latest_current_trade_review_digest_next_step"] == gap_summary_1["latest_current_trade_review_digest_next_step"]
 
 
+def test_initial_trade_protection_supports_optional_sl_tp_and_restart_recovery() -> None:
+    session_plain = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_plain = MinimalTradingLoop(session_plain)
+    journal_plain = LocalJournalRuntime(session_plain, trading_plain, _reset_dir(TMP_ROOT / "initial_protection_plain"))
+
+    trading_plain.buy_market(volume=1.0)
+    session_plain.play()
+    session_plain.advance_frame()
+
+    plain_open_view = build_desktop_trading_view(trading_plain)
+    assert plain_open_view["active_trade_present"] is True
+    assert plain_open_view["protection_present"] is False
+    assert plain_open_view["current_stop_loss"] is None
+    assert plain_open_view["current_take_profit"] is None
+
+    trading_plain.manual_close()
+    session_plain.advance_frame()
+
+    plain_result = build_desktop_journal_view(journal_plain)["derived_review_output"]["latest_trade_result"]
+    assert plain_result["close_reason"] == "manual_close"
+    assert plain_result["has_initial_trade_protection"] is False
+    assert plain_result["stop_loss"] is None
+    assert plain_result["take_profit"] is None
+
+    session_sl = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_sl = MinimalTradingLoop(session_sl)
+    journal_sl = LocalJournalRuntime(session_sl, trading_sl, _reset_dir(TMP_ROOT / "initial_protection_only_sl"))
+
+    trading_sl.sell_market(volume=1.0, stop_loss=1.10363)
+    session_sl.play()
+    session_sl.advance_frame()
+
+    sl_open_view = build_desktop_trading_view(trading_sl)
+    assert sl_open_view["protection_present"] is True
+    assert sl_open_view["current_stop_loss"] == 1.10363
+    assert sl_open_view["current_take_profit"] is None
+
+    session_sl.advance_frame()
+
+    sl_trade_view = build_desktop_trading_view(trading_sl)
+    sl_result = build_desktop_journal_view(journal_sl)["derived_review_output"]["latest_trade_result"]
+    assert sl_trade_view["active_trade_present"] is False
+    assert sl_trade_view["last_close_reason"] == "stop_loss_hit"
+    assert sl_trade_view["last_execution_outcome"]["execution_type"] == "protective_close_fill"
+    assert sl_trade_view["last_execution_outcome"]["reason"] == "stop_loss_hit"
+    assert sl_result["close_reason"] == "stop_loss_hit"
+    assert sl_result["has_initial_trade_protection"] is True
+    assert sl_result["stop_loss"] == 1.10363
+    assert sl_result["take_profit"] is None
+
+    session_tp = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_tp = MinimalTradingLoop(session_tp)
+    journal_tp = LocalJournalRuntime(session_tp, trading_tp, _reset_dir(TMP_ROOT / "initial_protection_only_tp"))
+
+    trading_tp.buy_market(volume=1.0, take_profit=1.10360)
+    session_tp.play()
+    session_tp.advance_frame()
+    while trading_tp.get_active_trade_count() == 1:
+        session_tp.advance_frame()
+
+    tp_trade_view = build_desktop_trading_view(trading_tp)
+    tp_result = build_desktop_journal_view(journal_tp)["derived_review_output"]["latest_trade_result"]
+    assert tp_trade_view["last_close_reason"] == "take_profit_hit"
+    assert tp_trade_view["last_execution_outcome"]["execution_type"] == "protective_close_fill"
+    assert tp_trade_view["last_execution_outcome"]["reason"] == "take_profit_hit"
+    assert tp_result["close_reason"] == "take_profit_hit"
+    assert tp_result["stop_loss"] is None
+    assert tp_result["take_profit"] == 1.10360
+    assert tp_result["has_initial_trade_protection"] is True
+
+    session_both = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_both = MinimalTradingLoop(session_both)
+    journal_both = LocalJournalRuntime(session_both, trading_both, _reset_dir(TMP_ROOT / "initial_protection_both"))
+
+    trading_both.buy_market(volume=1.0, stop_loss=1.10340, take_profit=1.10360)
+    session_both.play()
+    session_both.advance_frame()
+    both_open_view = build_desktop_trading_view(trading_both)
+    assert both_open_view["protection_present"] is True
+    assert both_open_view["current_stop_loss"] == 1.10340
+    assert both_open_view["current_take_profit"] == 1.10360
+
+    while trading_both.get_active_trade_count() == 1:
+        session_both.advance_frame()
+
+    both_result = build_desktop_journal_view(journal_both)["derived_review_output"]["latest_trade_result"]
+    assert both_result["close_reason"] == "take_profit_hit"
+    assert both_result["stop_loss"] == 1.10340
+    assert both_result["take_profit"] == 1.10360
+    assert both_result["has_initial_trade_protection"] is True
+
+    active_storage_dir = _reset_dir(TMP_ROOT / "initial_protection_active_recovery")
+    session_active_1 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_active_1 = MinimalTradingLoop(session_active_1)
+    LocalJournalRuntime(session_active_1, trading_active_1, active_storage_dir)
+
+    trading_active_1.buy_market(volume=1.0, stop_loss=1.10340, take_profit=1.10370)
+    session_active_1.play()
+    session_active_1.advance_frame()
+
+    active_view_1 = build_desktop_trading_view(trading_active_1)
+    assert active_view_1["active_trade_present"] is True
+    assert active_view_1["protection_present"] is True
+    assert active_view_1["current_stop_loss"] == 1.10340
+    assert active_view_1["current_take_profit"] == 1.10370
+
+    session_active_2 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_active_2 = MinimalTradingLoop(session_active_2)
+    LocalJournalRuntime(session_active_2, trading_active_2, active_storage_dir)
+
+    recovered_active_view = build_desktop_trading_view(trading_active_2)
+    assert recovered_active_view["active_trade_present"] is True
+    assert recovered_active_view["protection_present"] is True
+    assert recovered_active_view["current_stop_loss"] == active_view_1["current_stop_loss"]
+    assert recovered_active_view["current_take_profit"] == active_view_1["current_take_profit"]
+
+    closed_storage_dir = _reset_dir(TMP_ROOT / "initial_protection_closed_recovery")
+    session_closed_1 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_closed_1 = MinimalTradingLoop(session_closed_1)
+    journal_closed_1 = LocalJournalRuntime(session_closed_1, trading_closed_1, closed_storage_dir)
+
+    trading_closed_1.buy_market(volume=1.0, stop_loss=1.10340, take_profit=1.10360)
+    session_closed_1.play()
+    session_closed_1.advance_frame()
+    while trading_closed_1.get_active_trade_count() == 1:
+        session_closed_1.advance_frame()
+
+    closed_result_1 = build_desktop_journal_view(journal_closed_1)["derived_review_output"]["latest_trade_result"]
+    assert closed_result_1["close_reason"] == "take_profit_hit"
+    assert closed_result_1["stop_loss"] == 1.10340
+    assert closed_result_1["take_profit"] == 1.10360
+    assert closed_result_1["has_initial_trade_protection"] is True
+
+    session_closed_2 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_closed_2 = MinimalTradingLoop(session_closed_2)
+    journal_closed_2 = LocalJournalRuntime(session_closed_2, trading_closed_2, closed_storage_dir)
+
+    recovered_closed_view = build_desktop_trading_view(trading_closed_2)
+    recovered_closed_result = build_desktop_journal_view(journal_closed_2)["derived_review_output"]["latest_trade_result"]
+    assert recovered_closed_view["active_trade_present"] is False
+    assert recovered_closed_view["last_close_reason"] == "take_profit_hit"
+    assert recovered_closed_result["close_reason"] == closed_result_1["close_reason"]
+    assert recovered_closed_result["stop_loss"] == closed_result_1["stop_loss"]
+    assert recovered_closed_result["take_profit"] == closed_result_1["take_profit"]
+    assert recovered_closed_result["has_initial_trade_protection"] is True
+
+
 def test_bill_williams_review_evidence_status_derives_from_review_and_snapshot_context_and_recovers() -> None:
     from runtime_bootstrap import import_raw_dataset
 

@@ -92,6 +92,8 @@ class OrderRecord:
     requested_volume: float
     created_at: str
     replay_mode: str
+    stop_loss: float | None = None
+    take_profit: float | None = None
     filled_at: str | None = None
     rejection_reason: str | None = None
 
@@ -108,6 +110,8 @@ class PositionRecord:
     current_open_volume: float
     average_entry_price: float
     opened_at: str
+    stop_loss: float | None = None
+    take_profit: float | None = None
     closed_at: str | None = None
     average_exit_price: float | None = None
     close_reason: str | None = None
@@ -134,6 +138,8 @@ class TradeRecord:
     entry_price: float | None = None
     exit_price: float | None = None
     average_exit_price: float | None = None
+    stop_loss: float | None = None
+    take_profit: float | None = None
     close_reason: str | None = None
     closed_at: str | None = None
 

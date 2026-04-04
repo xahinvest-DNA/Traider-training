@@ -2812,6 +2812,60 @@ def test_desktop_shell_controller_exposes_chart_snapshot_authoring_flow() -> Non
     assert latest_result["linked_chart_snapshot_count"] == 2
     assert latest_result["linked_chart_snapshot_ids"] == [pre_snapshot_id, review_snapshot_id]
 
+def test_desktop_shell_surfaces_initial_trade_protection_and_restart_recovery() -> None:
+    active_storage_dir = _reset_dir(TMP_ROOT / "desktop_initial_protection_active")
+    controller_1 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=active_storage_dir)
+    controller_1.buy_market(stop_loss=1.10340, take_profit=1.10370)
+    controller_1.play()
+    controller_1.advance_frame()
+
+    active_workspace = controller_1.get_workspace_view()
+    active_trade_lines = build_trade_context_lines(active_workspace["trading"])
+    assert any(line == "Protection present: yes" for line in active_trade_lines)
+    assert any(line == "Stop loss / take profit: 1.1034 / 1.1037" for line in active_trade_lines)
+
+    controller_2 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=active_storage_dir)
+    recovered_active_workspace = controller_2.get_workspace_view()
+    recovered_active_trade_lines = build_trade_context_lines(recovered_active_workspace["trading"])
+    assert recovered_active_workspace["journal"]["recovered"] is True
+    assert any(line == "Protection present: yes" for line in recovered_active_trade_lines)
+    assert any(line == "Stop loss / take profit: 1.1034 / 1.1037" for line in recovered_active_trade_lines)
+
+    closed_storage_dir = _reset_dir(TMP_ROOT / "desktop_initial_protection_closed")
+    controller_3 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=closed_storage_dir)
+    controller_3.buy_market(stop_loss=1.10340, take_profit=1.10360)
+    controller_3.play()
+    controller_3.advance_frame()
+    while controller_3.get_workspace_view()["trading"]["active_trade_present"]:
+        controller_3.advance_frame()
+
+    closed_workspace = controller_3.get_workspace_view()
+    latest_result_lines = build_latest_result_lines(closed_workspace["journal"])
+    history_lines = build_latest_trade_result_lines(closed_workspace["journal"])
+    assert any(line == "Close reason: take_profit_hit" for line in latest_result_lines)
+    assert any(line == "Protection present: yes" for line in latest_result_lines)
+    assert any(line == "Stop loss / take profit: 1.1034 / 1.1036" for line in latest_result_lines)
+    assert any(line == "Close reason: take_profit_hit" for line in history_lines)
+    assert any(line == "Protection present: yes" for line in history_lines)
+    assert any(line == "Stop loss / take profit: 1.1034 / 1.1036" for line in history_lines)
+
+    controller_4 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=closed_storage_dir)
+    recovered_closed_workspace = controller_4.get_workspace_view()
+    recovered_latest_result_lines = build_latest_result_lines(recovered_closed_workspace["journal"])
+    recovered_history_lines = build_latest_trade_result_lines(recovered_closed_workspace["journal"])
+    recovered_trade_lines = build_trade_context_lines(recovered_closed_workspace["trading"])
+
+    assert recovered_closed_workspace["journal"]["recovered"] is True
+    assert any(line == "Active trade: no" for line in recovered_trade_lines)
+    assert any(line == "Last close reason: take_profit_hit" for line in recovered_trade_lines)
+    assert any(line == "Close reason: take_profit_hit" for line in recovered_latest_result_lines)
+    assert any(line == "Protection present: yes" for line in recovered_latest_result_lines)
+    assert any(line == "Stop loss / take profit: 1.1034 / 1.1036" for line in recovered_latest_result_lines)
+    assert any(line == "Close reason: take_profit_hit" for line in recovered_history_lines)
+    assert any(line == "Protection present: yes" for line in recovered_history_lines)
+    assert any(line == "Stop loss / take profit: 1.1034 / 1.1036" for line in recovered_history_lines)
+
+
 def test_desktop_shell_surfaces_bill_williams_review_evidence_status_after_reopen() -> None:
     storage_dir = _reset_dir(TMP_ROOT / "review_evidence_status_surfaces_state")
 
