@@ -1,0 +1,27 @@
+{
+  "dataset_id": "eurusd-raw-e7aedd7e-v1",
+  "status": "accepted_with_warnings",
+  "warnings": [
+    "repaired_out_of_order_ticks:1",
+    "unexpected_gaps:1"
+  ],
+  "warning_count": 2,
+  "warning_preview": "repaired_out_of_order_ticks:1, unexpected_gaps:1",
+  "errors": [],
+  "timezone_canonical": "UTC",
+  "normalized_precision": 5,
+  "raw_row_count": 3,
+  "tick_count": 3,
+  "source_type": "user_supplied",
+  "source_id": "eurusd_raw.csv",
+  "duplicate_tick_count": 0,
+  "duplicate_timestamp_count": 0,
+  "unexpected_gap_count": 1,
+  "repaired_out_of_order_count": 1,
+  "data_quality_flags": [
+    "repaired_out_of_order_ticks"
+  ],
+  "liquidity_flags": [
+    "unexpected_gap"
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "training_session": {
+    "session_id": "session-8fddb7fefcf6",
+    "mode": "training",
+    "session_type": "training_session",
+    "instrument_id": "EURUSD",
+    "symbol": "EURUSD",
+    "market_profile": "FX/CFD",
+    "dataset_id": "eurusd-sample-v1",
+    "started_at": "2025-01-02T10:00:00Z",
+    "status": "created",
+    "created_at": "2025-01-02T10:00:00Z",
+    "schema_version": "journal-schema/v1",
+    "ended_at": null,
+    "active_timeframe": "M1",
+    "synchronized_timeframes": [
+      "M1",
+      "M5"
+    ],
+    "start_simulation_time": "2025-01-02T10:00:00Z",
+    "end_simulation_time": null,
+    "finalization_status": "open",
+    "finalized_at": null,
+    "finalization_reason": null,
+    "recovery_context_acknowledged_at": null,
+    "updated_at": "2025-01-02T10:00:00Z"
+  },
+  "chart_snapshots": [
+    {
+      "snapshot_id": "snapshot-d146d8cd023c",
+      "session_id": "session-8fddb7fefcf6",
+      "captured_at": "2025-01-02T10:00:00Z",
+      "artifact_type": "image_path",
+      "artifact_ref": "snapshots/session-2/review.png",
+      "schema_version": "journal-schema/v1",
+      "trade_id": null,
+      "execution_id": null,
+      "simulation_time": "2025-01-02T10:00:00Z",
+      "timeframe_context": "M1",
+      "instrument_id": "EURUSD",
+      "snapshot_role": "review_context",
+      "annotation_ref": null,
+      "created_at": "2025-01-02T10:00:00Z"
+    }
+  ],
+  "pre_trade_notes": [
+    {
+      "note_id": "note-452a29f1fb43",
+      "session_id": "session-8fddb7fefcf6",
+      "note_type": "trade_intent",
+      "content": "Recovered note",
+      "note_timestamp": "2025-01-02T10:00:00Z",
+      "created_at": "2025-01-02T10:00:00Z",
+      "schema_version": "journal-schema/v1",
+      "trade_id": null,
+      "instrument_id": "EURUSD",
+      "timeframe_context": "M1",
+      "setup_tag": null,
+      "thesis_summary": null,
+      "risk_plan": null,
+      "chart_snapshot_ref": "snapshot-d146d8cd023c",
+      "updated_at": null
+    }
+  ],
+  "post_trade_reviews": [],
+  "behavioral_flags": [],
+  "rule_violations": [],
+  "review_pending_trade_id": null,
+  "trading_state": {
+    "lifecycle_state": "Idle",
+    "active_trade_id": null,
+    "active_position_id": null,
+    "pending_order_id": null,
+    "pending_close_order_id": null,
+    "orders": [],
+    "position": null,
+    "trades": [],
+    "executions": [],
+    "last_execution": null
+  },
+  "replay_state": {
+    "time_cursor": 0,
+    "simulation_time": "2025-01-02T10:00:00Z",
+    "active_timeframe": "M1",
+    "synchronized_timeframes": [
+      "M1",
+      "M5"
+    ],
+    "is_paused": true,
+    "is_finished": false,
+    "speed_multiplier": 1.0
+  }
+}

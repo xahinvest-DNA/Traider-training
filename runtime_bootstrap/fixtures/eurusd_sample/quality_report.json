@@ -1,0 +1,9 @@
+﻿{
+  "dataset_id": "eurusd-sample-v1",
+  "status": "accepted",
+  "warnings": [],
+  "errors": [],
+  "timezone_canonical": "UTC",
+  "normalized_precision": 5,
+  "tick_count": 6
+}

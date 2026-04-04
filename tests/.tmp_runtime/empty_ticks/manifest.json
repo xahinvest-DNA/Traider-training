@@ -1,0 +1,14 @@
+{
+  "schema_version": "replay-dataset/v1",
+  "dataset_id": "eurusd-sample-v1",
+  "instrument_id": "EURUSD",
+  "market_profile": "FX/CFD",
+  "timezone_canonical": "UTC",
+  "price_precision": 5,
+  "dataset_start_time": "2025-01-02T10:00:00Z",
+  "dataset_end_time": "2025-01-02T10:00:07Z",
+  "active_timeframe": "M1",
+  "synchronized_timeframes": ["M1", "M5"],
+  "quality_report_ref": "quality_report.json",
+  "ticks_ref": "ticks.json"
+}

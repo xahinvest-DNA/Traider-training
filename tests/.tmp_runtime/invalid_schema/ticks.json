@@ -1,0 +1,8 @@
+[
+  {"timestamp": "2025-01-02T10:00:00Z", "bid": 1.10345, "ask": 1.10357, "source_id": "fixture"},
+  {"timestamp": "2025-01-02T10:00:01Z", "bid": 1.10348, "ask": 1.10360, "source_id": "fixture"},
+  {"timestamp": "2025-01-02T10:00:03Z", "bid": 1.10352, "ask": 1.10364, "source_id": "fixture"},
+  {"timestamp": "2025-01-02T10:00:04Z", "bid": 1.10350, "ask": 1.10362, "source_id": "fixture"},
+  {"timestamp": "2025-01-02T10:00:06Z", "bid": 1.10356, "ask": 1.10368, "source_id": "fixture"},
+  {"timestamp": "2025-01-02T10:00:07Z", "bid": 1.10361, "ask": 1.10373, "source_id": "fixture"}
+]

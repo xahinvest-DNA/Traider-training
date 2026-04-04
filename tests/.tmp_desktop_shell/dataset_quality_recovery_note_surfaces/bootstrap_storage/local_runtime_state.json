@@ -1,0 +1,58 @@
+{
+  "training_session": {
+    "session_id": "session-aad1d122d2d5",
+    "mode": "training",
+    "session_type": "training_session",
+    "instrument_id": "EURUSD",
+    "symbol": "EURUSD",
+    "market_profile": "FX/CFD",
+    "dataset_id": "eurusd-raw-e7aedd7e-v1",
+    "started_at": "2025-01-02T10:00:00Z",
+    "status": "created",
+    "created_at": "2025-01-02T10:00:00Z",
+    "schema_version": "journal-schema/v1",
+    "ended_at": null,
+    "active_timeframe": "M1",
+    "synchronized_timeframes": [
+      "M1",
+      "M5"
+    ],
+    "start_simulation_time": "2025-01-02T10:00:00Z",
+    "end_simulation_time": null,
+    "finalization_status": "open",
+    "finalized_at": null,
+    "finalization_reason": null,
+    "recovery_context_acknowledged_at": null,
+    "updated_at": null
+  },
+  "chart_snapshots": [],
+  "pre_trade_notes": [],
+  "post_trade_reviews": [],
+  "behavioral_flags": [],
+  "rule_violations": [],
+  "review_pending_trade_id": null,
+  "trading_state": {
+    "lifecycle_state": "Idle",
+    "active_trade_id": null,
+    "active_position_id": null,
+    "pending_order_id": null,
+    "pending_close_order_id": null,
+    "orders": [],
+    "position": null,
+    "trades": [],
+    "executions": [],
+    "last_execution": null
+  },
+  "replay_state": {
+    "time_cursor": 0,
+    "simulation_time": "2025-01-02T10:00:00Z",
+    "active_timeframe": "M1",
+    "synchronized_timeframes": [
+      "M1",
+      "M5"
+    ],
+    "is_paused": true,
+    "is_finished": false,
+    "speed_multiplier": 1.0
+  }
+}

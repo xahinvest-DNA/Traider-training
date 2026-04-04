@@ -1,0 +1,24 @@
+{
+  "schema_version": "replay-dataset/v1",
+  "dataset_id": "eurusd-raw-e7aedd7e-v1",
+  "instrument_id": "EURUSD",
+  "market_profile": "FX/CFD",
+  "timezone_canonical": "UTC",
+  "price_precision": 5,
+  "dataset_start_time": "2025-01-02T10:00:00Z",
+  "dataset_end_time": "2025-01-02T10:02:30Z",
+  "active_timeframe": "M1",
+  "synchronized_timeframes": [
+    "M1",
+    "M5"
+  ],
+  "quality_report_ref": "quality_report.json",
+  "ticks_ref": "ticks.json",
+  "source_type": "user_supplied",
+  "source_id": "eurusd_raw.csv",
+  "raw_input_ref": "tests\\.tmp_runtime\\dataset_quality_context_projection\\eurusd_raw.csv",
+  "imported_at": "2026-04-04T06:48:35.926890Z",
+  "checksum": "e7aedd7e85a3f54a4baf32764b8689d639792290dbb49f72282a3d722deced07",
+  "quality_summary": "accepted_with_warnings",
+  "warning_count": 2
+}

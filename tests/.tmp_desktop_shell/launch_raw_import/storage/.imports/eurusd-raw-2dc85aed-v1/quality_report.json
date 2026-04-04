@@ -1,0 +1,20 @@
+{
+  "dataset_id": "eurusd-raw-2dc85aed-v1",
+  "status": "accepted",
+  "warnings": [],
+  "warning_count": 0,
+  "warning_preview": "none",
+  "errors": [],
+  "timezone_canonical": "UTC",
+  "normalized_precision": 5,
+  "raw_row_count": 2,
+  "tick_count": 2,
+  "source_type": "user_supplied",
+  "source_id": "eurusd_raw.csv",
+  "duplicate_tick_count": 0,
+  "duplicate_timestamp_count": 0,
+  "unexpected_gap_count": 0,
+  "repaired_out_of_order_count": 0,
+  "data_quality_flags": [],
+  "liquidity_flags": []
+}
