@@ -52,6 +52,7 @@ def build_trade_review_result(
         snapshot_index,
     )
     linked_snapshot_summaries = _merge_snapshot_summaries(latest_note_snapshot, latest_review_snapshots)
+    review_status = _review_status(trade, trade_reviews)
     method_facets = _build_method_facets(latest_review)
     intent_delta = _build_intent_delta(latest_note, latest_review, method_facets)
     review_completeness = _build_review_completeness(latest_review, method_facets)
@@ -91,6 +92,15 @@ def build_trade_review_result(
         latest_note_snapshot=latest_note_snapshot,
         latest_review_snapshots=latest_review_snapshots,
     )
+    current_trade_review_digest = _build_current_trade_review_digest(
+        review_status=review_status,
+        intent_delta=intent_delta,
+        review_completeness=review_completeness,
+        review_rule_context=review_rule_context,
+        review_discipline_reason=review_discipline_reason,
+        review_evidence_status=review_evidence_status,
+        review_evidence_follow_up=review_evidence_follow_up,
+    )
 
     return {
         "trade_id": trade.trade_id,
@@ -105,7 +115,7 @@ def build_trade_review_result(
         "total_trade_cost": trade.total_trade_cost,
         "holding_time_seconds": _holding_time_seconds(trade),
         "outcome_label": _outcome_label(trade),
-        "review_status": _review_status(trade, trade_reviews),
+        "review_status": review_status,
         "setup_tag": (
             latest_review.setup_tag if latest_review and latest_review.setup_tag else latest_note.setup_tag if latest_note else None
         ),
@@ -132,6 +142,10 @@ def build_trade_review_result(
         "has_bill_williams_review_evidence": review_evidence_status["has_bill_williams_review_evidence"],
         "bill_williams_review_evidence_follow_up_status": review_evidence_follow_up["follow_up_status"],
         "bill_williams_review_evidence_follow_up_text": review_evidence_follow_up["follow_up_text"],
+        "current_trade_review_digest_status": current_trade_review_digest["digest_status"],
+        "current_trade_review_digest_headline": current_trade_review_digest["digest_headline"],
+        "current_trade_review_digest_primary_gap": current_trade_review_digest["digest_primary_gap"],
+        "current_trade_review_digest_next_step": current_trade_review_digest["digest_next_step"],
         "pre_trade_note_count": len(trade_notes),
         "post_trade_review_count": len(trade_reviews),
         "behavioral_flag_count": len(trade_flags),
@@ -401,6 +415,18 @@ def build_session_review_summary(
         ),
         "latest_bill_williams_review_evidence_follow_up_text": (
             latest_trade_result["bill_williams_review_evidence_follow_up_text"] if latest_trade_result else None
+        ),
+        "latest_current_trade_review_digest_status": (
+            latest_trade_result["current_trade_review_digest_status"] if latest_trade_result else "not_applicable"
+        ),
+        "latest_current_trade_review_digest_headline": (
+            latest_trade_result["current_trade_review_digest_headline"] if latest_trade_result else None
+        ),
+        "latest_current_trade_review_digest_primary_gap": (
+            latest_trade_result["current_trade_review_digest_primary_gap"] if latest_trade_result else None
+        ),
+        "latest_current_trade_review_digest_next_step": (
+            latest_trade_result["current_trade_review_digest_next_step"] if latest_trade_result else None
         ),
         "latest_linked_chart_snapshot_count": (
             latest_trade_result["linked_chart_snapshot_count"] if latest_trade_result else 0
@@ -2025,6 +2051,69 @@ def _build_bill_williams_review_evidence_follow_up(
     return {
         "follow_up_status": "not_applicable",
         "follow_up_text": None,
+    }
+
+
+
+def _build_current_trade_review_digest(
+    review_status: str,
+    intent_delta: dict,
+    review_completeness: dict,
+    review_rule_context: dict,
+    review_discipline_reason: dict,
+    review_evidence_status: dict,
+    review_evidence_follow_up: dict,
+) -> dict:
+    if review_status != "reviewed":
+        return {
+            "digest_status": "pending_review",
+            "digest_headline": "Post-trade review is still missing for this closed trade.",
+            "digest_primary_gap": "pending review",
+            "digest_next_step": "Add PostTradeReview to capture the trade takeaway.",
+        }
+
+    follow_up_status = review_evidence_follow_up.get("follow_up_status")
+    if follow_up_status in {"link_any_chart_evidence", "link_pre_trade_snapshot", "link_review_snapshot"}:
+        return {
+            "digest_status": "reviewed_gap_open",
+            "digest_headline": "Reviewed trade still needs linked chart evidence.",
+            "digest_primary_gap": review_evidence_status.get("evidence_text") or "Linked chart evidence is still incomplete for this review.",
+            "digest_next_step": review_evidence_follow_up.get("follow_up_text"),
+        }
+
+    completeness_status = review_completeness.get("completeness_status")
+    missing_parts = list(review_completeness.get("missing_parts") or [])
+    if completeness_status in {"partial", "sparse", "review_missing"} and missing_parts:
+        next_field = missing_parts[0]
+        return {
+            "digest_status": "reviewed_gap_open",
+            "digest_headline": "Reviewed trade is present, but key review parts are still missing.",
+            "digest_primary_gap": f"Missing review parts: {', '.join(missing_parts)}.",
+            "digest_next_step": _review_sequence_prompt(next_field, intent_delta),
+        }
+
+    reason_status = review_discipline_reason.get("reason_status")
+    if reason_status in {
+        "guard_execution_reason",
+        "recheck_rules_reason",
+        "recheck_intent_reason",
+        "declare_intent_reason",
+        "review_required_reason",
+        "complete_context_reason",
+    }:
+        return {
+            "digest_status": "reviewed_gap_open",
+            "digest_headline": "Reviewed trade is clear enough, but rule or discipline pressure is still open.",
+            "digest_primary_gap": review_discipline_reason.get("reason_text") or review_rule_context.get("context_text"),
+            "digest_next_step": None,
+        }
+
+    setup_tag = review_rule_context.get("setup_tag") or "-"
+    return {
+        "digest_status": "reviewed_clear",
+        "digest_headline": f"Reviewed trade takeaway is clear for {setup_tag}.",
+        "digest_primary_gap": None,
+        "digest_next_step": None,
     }
 
 

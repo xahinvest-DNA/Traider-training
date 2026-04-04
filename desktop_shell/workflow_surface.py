@@ -154,6 +154,9 @@ def _build_review_prompt_lines(
 
 def _append_review_messages(lines: list[str], summary: dict[str, Any], latest_trade_result: dict[str, Any] | None) -> None:
     message_fields = [
+        summary.get("latest_current_trade_review_digest_headline"),
+        summary.get("latest_current_trade_review_digest_primary_gap"),
+        summary.get("latest_current_trade_review_digest_next_step"),
         (summary.get("review_weak_spots") or {}).get("advisory_prompt"),
         (summary.get("review_progress") or {}).get("advisory_prompt"),
         (summary.get("review_momentum") or {}).get("advisory_prompt"),
@@ -208,6 +211,9 @@ def _append_review_messages(lines: list[str], summary: dict[str, Any], latest_tr
         if recommended_order:
             message_fields.append(f"Recommended review order: {' -> '.join(recommended_order)}")
         message_fields.extend([
+            latest_trade_result.get("current_trade_review_digest_headline"),
+            latest_trade_result.get("current_trade_review_digest_primary_gap"),
+            latest_trade_result.get("current_trade_review_digest_next_step"),
             review_sequence.get("next_prompt"),
             (latest_trade_result.get("review_rule_context") or {}).get("context_text"),
             (latest_trade_result.get("review_discipline_cue") or {}).get("cue_text"),

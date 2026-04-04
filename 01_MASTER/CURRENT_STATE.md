@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-04
-Current stage: Bill Williams Review Evidence Follow-Up implemented; Current Trade Review Digest selected by the bounded post-evidence-follow-up audit
-Active module: Current Trade Review Digest is the next bounded product-facing slice after Bill Williams Review Evidence Follow-Up
-Active question: how should the current desktop-first/local-first review workflow expose one compact current-trade digest from existing review signals without reopening the evidence chain, dashboard scope, mentor logic, mobile, sync, or new persistence
+Current stage: Current Trade Review Digest implemented as one bounded derive-on-read takeaway layer for the latest/current closed trade
+Active module: Post-Digest Next-Slice Audit is the next bounded managerial step after Current Trade Review Digest
+Active question: after Current Trade Review Digest, which single bounded next slice gives the strongest user-visible value inside the current desktop-first/local-first review workflow without reopening digest layering, mentor/dashboard drift, workflow-engine logic, mobile, sync, or new persistence
 
 ## Where the project is now
 
@@ -92,6 +92,7 @@ At this point:
 - derive-on-read Bill Williams review discipline reason is implemented across current trade review output, session summary, and desktop context/history/workflow surfaces;
 - derive-on-read Bill Williams review evidence status is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces using only existing review facts and linked snapshot refs, with restart recovery covered from existing local facts;
 - derive-on-read Bill Williams review evidence follow-up is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces so missing or partial chart evidence now maps to one compact next-step cue rebuilt from existing local facts after restart;
+- derive-on-read Current Trade Review Digest is implemented across current trade review output, session review summary, and desktop result/history/context/workflow surfaces so the latest/current closed trade now exposes one compact takeaway headline, primary gap, and next step rebuilt from existing local facts after restart;
 - the bounded post-evidence-follow-up audit rejects further evidence-chain continuation, recovery-tail micro-polish, dashboard/media expansion, mentor logic, queue/blocker orchestration, and mobile/sync drift as the wrong current frontier for the local desktop review loop;
 - the audit selects Current Trade Review Digest as the strongest next slice because the main remaining product gap is no longer evidence diagnosis or evidence actionability, but fragmented review feedback across many small signals;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
@@ -148,7 +149,7 @@ At this point:
 
 ## Next step
 
-The next working step is to implement one bounded Current Trade Review Digest slice so the current desktop-first/local-first review workflow can turn existing review, evidence, and discipline signals into one compact user-facing takeaway without adding mentor logic, queue/blocker state, dashboard scope, or new persistence.
+The next working step is to run one bounded Post-Digest Next-Slice Audit so the repository chooses the single strongest product-facing slice after Current Trade Review Digest instead of continuing digest layering, reopening evidence-chain inertia, or drifting into mentor, dashboard, workflow-engine, mobile, sync, or new-persistence scope.
 
 ## What must not be lost in a new chat
 

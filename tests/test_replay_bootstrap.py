@@ -2940,6 +2940,102 @@ def test_dataset_quality_recovery_acknowledgment_is_not_exposed_without_warned_r
     assert recovery_ack["acknowledgment_status"] == "not_applicable"
     assert recovery_ack["status_text"] is None
 
+
+def test_current_trade_review_digest_derives_statuses_and_recovers() -> None:
+    session_none = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_none = MinimalTradingLoop(session_none)
+    journal_none = LocalJournalRuntime(session_none, trading_none, _reset_dir(TMP_ROOT / "digest_not_applicable_state"))
+    summary_none = build_desktop_journal_view(journal_none)["session_review_summary"]
+    assert summary_none["latest_current_trade_review_digest_status"] == "not_applicable"
+    assert summary_none["latest_current_trade_review_digest_headline"] is None
+
+    session_pending = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_pending = MinimalTradingLoop(session_pending)
+    journal_pending = LocalJournalRuntime(session_pending, trading_pending, _reset_dir(TMP_ROOT / "digest_pending_review_state"))
+    trading_pending.buy_market(volume=1.0)
+    session_pending.play()
+    session_pending.advance_frame()
+    trading_pending.manual_close()
+    session_pending.advance_frame()
+    pending_view = build_desktop_journal_view(journal_pending)
+    pending_result = pending_view["derived_review_output"]["latest_trade_result"]
+    assert pending_result["current_trade_review_digest_status"] == "pending_review"
+    assert pending_result["current_trade_review_digest_headline"] == "Post-trade review is still missing for this closed trade."
+    assert pending_result["current_trade_review_digest_primary_gap"] == "pending review"
+    assert pending_result["current_trade_review_digest_next_step"] == "Add PostTradeReview to capture the trade takeaway."
+
+    session_clear = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_clear = MinimalTradingLoop(session_clear)
+    journal_clear = LocalJournalRuntime(session_clear, trading_clear, _reset_dir(TMP_ROOT / "digest_reviewed_clear_state"))
+    clear_pre = journal_clear.create_chart_snapshot(artifact_ref="snapshots/digest/clear-pre.png", snapshot_role="pre_entry_context")
+    journal_clear.create_pre_trade_note(
+        content="Clear digest note",
+        setup_tag="BW_FRACTAL_LONG",
+        chart_snapshot_ref=clear_pre.snapshot_id,
+    )
+    trading_clear.buy_market(volume=1.0)
+    session_clear.play()
+    session_clear.advance_frame()
+    trading_clear.manual_close()
+    session_clear.advance_frame()
+    clear_review = journal_clear.create_chart_snapshot(artifact_ref="snapshots/digest/clear-review.png", snapshot_role="review_context")
+    journal_clear.create_post_trade_review(
+        content="Clear digest review",
+        setup_tag="BW_FRACTAL_LONG",
+        compliance_label="valid_setup",
+        setup_variant="fractal_breakout",
+        entry_timing_label="timely_entry",
+        market_context_label="clean_context",
+        exit_quality_label="disciplined_exit",
+        review_clarity_label="high_clarity",
+        chart_snapshot_refs=(clear_review.snapshot_id,),
+    )
+    clear_view = build_desktop_journal_view(journal_clear)
+    clear_result = clear_view["derived_review_output"]["latest_trade_result"]
+    assert clear_result["current_trade_review_digest_status"] == "reviewed_clear"
+    assert clear_result["current_trade_review_digest_headline"] == "Reviewed trade takeaway is clear for BW_FRACTAL_LONG."
+    assert clear_result["current_trade_review_digest_primary_gap"] is None
+    assert clear_result["current_trade_review_digest_next_step"] is None
+
+    storage_dir = _reset_dir(TMP_ROOT / "digest_reviewed_gap_state")
+    session_gap = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_gap = MinimalTradingLoop(session_gap)
+    journal_gap = LocalJournalRuntime(session_gap, trading_gap, storage_dir)
+    trading_gap.buy_market(volume=1.0)
+    session_gap.play()
+    session_gap.advance_frame()
+    trading_gap.manual_close()
+    session_gap.advance_frame()
+    journal_gap.create_post_trade_review(
+        content="Gap-open review",
+        setup_tag="BW_1WM_LONG",
+        compliance_label="valid_setup",
+    )
+    gap_view_1 = build_desktop_journal_view(journal_gap)
+    gap_result_1 = gap_view_1["derived_review_output"]["latest_trade_result"]
+    gap_summary_1 = gap_view_1["session_review_summary"]
+    assert gap_result_1["current_trade_review_digest_status"] == "reviewed_gap_open"
+    assert gap_result_1["current_trade_review_digest_headline"] == "Reviewed trade still needs linked chart evidence."
+    assert gap_result_1["current_trade_review_digest_primary_gap"] == "Bill Williams review is filled, but no linked chart evidence is attached yet."
+    assert gap_result_1["current_trade_review_digest_next_step"] == "Link a pre-trade or review chart snapshot to back this Bill Williams review."
+    assert gap_summary_1["latest_current_trade_review_digest_status"] == "reviewed_gap_open"
+
+    session_gap_recovered = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_gap_recovered = MinimalTradingLoop(session_gap_recovered)
+    journal_gap_recovered = LocalJournalRuntime(session_gap_recovered, trading_gap_recovered, storage_dir)
+    gap_view_2 = build_desktop_journal_view(journal_gap_recovered)
+    gap_result_2 = gap_view_2["derived_review_output"]["latest_trade_result"]
+    gap_summary_2 = gap_view_2["session_review_summary"]
+    assert gap_result_2["current_trade_review_digest_status"] == "reviewed_gap_open"
+    assert gap_result_2["current_trade_review_digest_headline"] == gap_result_1["current_trade_review_digest_headline"]
+    assert gap_result_2["current_trade_review_digest_primary_gap"] == gap_result_1["current_trade_review_digest_primary_gap"]
+    assert gap_result_2["current_trade_review_digest_next_step"] == gap_result_1["current_trade_review_digest_next_step"]
+    assert gap_summary_2["latest_current_trade_review_digest_status"] == gap_summary_1["latest_current_trade_review_digest_status"]
+    assert gap_summary_2["latest_current_trade_review_digest_headline"] == gap_summary_1["latest_current_trade_review_digest_headline"]
+    assert gap_summary_2["latest_current_trade_review_digest_primary_gap"] == gap_summary_1["latest_current_trade_review_digest_primary_gap"]
+    assert gap_summary_2["latest_current_trade_review_digest_next_step"] == gap_summary_1["latest_current_trade_review_digest_next_step"]
+
+
 def test_bill_williams_review_evidence_status_derives_from_review_and_snapshot_context_and_recovers() -> None:
     from runtime_bootstrap import import_raw_dataset
 

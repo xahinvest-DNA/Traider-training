@@ -27,6 +27,10 @@ def build_latest_trade_result_lines(journal_view: dict[str, Any]) -> list[str]:
     review_evidence_text = latest.get("bill_williams_review_evidence_text") or "-"
     review_follow_up_status = latest.get("bill_williams_review_evidence_follow_up_status") or "-"
     review_follow_up_text = latest.get("bill_williams_review_evidence_follow_up_text") or "-"
+    digest_status = latest.get("current_trade_review_digest_status") or "-"
+    digest_headline = latest.get("current_trade_review_digest_headline") or "-"
+    digest_primary_gap = latest.get("current_trade_review_digest_primary_gap") or "-"
+    digest_next_step = latest.get("current_trade_review_digest_next_step") or "-"
     missing_parts = ", ".join(completeness["missing_parts"]) or "none"
     recommended_order = " -> ".join(review_sequence["recommended_missing_order"]) or "none"
     return [
@@ -34,6 +38,10 @@ def build_latest_trade_result_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Outcome / review: {latest['outcome_label']} / {latest['review_status']}",
         f"PnL / cost: {latest['realised_pnl']:.5f} / {latest['total_trade_cost']:.5f}",
         f"Holding sec: {latest['holding_time_seconds']}",
+        f"Review digest: {digest_status}",
+        f"Digest headline: {digest_headline}",
+        f"Digest primary gap: {digest_primary_gap}",
+        f"Digest next step: {digest_next_step}",
         f"Setup / compliance: {latest['setup_tag'] or '-'} / {latest['compliance_label'] or '-'}",
         f"Intent delta: {delta['delta_status']}",
         f"Declared / reviewed: {delta['declared_setup_tag'] or '-'} / {delta['reviewed_setup_tag'] or '-'}",

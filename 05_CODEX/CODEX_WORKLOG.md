@@ -234,3 +234,26 @@ Run one bounded managerial audit after `Bill Williams Review Evidence Follow-Up`
 
 ### Recommended next step
 Implement `T-106: Current Trade Review Digest Slice`.
+
+## 2026-04-04 - T-106 Current Trade Review Digest Slice
+
+### What was done
+- Implemented one bounded derive-on-read current-trade digest in `runtime_bootstrap/review_projection.py` over existing review status, evidence follow-up, review completeness, and already surfaced rule/discipline pressure.
+- Exposed the digest through existing desktop `result`, `history`, `context`, and `workflow` surfaces only, without adding a new subsystem, screen, workflow owner, or persistence layer.
+- Added targeted runtime and desktop coverage for the required digest states `not_applicable`, `pending_review`, `reviewed_clear`, and `reviewed_gap_open`, including restart recovery from the same local facts after reopen.
+- Synchronized project state and promoted a bounded post-digest audit into the next active task packet as `T-107`.
+
+### What was not changed
+- Module documents and tech schemas were not changed.
+- Runtime persistence entities were not changed.
+- No new dashboard, mentor, mobile, sync, media, or workflow-engine layer was introduced.
+- `DECISIONS.md` was not changed because no project-level decision was required.
+
+### Why this matters
+The current review loop now gives one compact trade-level takeaway for the latest/current closed trade, so users can understand the outcome of review faster without reading a scattered set of small signals or treating the digest as a new owner of truth.
+
+### Remaining gap after this step
+- The strongest next bounded slice after the digest still needs to be selected by an explicit frontier audit instead of by mechanically extending the digest/evidence chain.
+
+### Recommended next step
+Run `T-107: Post-Digest Next-Slice Audit`.

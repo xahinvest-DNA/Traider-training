@@ -86,6 +86,10 @@ def build_review_summary_lines(journal_view: dict[str, Any]) -> list[str]:
     latest_evidence_text = summary.get("latest_bill_williams_review_evidence_text") or "-"
     latest_follow_up_status = summary.get("latest_bill_williams_review_evidence_follow_up_status") or "-"
     latest_follow_up_text = summary.get("latest_bill_williams_review_evidence_follow_up_text") or "-"
+    latest_digest_status = summary.get("latest_current_trade_review_digest_status") or "not_applicable"
+    latest_digest_headline = summary.get("latest_current_trade_review_digest_headline") or "-"
+    latest_digest_primary_gap = summary.get("latest_current_trade_review_digest_primary_gap") or "-"
+    latest_digest_next_step = summary.get("latest_current_trade_review_digest_next_step") or "-"
     dataset_quality = journal_view.get("dataset_quality_context") or {}
     coverage = summary.get("review_field_coverage") or {}
     completed_facets = sum(1 for value in latest_method_facets.values() if value)
@@ -194,6 +198,10 @@ def build_review_summary_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Discipline reason text: {review_discipline_reason.get('reason_text') or '-'}",
         f"Review dataset link: {review_dataset_quality_link.get('link_status') or '-'}",
         f"Review dataset link text: {review_dataset_quality_link.get('link_text') or '-'}",
+        f"Latest trade digest: {latest_digest_status}",
+        f"Digest headline: {latest_digest_headline}",
+        f"Digest primary gap: {latest_digest_primary_gap}",
+        f"Digest next step: {latest_digest_next_step}",
         f"Latest BW evidence: {latest_evidence_status}",
         f"Latest BW evidence text: {latest_evidence_text}",
         f"Latest BW evidence follow-up: {latest_follow_up_status}",
@@ -252,6 +260,10 @@ def build_latest_result_lines(journal_view: dict[str, Any]) -> list[str]:
     review_evidence_text = latest_trade_result.get("bill_williams_review_evidence_text") or "-"
     review_follow_up_status = latest_trade_result.get("bill_williams_review_evidence_follow_up_status") or "-"
     review_follow_up_text = latest_trade_result.get("bill_williams_review_evidence_follow_up_text") or "-"
+    digest_status = latest_trade_result.get("current_trade_review_digest_status") or "not_applicable"
+    digest_headline = latest_trade_result.get("current_trade_review_digest_headline") or "-"
+    digest_primary_gap = latest_trade_result.get("current_trade_review_digest_primary_gap") or "-"
+    digest_next_step = latest_trade_result.get("current_trade_review_digest_next_step") or "-"
     dataset_quality = journal_view.get("dataset_quality_context") or {}
     missing_parts = ", ".join(completeness["missing_parts"]) or "none"
     recommended_order = " -> ".join(review_sequence["recommended_missing_order"]) or "none"
@@ -295,6 +307,10 @@ def build_latest_result_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Discipline reason text: {review_discipline_reason.get('reason_text') or '-'}",
         f"Review dataset link: {review_dataset_quality_link.get('link_status') or '-'}",
         f"Review dataset link text: {review_dataset_quality_link.get('link_text') or '-'}",
+        f"Review digest: {digest_status}",
+        f"Digest headline: {digest_headline}",
+        f"Digest primary gap: {digest_primary_gap}",
+        f"Digest next step: {digest_next_step}",
         f"Review evidence: {review_evidence_status}",
         f"Review evidence text: {review_evidence_text}",
         f"Review evidence follow-up: {review_follow_up_status}",
