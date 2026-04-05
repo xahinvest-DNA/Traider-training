@@ -861,3 +861,12 @@
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/REPLAY_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/TASKS.md`
 - Expected result: `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md` with purpose, product statement, current problem, stage goal, start flow, screen zones, chart boundary, replay UX boundary, trading UX boundary, compact context boundary, review entry boundary, secondary/debug separation, acceptance scenario, and explicit non-goals.
 - Outcome: fixed the product-facing chart-first boundary for desktop trainer workspace v1, made `bar chart only + Alligator + Fractals + AO` mandatory, and explicitly separated primary workspace from secondary and debug surfaces while preserving existing ownership contracts.
+
+### T-123
+
+- Status: completed
+- Module: Desktop Trainer Workspace Implementation Sequencing
+- Goal: create one bounded planning document that decomposes the accepted chart-first desktop trainer workspace boundary into the minimum realistic implementation sequence without architectural rewrite, source-of-truth drift, or premature replacement of the active coding frontier.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/REPLAY_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/TASKS.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md`
+- Expected result: `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md` with an explicit alignment decision, realistic bounded slice order, risks, and one strongest next desktop implementation slice.
+- Outcome: fixed the desktop-reset implementation order, decided that no separate pre-alignment pass for `03_MODULES/DESKTOP_WORKSPACE.md` is required before future coding, and selected `Desktop Trainer Main Screen Reset` as the strongest next desktop implementation slice once the repository intentionally opens the desktop-reset lane.

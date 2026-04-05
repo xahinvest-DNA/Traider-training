@@ -271,3 +271,40 @@ The repository already had a technically working desktop shell, but it still rea
 
 ### Recommended next step
 Run one bounded follow-up audit or implementation-planning pass that maps the accepted `DESKTOP_TRAINER_WORKSPACE_V1.md` boundary onto the smallest possible desktop-shell implementation sequence.
+
+## 2026-04-05 — T-123 Desktop Trainer Workspace Implementation Sequencing
+
+### Goal
+Create one bounded planning document that decomposes the accepted chart-first desktop trainer workspace boundary into the minimum realistic implementation sequence without architectural rewrite, source-of-truth drift, or premature replacement of the active coding frontier.
+
+### Files created
+- `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`
+
+### Files updated
+- `05_CODEX/TASKS.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Added a new bounded implementation-sequencing document for the desktop-reset lane on top of the accepted `T-122` workspace boundary.
+- Gave an explicit managerial decision that `03_MODULES/DESKTOP_WORKSPACE.md` does not require a separate mandatory alignment pass before future desktop-reset coding starts.
+- Broke the workspace reset into a realistic bounded order covering main-screen reset, start flow clarification, mandatory chart boundary, primary-surface text reduction, trader panel plus compact context, and review entry path.
+- Mapped the requested product areas to concrete slices and recorded the risks that must be blocked during implementation.
+- Selected `Desktop Trainer Main Screen Reset` as the strongest next desktop implementation slice once the repository intentionally opens the desktop-reset lane.
+- Kept `T-106` untouched as the current active coding frontier.
+
+### What was not changed
+- Runtime code was not changed.
+- `desktop_shell/` code was not changed.
+- Tests were not changed.
+- Schemas and module/master docs were not changed.
+- `01_MASTER/CURRENT_STATE.md` and `05_CODEX/NEXT_TASK.md` were not changed because this was a bounded planning pass, not an active-frontier switch.
+
+### Why this matters
+`T-122` fixed what the future trainer workspace should be, but not how to get there safely. This sequencing pass converts that product boundary into a controlled implementation path so future desktop work can move from shell to workspace without accidental rewrite or scope drift.
+
+### Remaining gap after this step
+- The implementation sequence is now documented, but no desktop-reset coding packet has been opened yet.
+- A future managerial step will still need to decide when the repository should move from the current active frontier to the desktop-reset lane.
+
+### Recommended next step
+When the repository is ready to open the desktop-reset lane explicitly, create one bounded coding packet for `Desktop Trainer Main Screen Reset` using `DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md` as the planning base.
