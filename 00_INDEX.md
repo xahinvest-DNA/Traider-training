@@ -2,8 +2,8 @@
 
 Last updated: 2026-04-05
 Project status: replay bootstrap, minimal trading loop, local-first session/journal loop, minimum Bill Williams review hooks, manual flags/violations, derived review output, session result metrics, session timeline projection, chart snapshot references, snapshot timeline exposure, snapshot-aware review output, session finalization, compact session review summary, MVP acceptance pass, desktop shell implementation boundary, first desktop shell coding slice, chart/replay refinement, session/trade context refinement, notes/review authoring refinement, current-session history/result refinement, workflow guidance/action feedback refinement, desktop shell layout/usability polish, desktop MVP acceptance/smoke pass, desktop launch path, desktop handoff/readiness, MVP pause point, first post-MVP direction selection, Bill Williams review-depth boundary, Bill Williams review-depth coding slice, Bill Williams review-delta slice, Bill Williams review-completeness slice, Bill Williams review-prompts slice, Bill Williams review-coverage slice, Bill Williams review-sequence slice, Bill Williams review-weak-spots slice, Bill Williams review-progress slice, Bill Williams review-momentum slice, Bill Williams review-stability slice, Bill Williams review-swings slice, Bill Williams review-floor slice, Bill Williams review-ceiling slice, Bill Williams review-band slice, Bill Williams review-headroom slice, Bill Williams review-pressure slice, Bill Williams review-target slice, Bill Williams review-focus slice, Bill Williams review-cue slice, Bill Williams review-badge slice, Bill Williams review-pill slice, Bill Williams review-chip slice, Bill Williams review-tag slice, Bill Williams review-token slice, Bill Williams review-marker slice, Bill Williams review-glyph slice, Bill Williams review-sigil slice, Bill Williams review-seal slice, Bill Williams review-crest slice, Bill Williams review-emblem slice, Bill Williams review-insignia slice, Bill Williams review-standard slice, Bill Williams review-banner slice, Bill Williams review-pennant slice, Bill Williams review-streamer slice, raw-dataset import, dataset-import hardening, dataset-quality context, dataset-quality review link, dataset-quality finalization link, dataset-quality restart-recovery note, dataset-quality recovery feedback, dataset-quality recovery acknowledgment, desktop chart snapshot authoring, review-discipline-reason, current-trade review digest, initial trade protection, current trade plan context, and pending stop entry are implemented
-Active module: post-Pending-Stop-Entry audit completed; Partial Close selected as the next bounded local desktop frontier
-Current focus: implement one bounded Partial Close slice so the current desktop-first/local-first product can support accepted active-trade volume reduction inside the one-trade replay workflow without expanding into broader position management, richer risk automation, mentor logic, dashboard/media scope, mobile, sync, or new persistence
+Active module: post-Partial-Close audit completed; no new bounded local desktop implementation frontier is selected yet
+Current focus: keep the repository in synchronized post-audit state and avoid activating another implementation lane until a stronger bounded local desktop frontier is explicitly justified
 
 ## Purpose
 
@@ -151,10 +151,9 @@ A new chat must start by reading:
 
 ## Next steps
 
-1. Implement the bounded Partial Close slice selected by the post-Pending-Stop-Entry audit.
-2. Do not broaden the live trade loop into add-on, ladders, pending-order orchestration, protection automation, or other broader position-management scope in the same pass.
-3. Keep desktop behavior inside existing trading/context/result/workflow surfaces; do not open a new subsystem, dashboard/media path, or mentor/mobile/sync lane.
-4. Do not break replay-centered bootstrap, the working trading loop, local journal runtime, thin desktop-shell boundary, accepted launch/readiness behavior, or the current protection/plan-context/pending-stop flows.
+1. Do not start another implementation slice by inertia; no strong bounded next local desktop frontier is currently selected.
+2. Keep position-management, pending-order, protection-automation, review-backfill, cosmetic polish, and later-phase mentor/dashboard/media/mobile/sync/new-persistence scope out of the next-step path unless a separate explicit selection pass justifies them.
+3. Preserve the current desktop-first/local-first boundary, existing source-of-truth ownership, and accepted replay/trading/journal/desktop contracts until a stronger bounded next frontier is fixed.
 
 
 

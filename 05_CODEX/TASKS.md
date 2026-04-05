@@ -935,3 +935,12 @@
 - Outcome: implemented one bounded manual partial-close path inside the current one-trade lifecycle with execution trace, realised-PnL accumulation, same-trade ownership continuity, later manual/protective close support, compact desktop-surface visibility, and restart recovery from the same local facts only.
 
 
+### T-116
+
+- Status: completed
+- Module: Post-Partial-Close Next-Slice Audit
+- Goal: run one bounded managerial/product audit after Partial Close so the repository selects the strongest next local desktop product-facing frontier only if it is truly justified, without mechanically extending position management, pending-order scope, protection automation, review backfill, cosmetic polish, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/PARTIAL_CLOSE.md`
+- Expected result: one explicit bounded next-step selection only if a clearly stronger local desktop frontier exists; otherwise record that no bounded next implementation slice is justified yet.
+- Outcome: the audit explicitly rejects broader position-management continuation, pending-order continuation, protection-automation continuation, review/digest/evidence backfill, cosmetic desktop polish, and later-phase mentor/dashboard/media/mobile/sync/new-persistence drift as weak or premature next steps, and records that no strong bounded next implementation slice is justified yet.
+

@@ -565,3 +565,75 @@ The live one-trade replay loop no longer collapses active-trade management to al
 
 ### Recommended next step
 Run one bounded post-Partial-Close next-slice audit.
+
+## 2026-04-05 - Post-T115 SSOT/doc sync
+
+### Goal
+Synchronize the operating-layer source-of-truth documents after `T-115 Partial Close` completion so the repository no longer presents Partial Close as the active implementation frontier.
+
+### Files updated
+- `00_INDEX.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was stale
+- `00_INDEX.md` still described `Partial Close` as the current implementation focus even though the implementation had already been completed and other SSOT files had moved on to the post-implementation audit state.
+- `05_CODEX/NEXT_TASK.md` still reflected the completed `T-115` implementation packet rather than the correct audit packet for the next repository step.
+
+### What was synchronized
+- Updated `00_INDEX.md` so the active module and current focus now point to the bounded post-Partial-Close audit/result state instead of an active Partial Close implementation lane.
+- Reframed `05_CODEX/NEXT_TASK.md` away from the completed implementation packet and into the bounded audit/result state needed for the post-`T-115` operating layer.
+
+### Why this mattered before the audit
+Running the next-step audit on top of stale repository navigation would have left the project presenting `T-115` as both completed and still active. This pass restores one honest operating-layer story before the audit result is recorded.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop shell code was not changed.
+- Tests were not changed.
+- Module documents, tech schemas, and `01_MASTER/DECISIONS.md` were not changed.
+
+### Recommended next step
+Run the bounded post-Partial-Close next-slice audit and record exactly one explicit result.
+
+## 2026-04-05 - T-116 Post-Partial-Close Next-Slice Audit
+
+### Goal
+Run one bounded managerial/product audit after `T-115 Partial Close` to determine whether the current local desktop-first product has one clearly strongest next bounded implementation frontier, without drifting into broader position management, pending-order growth, protection automation, review backfill, cosmetic polish, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
+
+### Files updated
+- `00_INDEX.md`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was reviewed
+- The current post-`T-115` product boundary in master, roadmap, scope, MVP, module, schema, and operating docs.
+- Plausibly adjacent local desktop candidates after Partial Close.
+- Whether any candidate strengthens the user-visible desktop training loop without hidden subsystem growth.
+
+### Explicitly rejected weak candidates
+- Broader position-management continuation such as add-on entry, richer scale-out, ladders, or preset close flows.
+- Pending-order continuation such as expiry, OCO/bracket behavior, or richer orchestration.
+- Protection-automation continuation such as trailing stop, break-even automation, or richer SL/TP editing history.
+- Review/digest/evidence backfill.
+- Cosmetic desktop polish.
+- Mentor/dashboard/media/mobile/sync/new-persistence drift or any hidden architecture rewrite.
+
+### Audit result
+- No strong bounded next implementation slice is justified yet.
+- No new implementation-facing frontier document was created because the audit did not justify activating one.
+- The repository is synchronized to a post-audit state where `T-115 Partial Close` remains completed and no new active implementation frontier is selected.
+
+### Why this matters
+The project avoids sliding into the next coding lane by inertia. The operating layer now records a deliberate hold state instead of pretending that a weak adjacent candidate is strong enough to become the next local desktop frontier.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop shell code was not changed.
+- Tests were not changed.
+- Module documents, tech schemas, and `01_MASTER/DECISIONS.md` were not changed.
+
+### Recommended next step
+Do not activate another implementation lane until a stronger bounded local desktop frontier is explicitly justified in a separate selection pass.
