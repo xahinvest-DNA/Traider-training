@@ -637,3 +637,54 @@ The project avoids sliding into the next coding lane by inertia. The operating l
 
 ### Recommended next step
 Do not activate another implementation lane until a stronger bounded local desktop frontier is explicitly justified in a separate selection pass.
+
+## 2026-04-05 - T-117 Desktop Workflow Validation / Friction Discovery Pass
+
+### Goal
+Run one bounded validation pass on the already implemented desktop-first/local-first workflow so the repository can identify real recurring product friction from realistic usage, instead of extending adjacent features by inertia.
+
+### Files updated
+- `00_INDEX.md`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+- `05_CODEX/DESKTOP_TRANSITION_STATE_COHERENCE.md`
+
+### Validation coverage
+- Empty desktop start / readiness-to-action state
+- Market entry into active trade without declared plan
+- Active trade with initial protection
+- Pending stop staging and cancellation
+- Pending stop trigger into active trade
+- Partial close while trade remains active
+- Full note -> trade -> review -> finalization flow
+- Restart recovery for partially closed active trade
+- Closed trade with review still pending
+
+### Real recurring friction found
+- Transition-state language is not fully coherent across existing `trade`, `workflow`, `result`, `finalization`, `readiness`, and `pause-point` surfaces.
+- Pending-entry and finalized/recovered states can force the user to reconcile contradictory or misleading status wording across surfaces before understanding the actual next step.
+- Clean dataset states can still surface warned-dataset copy in finalization/readiness/pause-point reporting, which makes the product appear less trustworthy than the underlying facts warrant.
+
+### Explicitly rejected weak candidates
+- Cosmetic-only polish without repeated workflow break
+- Learning-curve discomfort that does not create recurring continuity loss
+- Adjacent feature inertia in position management, pending-order growth, protection automation, or review/evidence backfill
+- Mentor/dashboard/media/mobile/sync/new-persistence drift
+- Hidden architecture rewrite temptation
+
+### Validation result
+- The strongest recurring friction point is bounded desktop transition-state coherence.
+- One future implementation-facing candidate is justified and recorded as `05_CODEX/DESKTOP_TRANSITION_STATE_COHERENCE.md`.
+- No implementation work started in this pass; the repository is synchronized only to the validation result.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop shell code was not changed.
+- Tests were not changed.
+- Module documents, tech schemas, and `01_MASTER/DECISIONS.md` were not changed.
+
+### Recommended next step
+If implementation resumes, activate one bounded `Desktop Transition-State Coherence` slice and keep it strictly inside existing workflow/result/finalization/readiness surfaces.
+

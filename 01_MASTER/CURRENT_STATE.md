@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-05
-Current stage: Partial Close implementation and the bounded post-implementation audit are completed; no strong next bounded local desktop implementation frontier is justified yet
-Active module: post-Partial-Close next-slice audit completed with no new implementation slice activated
-Active question: how to keep the repository synchronized and avoid activating a weak or drift-prone next implementation frontier before a stronger bounded local desktop slice is explicitly justified
+Current stage: bounded desktop workflow validation is completed after the post-Partial-Close audit; one recurring transition-state coherence friction is now the strongest validated later slice candidate
+Active module: `T-117 Desktop Workflow Validation / Friction Discovery Pass` is completed, with `Desktop Transition-State Coherence` identified as the strongest justified later slice candidate
+Active question: whether to activate the bounded transition-state coherence candidate as the next coding pass without letting the repository drift into broader feature growth
 
 ## Where the project is now
 
@@ -157,7 +157,7 @@ At this point:
 
 ## Next step
 
-The next working step is to run one bounded post-Partial-Close next-slice audit so the repository selects the strongest follow-up frontier without mechanically extending position management, pending-order handling, protection automation, mentor/dashboard/media scope, mobile, sync, or new persistence.
+If implementation resumes, activate one bounded `Desktop Transition-State Coherence` slice so the current desktop loop stops forcing the user to reconcile inconsistent transition-state messages across existing surfaces.
 
 ## What must not be lost in a new chat
 

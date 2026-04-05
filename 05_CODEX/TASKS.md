@@ -944,3 +944,11 @@
 - Expected result: one explicit bounded next-step selection only if a clearly stronger local desktop frontier exists; otherwise record that no bounded next implementation slice is justified yet.
 - Outcome: the audit explicitly rejects broader position-management continuation, pending-order continuation, protection-automation continuation, review/digest/evidence backfill, cosmetic desktop polish, and later-phase mentor/dashboard/media/mobile/sync/new-persistence drift as weak or premature next steps, and records that no strong bounded next implementation slice is justified yet.
 
+### T-117
+
+- Status: completed
+- Module: Desktop Workflow Validation / Friction Discovery Pass
+- Goal: run one bounded local desktop workflow validation pass over the already implemented product loop so the repository can distinguish recurring user-visible friction from noise and identify exactly one strongest justified later slice candidate only if validation evidence is strong enough.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/INITIAL_TRADE_PROTECTION.md`, `05_CODEX/CURRENT_TRADE_PLAN_CONTEXT.md`, `05_CODEX/PENDING_STOP_ENTRY.md`, `05_CODEX/PARTIAL_CLOSE.md`
+- Expected result: one bounded validation result that either records no strong recurring friction yet or identifies exactly one strongest recurring product-facing friction point that could justify one later bounded slice.
+- Outcome: validation across realistic desktop-loop scenarios finds one recurring product-facing friction: transition-state language is not fully coherent across existing trade/workflow/result/finalization/readiness/pause-point surfaces. Cosmetic-only issues, user-learning noise, broader feature inertia, and later-phase drift are explicitly rejected. One future candidate document, `05_CODEX/DESKTOP_TRANSITION_STATE_COHERENCE.md`, is created because the evidence is strong enough, but no code implementation is started in this pass.
