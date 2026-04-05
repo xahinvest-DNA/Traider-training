@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from dataclasses import asdict
 from itertools import count
@@ -22,6 +22,8 @@ from .types import (
 )
 
 TradingSubscriber = Callable[[dict[str, Any]], None]
+PENDING_STOP_ORDER_TYPES = {"BuyStop", "SellStop"}
+MARKET_ENTRY_ORDER_TYPES = {"BuyMarket", "SellMarket"}
 
 
 class MinimalTradingLoop:
@@ -75,6 +77,55 @@ class MinimalTradingLoop:
             take_profit=take_profit,
         )
 
+    def buy_stop(
+        self,
+        trigger_price: float,
+        volume: float = 1.0,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
+    ) -> OrderRecord:
+        return self._request_pending_stop_entry(
+            side="buy",
+            trigger_price=trigger_price,
+            volume=volume,
+            stop_loss=stop_loss,
+            take_profit=take_profit,
+        )
+
+    def sell_stop(
+        self,
+        trigger_price: float,
+        volume: float = 1.0,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
+    ) -> OrderRecord:
+        return self._request_pending_stop_entry(
+            side="sell",
+            trigger_price=trigger_price,
+            volume=volume,
+            stop_loss=stop_loss,
+            take_profit=take_profit,
+        )
+
+    def cancel_pending_entry(self) -> OrderRecord:
+        self._validate_pending_cancel_allowed()
+        assert self.state.pending_order_id is not None
+        order = self._find_order(self.state.pending_order_id)
+        order.status = "cancelled"
+        order.cancelled_at = self.replay_session.state.simulation_time
+        order.cancellation_reason = "manual_cancel"
+        self.state.pending_order_id = None
+        self.state.lifecycle_state = "Terminal"
+        self._publish(
+            "OrderCancelled",
+            {
+                "order_id": order.order_id,
+                "order_type": order.order_type,
+                "cancellation_reason": order.cancellation_reason,
+            },
+        )
+        return order
+
     def manual_close(self) -> OrderRecord:
         self._validate_close_allowed()
         assert self.state.position is not None
@@ -103,15 +154,38 @@ class MinimalTradingLoop:
         position = self.state.position
         latest_trade = self.state.trades[-1] if self.state.trades else None
         trade_status = latest_trade.status if latest_trade else "idle"
+        pending_entry_order = self._find_order(self.state.pending_order_id) if self.state.pending_order_id else None
+        pending_stop_order = (
+            pending_entry_order if pending_entry_order and pending_entry_order.order_type in PENDING_STOP_ORDER_TYPES else None
+        )
+        latest_stop_order = self._latest_stop_order()
         protection_present = bool(
             position
             and position.status == "open"
             and (position.stop_loss is not None or position.take_profit is not None)
         )
+        latest_pending_stop_result = None
+        latest_pending_stop_status = None
+        if latest_stop_order is not None:
+            latest_pending_stop_status = latest_stop_order.status
+            if latest_stop_order.status == "filled":
+                latest_pending_stop_result = "triggered"
+            elif latest_stop_order.status == "cancelled":
+                latest_pending_stop_result = "cancelled"
         return {
             "lifecycle_state": self.state.lifecycle_state,
             "active_trade_present": position is not None and position.status == "open",
             "active_trade_id": self.state.active_trade_id,
+            "entry_pending_present": pending_entry_order is not None,
+            "pending_stop_present": pending_stop_order is not None,
+            "pending_stop_order_id": pending_stop_order.order_id if pending_stop_order else None,
+            "pending_stop_side": pending_stop_order.side if pending_stop_order else None,
+            "pending_stop_trigger_price": pending_stop_order.trigger_price if pending_stop_order else None,
+            "pending_stop_status": pending_stop_order.status if pending_stop_order else None,
+            "pending_stop_stop_loss": pending_stop_order.stop_loss if pending_stop_order else None,
+            "pending_stop_take_profit": pending_stop_order.take_profit if pending_stop_order else None,
+            "latest_pending_stop_status": latest_pending_stop_status,
+            "latest_pending_stop_result": latest_pending_stop_result,
             "trade_side": position.side if position else None,
             "current_open_volume": position.current_open_volume if position else 0.0,
             "average_entry_price": position.average_entry_price if position else None,
@@ -122,6 +196,7 @@ class MinimalTradingLoop:
             "last_execution_outcome": asdict(self.state.last_execution) if self.state.last_execution else None,
             "last_close_reason": latest_trade.close_reason if latest_trade else None,
             "manual_close_available": position is not None and position.status == "open",
+            "pending_entry_cancel_available": pending_stop_order is not None,
             "replay_mode": self.replay_session.state.replay_mode,
             "session_context": {
                 "session_id": self.session_id,
@@ -166,6 +241,41 @@ class MinimalTradingLoop:
         self._publish("OrderPlaced", {"order_id": order.order_id, "order_type": order.order_type})
         return order
 
+    def _request_pending_stop_entry(
+        self,
+        side: str,
+        trigger_price: float,
+        volume: float,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
+    ) -> OrderRecord:
+        self._validate_entry_allowed()
+        if volume <= 0:
+            raise InvalidTradeCommandError("Volume must be positive")
+        self._validate_pending_stop(side, trigger_price, stop_loss, take_profit)
+
+        order_type = "BuyStop" if side == "buy" else "SellStop"
+        order = OrderRecord(
+            order_id=self._next_id("order"),
+            session_id=self.session_id,
+            trade_id=None,
+            instrument_id=self.replay_session.state.instrument_id,
+            order_type=order_type,
+            side=side,
+            status="placed",
+            requested_volume=float(volume),
+            created_at=self.replay_session.state.simulation_time,
+            replay_mode=self.replay_session.state.replay_mode,
+            trigger_price=float(trigger_price),
+            stop_loss=stop_loss,
+            take_profit=take_profit,
+        )
+        self.state.orders.append(order)
+        self.state.pending_order_id = order.order_id
+        self.state.lifecycle_state = "EntryRequested"
+        self._publish("OrderPlaced", {"order_id": order.order_id, "order_type": order.order_type})
+        return order
+
     def _validate_entry_allowed(self) -> None:
         if self.replay_session.state.replay_mode == "review_replay":
             raise TradingModeRestrictionError("Trading actions are not allowed in review replay mode")
@@ -183,6 +293,17 @@ class MinimalTradingLoop:
             raise InvalidTradeCommandError("Cannot close a trade after replay finished")
         if self.state.lifecycle_state != "PositionOpened" or not self.state.position:
             raise NoActivePositionError("Manual close requires an open position")
+
+    def _validate_pending_cancel_allowed(self) -> None:
+        if self.replay_session.state.replay_mode == "review_replay":
+            raise TradingModeRestrictionError("Trading actions are not allowed in review replay mode")
+        if self.replay_session.state.is_finished:
+            raise InvalidTradeCommandError("Cannot cancel a pending stop after replay finished")
+        if not self.state.pending_order_id:
+            raise InvalidTradeCommandError("No pending stop entry is available to cancel")
+        order = self._find_order(self.state.pending_order_id)
+        if order.order_type not in PENDING_STOP_ORDER_TYPES:
+            raise InvalidTradeCommandError("Only pending stop entry cancellation is supported in the current slice")
 
     def _validate_initial_protection(
         self,
@@ -204,12 +325,37 @@ class MinimalTradingLoop:
         if take_profit is not None and take_profit >= snapshot.bid:
             raise InvalidTradeCommandError("SellMarket take profit must stay below the current bid")
 
+    def _validate_pending_stop(
+        self,
+        side: str,
+        trigger_price: float,
+        stop_loss: float | None,
+        take_profit: float | None,
+    ) -> None:
+        snapshot = self.replay_session.get_execution_snapshot()
+        if side == "buy":
+            if trigger_price <= snapshot.ask:
+                raise InvalidTradeCommandError("BuyStop trigger price must stay above the current ask")
+            if stop_loss is not None and stop_loss >= trigger_price:
+                raise InvalidTradeCommandError("BuyStop stop loss must stay below the trigger price")
+            if take_profit is not None and take_profit <= trigger_price:
+                raise InvalidTradeCommandError("BuyStop take profit must stay above the trigger price")
+            return
+        if trigger_price >= snapshot.bid:
+            raise InvalidTradeCommandError("SellStop trigger price must stay below the current bid")
+        if stop_loss is not None and stop_loss <= trigger_price:
+            raise InvalidTradeCommandError("SellStop stop loss must stay above the trigger price")
+        if take_profit is not None and take_profit >= trigger_price:
+            raise InvalidTradeCommandError("SellStop take profit must stay below the trigger price")
+
     def _on_replay_event(self, event: ReplayEvent) -> None:
         if event.event_type != "TickArrived":
             return
         snapshot = self.replay_session.get_execution_snapshot()
         if self.state.pending_order_id:
-            self._fill_entry(snapshot)
+            order = self._find_order(self.state.pending_order_id)
+            if order.order_type not in PENDING_STOP_ORDER_TYPES or self._pending_stop_trigger_reached(order, snapshot):
+                self._fill_entry(snapshot)
         elif self.state.pending_close_order_id:
             self._fill_close(snapshot)
         elif self.state.position and self.state.position.status == "open":
@@ -273,7 +419,7 @@ class MinimalTradingLoop:
             fill_price=fill_price,
             snapshot=snapshot,
             execution_type="entry_fill",
-            reason="market_entry",
+            reason=("pending_stop_trigger" if order.order_type in PENDING_STOP_ORDER_TYPES else "market_entry"),
         )
 
         self.state.trades.append(trade)
@@ -394,6 +540,14 @@ class MinimalTradingLoop:
             return "take_profit_hit"
         return None
 
+    def _pending_stop_trigger_reached(self, order: OrderRecord, snapshot: ExecutionSnapshot) -> bool:
+        trigger_price = order.trigger_price
+        if trigger_price is None:
+            return False
+        if order.side == "buy":
+            return snapshot.ask >= trigger_price
+        return snapshot.bid <= trigger_price
+
     def _build_execution(
         self,
         trade_id: str,
@@ -436,6 +590,12 @@ class MinimalTradingLoop:
             if order.order_id == order_id:
                 return order
         raise InvalidTradeCommandError(f"Order not found: {order_id}")
+
+    def _latest_stop_order(self) -> OrderRecord | None:
+        for order in reversed(self.state.orders):
+            if order.order_type in PENDING_STOP_ORDER_TYPES:
+                return order
+        return None
 
     def _calculate_unrealized_pnl(self) -> float | None:
         position = self.state.position

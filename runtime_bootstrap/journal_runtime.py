@@ -500,7 +500,7 @@ class LocalJournalRuntime:
             self.training_session.end_simulation_time = now
             self.training_session.updated_at = now
             self._persist()
-        elif event_type == "OrderPlaced":
+        elif event_type in {"OrderPlaced", "OrderCancelled"}:
             self.training_session.updated_at = now
             self._persist()
 

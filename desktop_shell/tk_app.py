@@ -67,6 +67,7 @@ class TraderTrainerDesktopApp:
         self.flag_code = tk.StringVar(value="premature_exit")
         self.violation_code = tk.StringVar(value="manual_plan_deviation")
         self.speed_value = tk.StringVar(value="1.0")
+        self.pending_stop_trigger_value = tk.StringVar()
         self.initial_stop_loss_value = tk.StringVar()
         self.initial_take_profit_value = tk.StringVar()
         self.pending_note_snapshot_id: str | None = None
@@ -115,6 +116,9 @@ class TraderTrainerDesktopApp:
             ("advance", "Advance", self._action_advance),
             ("buy", "Buy", self._action_buy),
             ("sell", "Sell", self._action_sell),
+            ("buy_stop", "BuyStop", self._action_buy_stop),
+            ("sell_stop", "SellStop", self._action_sell_stop),
+            ("cancel_entry", "Cancel Entry", self._action_cancel_entry),
             ("close", "Close", self._action_close),
             ("finalize", "Finalize", self._action_finalize),
             ("force_finalize", "Force Finalize", self._action_force_finalize),
@@ -130,13 +134,15 @@ class TraderTrainerDesktopApp:
         speed_button = ttk.Button(controls, text="Set Speed", command=self._action_set_speed)
         speed_button.grid(row=0, column=len(button_specs) + 2, padx=4)
         self.control_buttons["set_speed"] = speed_button
-        ttk.Label(controls, text="Initial SL").grid(row=0, column=len(button_specs) + 3, padx=(16, 4))
-        ttk.Entry(controls, textvariable=self.initial_stop_loss_value, width=12).grid(row=0, column=len(button_specs) + 4, padx=4)
-        ttk.Label(controls, text="Initial TP").grid(row=0, column=len(button_specs) + 5, padx=(12, 4))
-        ttk.Entry(controls, textvariable=self.initial_take_profit_value, width=12).grid(row=0, column=len(button_specs) + 6, padx=4)
+        ttk.Label(controls, text="Stop trigger").grid(row=0, column=len(button_specs) + 3, padx=(16, 4))
+        ttk.Entry(controls, textvariable=self.pending_stop_trigger_value, width=12).grid(row=0, column=len(button_specs) + 4, padx=4)
+        ttk.Label(controls, text="Initial SL").grid(row=0, column=len(button_specs) + 5, padx=(12, 4))
+        ttk.Entry(controls, textvariable=self.initial_stop_loss_value, width=12).grid(row=0, column=len(button_specs) + 6, padx=4)
+        ttk.Label(controls, text="Initial TP").grid(row=0, column=len(button_specs) + 7, padx=(12, 4))
+        ttk.Entry(controls, textvariable=self.initial_take_profit_value, width=12).grid(row=0, column=len(button_specs) + 8, padx=4)
 
         self.control_hint_label = ttk.Label(controls, justify="left", anchor="w")
-        self.control_hint_label.grid(row=1, column=0, columnspan=len(button_specs) + 7, sticky="ew", pady=(6, 0))
+        self.control_hint_label.grid(row=1, column=0, columnspan=len(button_specs) + 9, sticky="ew", pady=(6, 0))
 
         left_top = ttk.LabelFrame(root, text="Chart / Replay Surface", padding=8)
         left_top.grid(row=1, column=0, sticky="nsew", padx=8, pady=8)
@@ -385,7 +391,8 @@ class TraderTrainerDesktopApp:
             return None
         return float(stripped)
 
-    def _clear_trade_protection_inputs(self) -> None:
+    def _clear_entry_inputs(self) -> None:
+        self.pending_stop_trigger_value.set("")
         self.initial_stop_loss_value.set("")
         self.initial_take_profit_value.set("")
 
@@ -442,7 +449,7 @@ class TraderTrainerDesktopApp:
                 stop_loss=self._parse_optional_float(self.initial_stop_loss_value.get()),
                 take_profit=self._parse_optional_float(self.initial_take_profit_value.get()),
             )
-            self._clear_trade_protection_inputs()
+            self._clear_entry_inputs()
 
         self._run_action(submit, "BuyMarket submitted")
 
@@ -452,9 +459,34 @@ class TraderTrainerDesktopApp:
                 stop_loss=self._parse_optional_float(self.initial_stop_loss_value.get()),
                 take_profit=self._parse_optional_float(self.initial_take_profit_value.get()),
             )
-            self._clear_trade_protection_inputs()
+            self._clear_entry_inputs()
 
         self._run_action(submit, "SellMarket submitted")
+
+    def _action_buy_stop(self) -> None:
+        def submit() -> None:
+            self.controller.buy_stop(
+                trigger_price=float(self.pending_stop_trigger_value.get() or "0"),
+                stop_loss=self._parse_optional_float(self.initial_stop_loss_value.get()),
+                take_profit=self._parse_optional_float(self.initial_take_profit_value.get()),
+            )
+            self._clear_entry_inputs()
+
+        self._run_action(submit, "BuyStop submitted")
+
+    def _action_sell_stop(self) -> None:
+        def submit() -> None:
+            self.controller.sell_stop(
+                trigger_price=float(self.pending_stop_trigger_value.get() or "0"),
+                stop_loss=self._parse_optional_float(self.initial_stop_loss_value.get()),
+                take_profit=self._parse_optional_float(self.initial_take_profit_value.get()),
+            )
+            self._clear_entry_inputs()
+
+        self._run_action(submit, "SellStop submitted")
+
+    def _action_cancel_entry(self) -> None:
+        self._run_action(self.controller.cancel_pending_entry, "Pending stop cancelled")
 
     def _action_close(self) -> None:
         self._run_action(self.controller.manual_close, "Manual close requested")

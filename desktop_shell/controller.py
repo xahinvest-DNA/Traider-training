@@ -76,6 +76,40 @@ class DesktopShellController:
         self.trading_loop.sell_market(volume=volume, stop_loss=stop_loss, take_profit=take_profit)
         return self.get_workspace_view()
 
+    def buy_stop(
+        self,
+        trigger_price: float,
+        volume: float = 1.0,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
+    ) -> dict[str, Any]:
+        self.trading_loop.buy_stop(
+            trigger_price=trigger_price,
+            volume=volume,
+            stop_loss=stop_loss,
+            take_profit=take_profit,
+        )
+        return self.get_workspace_view()
+
+    def sell_stop(
+        self,
+        trigger_price: float,
+        volume: float = 1.0,
+        stop_loss: float | None = None,
+        take_profit: float | None = None,
+    ) -> dict[str, Any]:
+        self.trading_loop.sell_stop(
+            trigger_price=trigger_price,
+            volume=volume,
+            stop_loss=stop_loss,
+            take_profit=take_profit,
+        )
+        return self.get_workspace_view()
+
+    def cancel_pending_entry(self) -> dict[str, Any]:
+        self.trading_loop.cancel_pending_entry()
+        return self.get_workspace_view()
+
     def manual_close(self) -> dict[str, Any]:
         self.trading_loop.manual_close()
         return self.get_workspace_view()

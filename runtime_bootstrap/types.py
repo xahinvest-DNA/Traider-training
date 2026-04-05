@@ -92,9 +92,12 @@ class OrderRecord:
     requested_volume: float
     created_at: str
     replay_mode: str
+    trigger_price: float | None = None
     stop_loss: float | None = None
     take_profit: float | None = None
     filled_at: str | None = None
+    cancelled_at: str | None = None
+    cancellation_reason: str | None = None
     rejection_reason: str | None = None
 
 

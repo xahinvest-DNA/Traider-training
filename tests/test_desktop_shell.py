@@ -619,6 +619,9 @@ def test_desktop_shell_control_helpers_surface_availability_map() -> None:
     assert initial_map["play"] is True
     assert initial_map["pause"] is False
     assert initial_map["buy"] is True
+    assert initial_map["buy_stop"] is True
+    assert initial_map["sell_stop"] is True
+    assert initial_map["cancel_entry"] is False
     assert initial_map["close"] is False
     assert initial_map["add_review"] is False
     assert initial_map["finalize"] is True
@@ -636,6 +639,8 @@ def test_desktop_shell_control_helpers_surface_availability_map() -> None:
     assert active_map["play"] is False
     assert active_map["pause"] is True
     assert active_map["buy"] is False
+    assert active_map["buy_stop"] is False
+    assert active_map["cancel_entry"] is False
     assert active_map["close"] is True
     assert active_map["finalize"] is False
 
@@ -3054,3 +3059,86 @@ def test_desktop_shell_surfaces_current_trade_plan_context_and_restart_recovery(
     assert any(line == "Thesis summary: expect second wise man continuation" for line in recovered_closed_result_lines)
     assert any(line == "Risk plan: protect below local pullback" for line in recovered_closed_result_lines)
     assert any(line == "Declared plan: present" for line in recovered_closed_workflow_lines)
+
+
+
+def test_desktop_shell_surfaces_pending_stop_entry_and_restart_recovery() -> None:
+    pending_storage = _reset_dir(TMP_ROOT / "desktop_pending_stop_pending")
+    controller_pending_1 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=pending_storage)
+    controller_pending_1.sell_stop(trigger_price=1.10344, stop_loss=1.10360, take_profit=1.10330)
+
+    pending_workspace_1 = controller_pending_1.get_workspace_view()
+    pending_trade_lines_1 = build_trade_context_lines(pending_workspace_1["trading"], pending_workspace_1["journal"])
+    pending_workflow_lines_1 = build_workflow_guidance_lines(
+        pending_workspace_1["replay"],
+        pending_workspace_1["trading"],
+        pending_workspace_1["journal"],
+    )
+    pending_button_map_1 = build_button_state_map(
+        pending_workspace_1["replay"],
+        pending_workspace_1["trading"],
+        pending_workspace_1["journal"],
+    )
+    assert any(line == "Pending stop: yes" for line in pending_trade_lines_1)
+    assert any(line == "Pending stop side: sell" for line in pending_trade_lines_1)
+    assert any(line == "Pending stop trigger: 1.10344" for line in pending_trade_lines_1)
+    assert any(line == "Pending stop status: placed" for line in pending_trade_lines_1)
+    assert any(line == "Pending stop SL / TP: 1.1036 / 1.1033" for line in pending_trade_lines_1)
+    assert any(line == "Pending stop entry is staged for the current one-trade replay loop." for line in pending_workflow_lines_1)
+    assert pending_button_map_1["cancel_entry"] is True
+    assert pending_button_map_1["buy_stop"] is False
+    assert pending_button_map_1["sell_stop"] is False
+
+    controller_pending_2 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=pending_storage)
+    pending_workspace_2 = controller_pending_2.get_workspace_view()
+    pending_trade_lines_2 = build_trade_context_lines(pending_workspace_2["trading"], pending_workspace_2["journal"])
+    assert pending_workspace_2["journal"]["recovered"] is True
+    assert any(line == "Pending stop: yes" for line in pending_trade_lines_2)
+    assert any(line == "Pending stop side: sell" for line in pending_trade_lines_2)
+    assert any(line == "Pending stop trigger: 1.10344" for line in pending_trade_lines_2)
+
+    controller_pending_2.cancel_pending_entry()
+    cancelled_workspace = controller_pending_2.get_workspace_view()
+    cancelled_trade_lines = build_trade_context_lines(cancelled_workspace["trading"], cancelled_workspace["journal"])
+    cancelled_button_map = build_button_state_map(
+        cancelled_workspace["replay"],
+        cancelled_workspace["trading"],
+        cancelled_workspace["journal"],
+    )
+    assert any(line == "Pending stop: no" for line in cancelled_trade_lines)
+    assert any(line == "Pending stop result: cancelled" for line in cancelled_trade_lines)
+    assert cancelled_button_map["cancel_entry"] is False
+    assert cancelled_button_map["buy_stop"] is True
+
+    triggered_storage = _reset_dir(TMP_ROOT / "desktop_pending_stop_triggered")
+    controller_trigger_1 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=triggered_storage)
+    controller_trigger_1.buy_stop(trigger_price=1.10364, stop_loss=1.10340, take_profit=1.10370)
+    controller_trigger_1.play()
+    controller_trigger_1.advance_frame()
+    waiting_workspace = controller_trigger_1.get_workspace_view()
+    waiting_trade_lines = build_trade_context_lines(waiting_workspace["trading"], waiting_workspace["journal"])
+    assert any(line == "Pending stop: yes" for line in waiting_trade_lines)
+    assert any(line == "Pending stop status: placed" for line in waiting_trade_lines)
+
+    controller_trigger_1.advance_frame()
+    triggered_workspace_1 = controller_trigger_1.get_workspace_view()
+    triggered_trade_lines_1 = build_trade_context_lines(triggered_workspace_1["trading"], triggered_workspace_1["journal"])
+    triggered_workflow_lines_1 = build_workflow_guidance_lines(
+        triggered_workspace_1["replay"],
+        triggered_workspace_1["trading"],
+        triggered_workspace_1["journal"],
+    )
+    assert any(line == "Active trade: yes" for line in triggered_trade_lines_1)
+    assert any(line == "Pending stop: no" for line in triggered_trade_lines_1)
+    assert any(line == "Pending stop result: triggered" for line in triggered_trade_lines_1)
+    assert any(line == "Last execution reason: pending_stop_trigger" for line in triggered_trade_lines_1)
+    assert any(line == "Protection present: yes" for line in triggered_trade_lines_1)
+    assert any(line == "Active trade is open while replay is running." for line in triggered_workflow_lines_1)
+
+    controller_trigger_2 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=triggered_storage)
+    triggered_workspace_2 = controller_trigger_2.get_workspace_view()
+    recovered_triggered_trade_lines = build_trade_context_lines(triggered_workspace_2["trading"], triggered_workspace_2["journal"])
+    assert triggered_workspace_2["journal"]["recovered"] is True
+    assert any(line == "Active trade: yes" for line in recovered_triggered_trade_lines)
+    assert any(line == "Pending stop result: triggered" for line in recovered_triggered_trade_lines)
+    assert any(line == "Last execution reason: pending_stop_trigger" for line in recovered_triggered_trade_lines)

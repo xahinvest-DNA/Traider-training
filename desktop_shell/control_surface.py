@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from typing import Any
 
@@ -15,14 +15,18 @@ def build_button_state_map(
     has_closed_trade = journal_view["derived_review_output"]["closed_trade_count"] > 0
     review_pending = journal_view["review_pending_trade_id"] is not None
     replay_status = replay_view["status"]
+    entry_available = not trading_view["active_trade_present"] and not trading_view.get("entry_pending_present")
 
     return {
         "play": replay_status == "paused" and allowed_replay["can_play"] and not is_finalized,
         "pause": replay_status == "running" and allowed_replay["can_pause"] and not is_finalized,
         "advance": replay_status != "finished" and not is_finalized,
         "set_speed": allowed_replay["can_change_speed"] and not is_finalized,
-        "buy": not trading_view["active_trade_present"] and replay_status != "finished" and not is_finalized,
-        "sell": not trading_view["active_trade_present"] and replay_status != "finished" and not is_finalized,
+        "buy": entry_available and replay_status != "finished" and not is_finalized,
+        "sell": entry_available and replay_status != "finished" and not is_finalized,
+        "buy_stop": entry_available and replay_status != "finished" and not is_finalized,
+        "sell_stop": entry_available and replay_status != "finished" and not is_finalized,
+        "cancel_entry": trading_view.get("pending_entry_cancel_available", False) and not is_finalized,
         "close": trading_view["manual_close_available"] and not is_finalized,
         "finalize": finalization["can_finalize_without_force"] and not is_finalized,
         "force_finalize": finalization["can_finalize_with_force"] and not is_finalized,
@@ -41,7 +45,7 @@ def build_control_hint_lines(button_state_map: dict[str, bool]) -> list[str]:
     return [
         "Control availability:",
         f"Replay -> Play {yn('play')} | Pause {yn('pause')} | Advance {yn('advance')} | Speed {yn('set_speed')}",
-        f"Trade -> Buy {yn('buy')} | Sell {yn('sell')} | Close {yn('close')}",
+        f"Trade -> Buy {yn('buy')} | Sell {yn('sell')} | BuyStop {yn('buy_stop')} | SellStop {yn('sell_stop')} | Cancel pending {yn('cancel_entry')} | Close {yn('close')}",
         f"Review -> Note {yn('add_note')} | Review {yn('add_review')} | Flag {yn('add_flag')} | Violation {yn('add_violation')}",
         f"Session -> Finalize {yn('finalize')} | Force finalize {yn('force_finalize')} | Review warning {yn('acknowledge_recovery')}",
     ]

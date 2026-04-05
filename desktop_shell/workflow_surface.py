@@ -30,6 +30,18 @@ def build_workflow_guidance_lines(
         _append_recovery_acknowledgment_guidance(lines, recovery_ack)
         return _append_dataset_quality_context(lines, dataset_quality)
 
+    if trading_view.get("pending_stop_present"):
+        lines = [
+            "Workflow guidance:",
+            "Pending stop entry is staged for the current one-trade replay loop.",
+            f"Pending stop side / trigger: {trading_view.get('pending_stop_side') or '-'} / {trading_view.get('pending_stop_trigger_price') if trading_view.get('pending_stop_trigger_price') is not None else '-'}",
+        ]
+        if replay_view["status"] == "paused":
+            lines.append("Advance replay or resume playback to wait for the trigger, or cancel the pending stop before it triggers.")
+        else:
+            lines.append("Replay is running. Monitor the trigger or cancel the pending stop before it is reached.")
+        return _append_dataset_quality_context(lines, dataset_quality)
+
     if trading_view["active_trade_present"]:
         plan_context = journal_view.get("current_trade_plan_context")
         if replay_view["status"] == "paused":

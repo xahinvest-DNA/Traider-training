@@ -426,3 +426,28 @@ The strongest next gain is no longer another recall or guidance layer. It is exp
 
 ### Recommended next step
 Implement `T-113: Pending Stop Entry Slice`.
+
+
+## 2026-04-05 - T-113 Pending Stop Entry Slice
+
+### What was done
+- Implemented one bounded `BuyStop` / `SellStop` trigger-based entry path in `runtime_bootstrap/trading_loop.py` on top of existing `OrderRecord`, `TradeRecord`, and `ExecutionRecord` ownership only, including post-tick trigger execution and one-active-pending-stop-at-most enforcement.
+- Extended `runtime_bootstrap/types.py` and `runtime_bootstrap/journal_runtime.py` only where strictly needed so pending stop facts, minimal manual cancel-before-trigger, and restart recovery persist through the same existing local order/trade state.
+- Exposed pending stop visibility and input only through existing desktop surfaces in `desktop_shell/controller.py`, `desktop_shell/control_surface.py`, `desktop_shell/context_surface.py`, `desktop_shell/workflow_surface.py`, and `desktop_shell/tk_app.py`, without creating a new screen, workflow owner, or pending-order subsystem.
+- Added targeted runtime and desktop tests for market-entry compatibility, `BuyStop`, `SellStop`, pending visibility, post-tick trigger execution, minimal manual cancellation, active/recovered pending state, triggered-state recovery, and one-trade / one-pending-stop constraints.
+- Synchronized project state and promoted a bounded post-pending-stop-entry audit into the next active task packet as `T-114`.
+
+### What was not changed
+- Module documents and tech schemas were not changed.
+- No new persistence entities, queue/scheduler state, expiry logic, OCO/bracket behavior, multi-order coordination, or pending-order edit history were introduced.
+- No add-on, partial close, trailing stop, break-even, mentor logic, dashboard/media scope, mobile, or sync behavior was introduced.
+- `DECISIONS.md` was not changed because no project-level decision was required.
+
+### Why this matters
+The live trade loop is no longer market-entry-only. The user can now stage one accepted stop-triggered entry inside the current one-trade replay workflow, which makes the desktop trainer meaningfully closer to the accepted trading contract without turning the product into a broader pending-order management system.
+
+### Remaining gap after this step
+- The next strongest local desktop product-facing frontier still needs to be selected explicitly instead of continuing pending-order handling by inertia.
+
+### Recommended next step
+Run `T-114: Post-Pending-Stop-Entry Next-Slice Audit`.

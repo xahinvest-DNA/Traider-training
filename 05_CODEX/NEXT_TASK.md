@@ -1,15 +1,15 @@
-# NEXT TASK
+﻿# NEXT TASK
 
 Last updated: 2026-04-05
 Status: active
-Task ID: T-113
-Task type: implementation
+Task ID: T-114
+Task type: audit
 
 ## Goal
-Implement one bounded `Pending Stop Entry` slice so the current desktop-first/local-first product can support accepted `BuyStop` / `SellStop` trigger-based entry inside the one-trade replay workflow, without turning the product into pending-order orchestration, broader risk management, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
+Run one bounded post-Pending-Stop-Entry audit so the repository selects the one strongest next local desktop product-facing slice after trigger-based stop entry is implemented, without mechanically expanding pending-order management, protection management, plan-management recall, review backfill, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
 
 ## Why this task matters now
-`T-111` closed the bounded factual plan-recall gap. The next strongest product gain is not more plan visibility or more protection behavior. It is exposing the already accepted trigger-based entry path from the trading contract, because the current product still relies too heavily on immediate market entry even though the trading and desktop contracts already assume manual stop orders belong in the live loop.
+`T-113` closed the strongest remaining live-loop gap after plan recall by exposing one accepted `BuyStop` / `SellStop` path inside the current one-trade replay workflow. The next step should not be "more pending-order management." It should be a bounded frontier audit that checks whether a stronger next product-facing slice now exists elsewhere inside the local desktop workflow.
 
 ## Required source-of-truth documents
 - `00_INDEX.md`
@@ -46,40 +46,40 @@ Implement one bounded `Pending Stop Entry` slice so the current desktop-first/lo
 14. `05_CODEX/PENDING_STOP_ENTRY.md`
 
 ## Exact question to answer
-How should the current desktop-first/local-first product expose one bounded pending stop entry path from already accepted `BuyStop` / `SellStop` contracts so the live one-trade replay loop gains real trigger-based entry behavior without drifting into pending-order orchestration, richer risk management, mentor logic, or a new persistence layer?
+After bounded Pending Stop Entry is implemented, which one next bounded local desktop slice gives the strongest user-visible product gain without turning the product into pending-order orchestration, richer risk management, mentor logic, workflow-engine behavior, dashboard/media scope, mobile, sync, or a new persistence layer?
 
-## Expected implementation outcome
-1. One bounded pending stop entry path over existing order/trade/execution contracts only.
-2. Desktop-facing exposure only through existing trading/context/result/workflow surfaces.
-3. Runtime, desktop, and test updates only where required for pending stop entry visibility, trigger execution, cancellation if needed in the bounded flow, and restart recovery.
-4. Synchronization of `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` after implementation.
+## Expected audit outcome
+1. One explicit bounded next-step decision only.
+2. Rejection of weak candidates that merely continue pending-order management, protection management, plan-management drift, review backfill, or cosmetic polish.
+3. One new implementation-facing document only if the audit finds a clearly justified next slice.
+4. Synchronization of `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` after the audit.
 
 ## Files allowed to change
-- runtime files strictly required for bounded pending stop entry
-- desktop-shell files strictly required for bounded pending stop entry
-- tests strictly required for bounded pending stop entry
 - `01_MASTER/CURRENT_STATE.md`
 - `05_CODEX/TASKS.md`
 - `05_CODEX/NEXT_TASK.md`
 - `05_CODEX/CODEX_WORKLOG.md`
+- one new implementation-facing document in `05_CODEX/` only if the audit selects a clearly justified next slice
 
 ## Files not to change
 - `03_MODULES/*`
 - `04_TECH/*`
+- runtime code
+- desktop-shell code
+- tests
 - `01_MASTER/DECISIONS.md` unless a true project-level decision becomes unavoidable
 
 ## Constraints
 - Stay inside desktop-first local-first boundaries.
-- Reuse existing `Order`, `TradeRecord`, and `ExecutionRecord` ownership only.
-- Do not introduce a new persisted queue, scheduler, order-management subsystem, or orchestration state.
-- Do not broaden into pending-order expiry, OCO/bracket behavior, multiple concurrent pending orders, add-on, partial close, trailing-stop logic, or break-even automation.
-- Do not backfill review/digest/evidence or reopen plan-management drift.
+- Do not continue pending-order management by inertia into expiry, multi-order coordination, richer editing history, or OCO/bracket behavior.
+- Do not reopen protection-lane continuation, plan-management drift, or review/digest/evidence backfill.
+- Do not introduce mentor logic, dashboard/media scope, mobile, sync, or new persistence.
 
 ## Acceptance criteria
-- The implementation exposes one bounded pending stop entry path from accepted `BuyStop` / `SellStop` contracts only.
-- Existing desktop trading/context/result/workflow surfaces can keep the pending stop state visible without a new subsystem.
-- Restart recovery restores the same pending stop state or triggered result from the same local order/trade facts.
-- `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` are synchronized to the implementation result.
+- The audit identifies whether a stronger bounded next slice exists after `T-113` without relying on pending-order-management inertia.
+- Weak candidates are explicitly rejected when they only deepen pending-order handling, protection management, plan management, review backfill, cosmetic polish, or forbidden drift.
+- `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` are synchronized to the audit result.
 
 ## Required handoff format
 Use `05_CODEX/HANDOFF_TEMPLATE.md` exactly.
+

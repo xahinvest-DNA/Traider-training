@@ -23,16 +23,26 @@ def build_trade_context_lines(trading_view: dict[str, Any], journal_view: dict[s
     execution_label = last_execution["execution_type"] if last_execution else "none"
     dataset_quality = trading_view.get("dataset_quality_context") or {}
     plan_context = (journal_view or {}).get("current_trade_plan_context") or {}
+    pending_trigger_price = trading_view.get("pending_stop_trigger_price")
+    pending_stop_loss = trading_view.get("pending_stop_stop_loss")
+    pending_take_profit = trading_view.get("pending_stop_take_profit")
     lines = [
         f"Lifecycle: {trading_view['lifecycle_state']}",
         f"Trade status: {trading_view['trade_status']}",
         f"Active trade: {'yes' if trading_view['active_trade_present'] else 'no'}",
+        f"Pending stop: {'yes' if trading_view.get('pending_stop_present') else 'no'}",
+        f"Pending stop side: {trading_view.get('pending_stop_side') or '-'}",
+        f"Pending stop trigger: {pending_trigger_price if pending_trigger_price is not None else '-'}",
+        f"Pending stop status: {trading_view.get('pending_stop_status') or '-'}",
+        f"Pending stop SL / TP: {pending_stop_loss if pending_stop_loss is not None else '-'} / {pending_take_profit if pending_take_profit is not None else '-'}",
+        f"Pending stop result: {trading_view.get('latest_pending_stop_result') or '-'}",
         f"Side: {trading_view['trade_side'] or '-'}",
         f"Open volume: {trading_view['current_open_volume']}",
         f"Protection present: {'yes' if trading_view.get('protection_present') else 'no'}",
         f"Stop loss / take profit: {trading_view.get('current_stop_loss') if trading_view.get('current_stop_loss') is not None else '-'} / {trading_view.get('current_take_profit') if trading_view.get('current_take_profit') is not None else '-'}",
         f"Manual close available: {'yes' if trading_view['manual_close_available'] else 'no'}",
         f"Last execution: {execution_label}",
+        f"Last execution reason: {last_execution.get('reason') if last_execution else '-'}",
         f"Last close reason: {trading_view.get('last_close_reason') or '-'}",
     ]
     lines.extend(_build_plan_context_lines(plan_context))

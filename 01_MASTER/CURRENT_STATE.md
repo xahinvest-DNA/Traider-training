@@ -1,9 +1,9 @@
 # Current State
 
 Last updated: 2026-04-05
-Current stage: post-Current-Trade-Plan-Context audit completed; Pending Stop Entry selected as the next bounded local desktop frontier
-Active module: Pending Stop Entry is the next implementation slice after bounded current-trade plan recall
-Active question: how should the current desktop-first/local-first product add one bounded pending stop entry path inside the one-trade replay workflow without turning the product into pending-order orchestration, broader risk management, mentor logic, or a new persistence layer
+Current stage: Pending Stop Entry implemented; post-pending-stop-entry audit is the next bounded local desktop frontier selection step
+Active module: bounded pending stop entry is implemented inside the one-trade replay workflow; the next step is a post-pending-stop-entry frontier audit
+Active question: after bounded pending stop entry is implemented, which one next local desktop product-facing slice gives the strongest user-visible gain without turning the product into pending-order orchestration, richer risk management, mentor logic, dashboard/media scope, mobile, sync, or new persistence
 
 ## Where the project is now
 
@@ -99,6 +99,7 @@ At this point:
 - the bounded post-Initial-Trade-Protection audit rejects further protection-lane continuation such as trailing stops, break-even automation, SL/TP edit history, pending-order orchestration, add-on or partial-close expansion, review-loop backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync drift, and selects Current Trade Plan Context as the strongest next local desktop slice because the live trade loop still loses the user's own declared setup/thesis/risk plan after entry;
 - bounded Current Trade Plan Context is implemented as a derive-on-read layer over linked `PreTradeNote` and trade facts, and is surfaced only through existing desktop `context`, `result`, and `workflow` projections so active/current and just-closed trades keep declared setup/thesis/risk-plan facts visible without creating a new owner of truth, persisted summary, mentor layer, or workflow engine;
 - the bounded post-Current-Trade-Plan-Context audit rejects further plan management, plan scoring, richer note workflow, checklist or acknowledgment logic, protection-lane continuation, review/digest/evidence backfill, cosmetic polish, mentor/dashboard/media/mobile/sync drift, and selects Pending Stop Entry as the strongest next local desktop slice because the live trade loop still lacks the accepted trigger-based entry path already implied by the trading and desktop contracts;
+- bounded Pending Stop Entry is implemented across runtime trading contracts, desktop trading/context/workflow surfaces, and restart recovery so the one-trade replay workflow now supports one visible `BuyStop` / `SellStop` trigger-based entry path plus minimal manual cancel before trigger, without creating pending-order orchestration, multiple pending orders, expiry logic, or new persistence;
 - the audit selects Current Trade Review Digest as the strongest next slice because the main remaining product gap is no longer evidence diagnosis or evidence actionability, but fragmented review feedback across many small signals;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
 - desktop launch now accepts raw dataset files, auto-imports them into local normalized artifacts before controller bootstrap, auto-relaunches through the ASCII-path Tk-capable interpreter `C:\Python311\python.exe` when the current Python cannot initialize Tk/Tcl, and still falls back to a non-GUI readiness report if no working Tk runtime is available;
@@ -155,7 +156,7 @@ At this point:
 
 ## Next step
 
-The next working step is to implement one bounded Pending Stop Entry slice so the current desktop-first/local-first product can support one accepted trigger-based entry path inside the one-trade replay workflow without expanding into pending-order orchestration, broader risk management, mentor logic, mobile, sync, or new persistence.
+The next working step is to run one bounded post-pending-stop-entry audit so the repository selects the strongest next local desktop product-facing slice without mechanically expanding pending-order management, broader risk behavior, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
 
 ## What must not be lost in a new chat
 

@@ -3439,3 +3439,109 @@ def test_current_trade_plan_context_derives_from_linked_notes_and_recovers() -> 
     assert recovered_closed_context["thesis_summary"] == "expect second wise man continuation"
     assert recovered_closed_context["risk_plan"] == "protect below local pullback"
     assert recovered_closed_result["current_trade_plan_context"] == closed_result_1["current_trade_plan_context"]
+
+
+
+def test_pending_stop_entry_supports_trigger_cancel_and_restart_recovery() -> None:
+    session_market = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_market = MinimalTradingLoop(session_market)
+    LocalJournalRuntime(session_market, trading_market, _reset_dir(TMP_ROOT / "pending_stop_market_intact"))
+
+    trading_market.buy_market(volume=1.0)
+    session_market.play()
+    session_market.advance_frame()
+    market_view = build_desktop_trading_view(trading_market)
+    assert market_view["active_trade_present"] is True
+    assert market_view["pending_stop_present"] is False
+    trading_market.manual_close()
+    session_market.advance_frame()
+
+    pending_storage = _reset_dir(TMP_ROOT / "pending_stop_pending_recovery")
+    session_pending_1 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_pending_1 = MinimalTradingLoop(session_pending_1)
+    LocalJournalRuntime(session_pending_1, trading_pending_1, pending_storage)
+
+    trading_pending_1.sell_stop(trigger_price=1.10344, volume=1.0, stop_loss=1.10360, take_profit=1.10330)
+    pending_view_1 = build_desktop_trading_view(trading_pending_1)
+    assert pending_view_1["entry_pending_present"] is True
+    assert pending_view_1["pending_stop_present"] is True
+    assert pending_view_1["pending_stop_side"] == "sell"
+    assert pending_view_1["pending_stop_trigger_price"] == 1.10344
+    assert pending_view_1["pending_stop_status"] == "placed"
+    assert pending_view_1["pending_stop_stop_loss"] == 1.10360
+    assert pending_view_1["pending_stop_take_profit"] == 1.10330
+
+    with pytest.raises(ActiveTradeExistsError):
+        trading_pending_1.buy_stop(trigger_price=1.10364)
+    with pytest.raises(ActiveTradeExistsError):
+        trading_pending_1.buy_market()
+
+    session_pending_2 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_pending_2 = MinimalTradingLoop(session_pending_2)
+    LocalJournalRuntime(session_pending_2, trading_pending_2, pending_storage)
+
+    recovered_pending_view = build_desktop_trading_view(trading_pending_2)
+    assert recovered_pending_view["entry_pending_present"] is True
+    assert recovered_pending_view["pending_stop_present"] is True
+    assert recovered_pending_view["pending_stop_side"] == "sell"
+    assert recovered_pending_view["pending_stop_trigger_price"] == 1.10344
+    assert recovered_pending_view["pending_stop_status"] == "placed"
+
+    trading_pending_2.cancel_pending_entry()
+    cancelled_view = build_desktop_trading_view(trading_pending_2)
+    assert cancelled_view["entry_pending_present"] is False
+    assert cancelled_view["pending_stop_present"] is False
+    assert cancelled_view["latest_pending_stop_status"] == "cancelled"
+    assert cancelled_view["latest_pending_stop_result"] == "cancelled"
+    assert trading_pending_2.state.orders[-1].cancellation_reason == "manual_cancel"
+
+    trading_pending_2.buy_market(volume=1.0)
+    session_pending_2.play()
+    session_pending_2.advance_frame()
+    assert build_desktop_trading_view(trading_pending_2)["active_trade_present"] is True
+
+    triggered_storage = _reset_dir(TMP_ROOT / "pending_stop_triggered_recovery")
+    session_trigger_1 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_trigger_1 = MinimalTradingLoop(session_trigger_1)
+    journal_trigger_1 = LocalJournalRuntime(session_trigger_1, trading_trigger_1, triggered_storage)
+
+    trading_trigger_1.buy_stop(trigger_price=1.10364, volume=1.0, stop_loss=1.10340, take_profit=1.10370)
+    session_trigger_1.play()
+    session_trigger_1.advance_frame()
+    waiting_view = build_desktop_trading_view(trading_trigger_1)
+    assert waiting_view["pending_stop_present"] is True
+    assert waiting_view["pending_stop_status"] == "placed"
+    assert waiting_view["active_trade_present"] is False
+
+    session_trigger_1.advance_frame()
+    triggered_view_1 = build_desktop_trading_view(trading_trigger_1)
+    assert triggered_view_1["pending_stop_present"] is False
+    assert triggered_view_1["active_trade_present"] is True
+    assert triggered_view_1["trade_side"] == "buy"
+    assert triggered_view_1["current_stop_loss"] == 1.10340
+    assert triggered_view_1["current_take_profit"] == 1.10370
+    assert triggered_view_1["last_execution_outcome"]["execution_type"] == "entry_fill"
+    assert triggered_view_1["last_execution_outcome"]["reason"] == "pending_stop_trigger"
+    assert triggered_view_1["latest_pending_stop_status"] == "filled"
+    assert triggered_view_1["latest_pending_stop_result"] == "triggered"
+    assert trading_trigger_1.state.orders[0].trigger_price == 1.10364
+    assert trading_trigger_1.state.orders[0].status == "filled"
+
+    session_trigger_2 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_trigger_2 = MinimalTradingLoop(session_trigger_2)
+    journal_trigger_2 = LocalJournalRuntime(session_trigger_2, trading_trigger_2, triggered_storage)
+
+    recovered_triggered_view = build_desktop_trading_view(trading_trigger_2)
+    assert recovered_triggered_view["active_trade_present"] is True
+    assert recovered_triggered_view["pending_stop_present"] is False
+    assert recovered_triggered_view["latest_pending_stop_status"] == "filled"
+    assert recovered_triggered_view["latest_pending_stop_result"] == "triggered"
+    assert recovered_triggered_view["last_execution_outcome"]["reason"] == "pending_stop_trigger"
+
+    trading_trigger_2.manual_close()
+    session_trigger_2.advance_frame()
+    closed_result = build_desktop_journal_view(journal_trigger_2)["derived_review_output"]["latest_trade_result"]
+    assert closed_result["close_reason"] == "manual_close"
+    assert closed_result["stop_loss"] == 1.10340
+    assert closed_result["take_profit"] == 1.10370
+    assert closed_result["has_initial_trade_protection"] is True
