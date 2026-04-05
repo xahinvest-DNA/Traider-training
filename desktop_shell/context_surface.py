@@ -36,6 +36,7 @@ def build_trade_context_lines(trading_view: dict[str, Any], journal_view: dict[s
         f"Active trade: {'yes' if trading_view['active_trade_present'] else 'no'}",
         f"Trade lifecycle focus: {transition_state['lifecycle_label'] if transition_state else ('active_trade_open' if trading_view['active_trade_present'] else 'idle')}",
         f"Trade lifecycle text: {transition_state['lifecycle_text'] if transition_state else ('Active trade is open.' if trading_view['active_trade_present'] else 'No trade lifecycle is currently in progress.')}",
+        f"Pending entry: {'yes' if trading_view.get('entry_pending_present') else 'no'}",
         f"Pending stop: {'yes' if trading_view.get('pending_stop_present') else 'no'}",
         f"Pending stop side: {trading_view.get('pending_stop_side') or '-'}",
         f"Pending stop trigger: {pending_trigger_price if pending_trigger_price is not None else '-'}",
