@@ -2,29 +2,29 @@
 
 Last updated: 2026-04-05
 Status: ready
-Task ID: T-125
+Task ID: T-126
 Task type: implementation
 
 ## Goal
-Implement one bounded `Desktop Trainer Start Flow Clarification` slice so the new chart-first workspace has a user-credible and unambiguous entry path for prepared dataset selection, raw historical import, new session creation, and past-session restore without rewriting runtime ownership or drifting into packaging/platform work.
+Implement one bounded `Desktop Trainer Mandatory Chart Boundary` slice so the existing chart-first workspace reaches the accepted product minimum: `bar chart only`, `Alligator`, `Fractals`, and a separate lower `AO` pane, without drifting into a broad charting platform or reopening startup/workspace architecture.
 
 ## Why this is next
-`T-124` made the desktop shell read like a trader workspace, but the sequence fixed in `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md` still requires startup ambiguity to be removed before the mandatory chart boundary is implemented.
+`T-125` removed startup ambiguity and now routes users into the chart-first workspace through explicit start choices. The next missing product boundary is the mandatory chart surface fixed in `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md` and sequenced in `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`.
 
 ## What should change
-1. Make the launch/start surface distinguish the accepted start paths: prepared dataset, raw import, new session, restore previous session.
-2. Connect that start choice cleanly into the current chart-first workspace instead of leaving startup implicit or shell-centric.
-3. Keep replay/trading/journal ownership unchanged and avoid packaging/platform drift.
+1. Replace the current generic replay trace with the accepted mandatory chart boundary.
+2. Keep the central chart area from `T-124` but make it product-credible for the trainer.
+3. Preserve replay/trading/journal ownership and avoid chart-platform drift.
 
 ## What must stay unchanged
-- no replay engine rewrite
-- no trading engine semantics rewrite
-- no journal/schema changes unless truly unavoidable
+- no launch/start-flow redesign again
+- no trading-panel redesign
+- no review redesign
+- no broader chart toolkit or multi-chart system
 - no dashboard/mobile/sync/mentor/platform scope
-- no mandatory chart-boundary work yet
 
 ## Recommended validation
-Run one bounded desktop-shell test pass that covers the clarified launch path and confirms the user can reach the existing chart-first workspace skeleton without startup ambiguity.
+Run one bounded desktop-shell test pass that confirms the chart area now enforces `bar chart only + Alligator + Fractals + AO` while the rest of the workspace remains intact.
 
 ## Required handoff format
 Use `05_CODEX/HANDOFF_TEMPLATE.md` exactly.

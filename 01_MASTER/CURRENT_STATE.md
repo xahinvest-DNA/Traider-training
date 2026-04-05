@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-05
-Current stage: bounded desktop trainer main-screen reset slice is completed; the desktop shell now reads as a chart-first workspace skeleton while start-flow clarification and mandatory chart boundary remain the next bounded gaps
-Active module: `T-124 Desktop Trainer Main Screen Reset` is completed
-Active question: whether the next desktop-reset frontier should now move into startup clarification exactly as sequenced, or whether one contradiction with the accepted chart-first boundary still appears in real use
+Current stage: bounded desktop trainer start-flow clarification slice is completed; the desktop shell now enters the chart-first workspace through explicit start choices while the mandatory chart boundary remains the next bounded gap
+Active module: `T-125 Desktop Trainer Start Flow Clarification` is completed
+Active question: whether the chart surface can now move directly into the accepted mandatory bar-plus-indicators boundary without reopening startup ambiguity or broader desktop rewrite
 
 ## Where the project is now
 
@@ -11,6 +11,7 @@ The project is in the sequential implementation stage of the first working proto
 
 At this point:
 
+- bounded desktop trainer start flow clarification is implemented in `desktop_shell/launch.py`, so prepared dataset, raw import, new session, and resume last local session are now explicit startup paths instead of implicit launch behavior;
 - the accepted chart-first desktop trainer workspace boundary and implementation sequence are now present in `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md` and `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`;
 - bounded desktop trainer main-screen reset is implemented in `desktop_shell/` so the shell now presents a compact replay/session bar, large central chart area, dedicated trading panel, compact context zone, visible review entry, and secondary/debug surfaces that no longer dominate the primary screen;
 - replay bootstrap is implemented in `runtime_bootstrap/`;

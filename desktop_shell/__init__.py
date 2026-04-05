@@ -36,9 +36,16 @@ from .history_surface import (
 )
 from .launch import (
     DesktopLaunchConfig,
+    DesktopStartPathOption,
+    DesktopStartSelection,
     build_controller_from_launch_config,
+    build_controller_from_start_selection,
     build_default_launch_config,
+    build_start_flow_options,
+    has_local_session_state,
     parse_launch_args,
+    reset_local_session_state,
+    resolve_start_selection,
     run_desktop_shell,
 )
 from .pause_point import (
@@ -70,6 +77,8 @@ from .controller import DesktopShellController
 
 __all__ = [
     "DesktopLaunchConfig",
+    "DesktopStartPathOption",
+    "DesktopStartSelection",
     "DesktopReadinessSnapshot",
     "DesktopShellController",
     "MVPPausePointSnapshot",
@@ -79,7 +88,9 @@ __all__ = [
     "build_compact_context_lines",
     "build_control_hint_lines",
     "build_controller_from_launch_config",
+    "build_controller_from_start_selection",
     "build_default_launch_config",
+    "build_start_flow_options",
     "build_finalization_blocker_lines",
     "build_finalization_lines",
     "build_history_status_lines",
@@ -113,8 +124,11 @@ __all__ = [
     "get_setup_tag_options",
     "get_setup_variant_options",
     "mvp_pause_point_to_json",
+    "has_local_session_state",
     "parse_launch_args",
     "readiness_snapshot_to_json",
+    "reset_local_session_state",
+    "resolve_start_selection",
     "run_desktop_shell",
     "run_mvp_pause_point_report",
     "run_readiness_report",

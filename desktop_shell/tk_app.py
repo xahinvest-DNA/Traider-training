@@ -48,10 +48,11 @@ from .workspace_surface import (
     build_workspace_bar_lines,
 )
 from .controller import DesktopShellController
+from .launch import DesktopStartSelection
 
 
 class TraderTrainerDesktopApp:
-    def __init__(self, controller: DesktopShellController) -> None:
+    def __init__(self, controller: DesktopShellController, startup_selection: DesktopStartSelection | None = None) -> None:
         self.controller = controller
         self.root = tk.Tk()
         self.root.title("Trader Trainer Workspace")
@@ -78,10 +79,17 @@ class TraderTrainerDesktopApp:
         self.partial_close_volume_value = tk.StringVar(value="0.5")
         self.pending_note_snapshot_id: str | None = None
         self.pending_review_snapshot_ids: list[str] = []
+        startup_detail = "Desktop shell refreshed into the chart-first trainer workspace skeleton."
+        startup_summary = "Workspace ready"
+        if startup_selection is not None:
+            startup_summary = startup_selection.label
+            startup_detail = startup_selection.detail
+            if startup_selection.selected_path:
+                startup_detail = f"{startup_detail} Source: {startup_selection.selected_path}"
         self.last_action_feedback: dict[str, str] | None = {
             "level": "info",
-            "summary": "Workspace ready",
-            "detail": "Desktop shell refreshed into the chart-first trainer workspace skeleton.",
+            "summary": startup_summary,
+            "detail": startup_detail,
         }
         self.control_buttons: dict[str, ttk.Button] = {}
         self.secondary_tabs: dict[str, ttk.Frame] = {}

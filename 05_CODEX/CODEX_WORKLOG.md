@@ -353,3 +353,46 @@ This slice is the first point where the desktop product stops reading like an in
 
 ### Recommended next step
 Open one bounded coding packet for `T-125 Desktop Trainer Start Flow Clarification`, then continue to the mandatory chart-boundary slice once startup into the workspace is unambiguous.
+
+
+## 2026-04-05 ? T-125 Desktop Trainer Start Flow Clarification
+
+### Goal
+Implement one bounded startup slice so the chart-first desktop workspace has explicit and user-credible start paths for prepared dataset, raw import, new session, and resume last local session without turning launch into a platform or manager layer.
+
+### Files updated
+- `desktop_shell/launch.py`
+- `desktop_shell/tk_app.py`
+- `desktop_shell/__init__.py`
+- `tests/test_desktop_shell.py`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Added explicit start-flow helpers for the four accepted startup paths and a narrow startup chooser that appears before the main workspace opens.
+- Made `new session` explicitly clear local recovery state instead of allowing accidental resume behavior to decide the path implicitly.
+- Kept `resume last local session` as its own explicit choice, only enabled when recoverable local state exists.
+- Routed prepared dataset and raw import choices into the existing chart-first workspace skeleton instead of creating a separate launch subsystem.
+- Surfaced the chosen startup path back inside the workspace as initial action feedback so the entry route remains understandable after launch.
+- Added bounded launch/start-flow tests covering explicit options, resume-vs-new-session semantics, required external paths, and workspace routing for prepared and raw dataset paths.
+
+### What was not changed
+- Replay engine contracts were not changed.
+- Trading engine semantics were not changed.
+- Journal/schema ownership and persistence model were not changed.
+- The mandatory chart-boundary slice was not started yet.
+- No dataset catalog, session browser, packaging layer, or launch-platform subsystem was created.
+
+### Verification
+- `pytest -p no:cacheprovider tests/test_desktop_shell.py -q`
+
+### Why this matters
+The workspace from `T-124` now has a clear and intentional way to be entered. Users no longer have to infer whether the app resumed old local state, opened a prepared dataset, or triggered raw import through hidden launch behavior.
+
+### Remaining gap after this step
+- The chart area is layout-primary and startup is explicit, but the accepted mandatory chart surface (`bar chart only + Alligator + Fractals + AO`) is still not implemented.
+
+### Recommended next step
+Open one bounded coding packet for `T-126 Desktop Trainer Mandatory Chart Boundary`.

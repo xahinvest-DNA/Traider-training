@@ -18,7 +18,9 @@ from desktop_shell import (
     build_compact_context_lines,
     build_control_hint_lines,
     build_controller_from_launch_config,
+    build_controller_from_start_selection,
     build_default_launch_config,
+    build_start_flow_options,
     build_finalization_blocker_lines,
     build_finalization_lines,
     build_history_status_lines,
@@ -53,7 +55,9 @@ from desktop_shell import (
     get_rule_violation_options,
     get_setup_tag_options,
     get_setup_variant_options,
+    has_local_session_state,
     parse_launch_args,
+    resolve_start_selection,
     run_mvp_pause_point_report,
     run_readiness_report,
 )
@@ -94,6 +98,27 @@ def test_desktop_shell_launch_helpers_build_predictable_local_entry_config() -> 
     workspace = controller.get_workspace_view()
     assert isinstance(controller, DesktopShellController)
     assert workspace["replay"]["dataset_id"] == "eurusd-sample-v1"
+
+
+def test_desktop_shell_start_flow_options_are_explicit_and_resume_is_not_implicit() -> None:
+    storage_dir = _reset_dir(TMP_ROOT / "startup_options")
+    config = DesktopLaunchConfig(dataset_handle=str(FIXTURE), storage_dir=storage_dir, replay_mode="training")
+
+    options_without_resume = build_start_flow_options(config)
+    assert [option.label for option in options_without_resume] == [
+        "Open prepared dataset",
+        "Import raw historical data",
+        "Start new session",
+        "Resume last local session",
+    ]
+    assert options_without_resume[-1].enabled is False
+    assert any("clean local session" in option.detail.lower() for option in options_without_resume[:2])
+
+    DesktopShellController(dataset_handle=FIXTURE, storage_dir=storage_dir)
+    assert has_local_session_state(storage_dir) is True
+    options_with_resume = build_start_flow_options(config)
+    assert options_with_resume[-1].enabled is True
+    assert "Resume the last local session" in options_with_resume[-1].detail
 
 
 def test_desktop_shell_launch_entrypoints_expose_help() -> None:
@@ -3413,3 +3438,71 @@ def test_desktop_compact_context_and_review_entry_stay_factual() -> None:
     assert any(line.startswith("PreTradeNotes:") for line in review_lines)
     assert any(line.startswith("Review pending trade:") for line in review_lines)
     assert any(line.startswith("Next review action:") for line in review_lines)
+
+
+def test_desktop_shell_start_flow_new_session_and_resume_split_recovery_honestly() -> None:
+    storage_dir = _reset_dir(TMP_ROOT / "startup_recovery_split")
+    config = DesktopLaunchConfig(dataset_handle=str(FIXTURE), storage_dir=storage_dir, replay_mode="training")
+
+    controller_1 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=storage_dir)
+    controller_1.buy_market()
+    assert has_local_session_state(storage_dir) is True
+
+    resumed_controller, resumed_selection = build_controller_from_start_selection(config, "resume_last_local_session")
+    resumed_workspace = resumed_controller.get_workspace_view()
+    assert resumed_selection.label == "Resume last local session"
+    assert resumed_workspace["journal"]["recovered"] is True
+
+    new_session_controller, new_session_selection = build_controller_from_start_selection(config, "start_new_session")
+    new_session_workspace = new_session_controller.get_workspace_view()
+    assert new_session_selection.label == "Start new session"
+    assert new_session_workspace["journal"]["recovered"] is False
+
+
+def test_desktop_shell_start_flow_prepared_and_raw_paths_route_into_workspace() -> None:
+    storage_dir = _reset_dir(TMP_ROOT / "startup_paths_to_workspace")
+    config = DesktopLaunchConfig(dataset_handle=str(FIXTURE), storage_dir=storage_dir, replay_mode="training", instrument_id="EURUSD")
+
+    prepared_controller, prepared_selection = build_controller_from_start_selection(
+        config,
+        "open_prepared_dataset",
+        selected_path=FIXTURE,
+    )
+    prepared_workspace = prepared_controller.get_workspace_view()
+    assert prepared_selection.label == "Open prepared dataset"
+    assert prepared_workspace["replay"]["dataset_id"] == "eurusd-sample-v1"
+    assert prepared_workspace["journal"]["recovered"] is False
+
+    raw_dir = _reset_dir(TMP_ROOT / "startup_raw_import")
+    raw_path = raw_dir / "eurusd_raw.csv"
+    raw_path.write_text(
+        "timestamp,bid,ask\n"
+        "2024-01-01T00:00:00Z,1.10000,1.10020\n"
+        "2024-01-01T00:00:01Z,1.10010,1.10030\n",
+        encoding="utf-8",
+    )
+    raw_config = DesktopLaunchConfig(
+        dataset_handle=str(FIXTURE),
+        storage_dir=raw_dir / "storage",
+        replay_mode="training",
+        instrument_id="EURUSD",
+    )
+    raw_controller, raw_selection = build_controller_from_start_selection(
+        raw_config,
+        "import_raw_historical_data",
+        selected_path=raw_path,
+    )
+    raw_workspace = raw_controller.get_workspace_view()
+    assert raw_selection.label == "Import raw historical data"
+    assert raw_selection.selected_path == str(raw_path)
+    assert raw_workspace["replay"]["dataset_id"].startswith("eurusd-raw-")
+    assert raw_workspace["journal"]["recovered"] is False
+
+
+def test_desktop_shell_start_flow_resolution_requires_explicit_external_paths() -> None:
+    config = DesktopLaunchConfig(dataset_handle=str(FIXTURE), storage_dir=TMP_ROOT / "startup_resolution_validation", replay_mode="training")
+
+    with pytest.raises(ValueError):
+        resolve_start_selection(config, "open_prepared_dataset")
+    with pytest.raises(ValueError):
+        resolve_start_selection(config, "import_raw_historical_data")

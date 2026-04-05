@@ -880,3 +880,13 @@
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/REPLAY_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`, current `desktop_shell/*`, and related tests.
 - Expected result: a chart-first main-screen reset inside `desktop_shell/` with compact replay/session bar, dominant chart area, dedicated trading panel, compact context zone, visible review entry, secondary/debug demotion, plus bounded tests and synchronized state files.
 - Outcome: rebuilt the Tk desktop shell into a chart-first workspace skeleton with a compact top replay/session bar, visually dominant main chart area, dedicated trader panel, compact factual context, visible review entry, and secondary notebook-backed workflow/history/debug surfaces while preserving existing runtime ownership and diagnostics.
+
+
+### T-125
+
+- Status: completed
+- Module: Desktop Trainer Start Flow Clarification
+- Goal: implement one bounded startup slice so the chart-first desktop workspace has explicit and user-credible start paths for prepared dataset, raw import, new session, and resume last local session without turning launch into a platform or manager layer.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/REPLAY_ENGINE.md`, `03_MODULES/TRADING_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`, `05_CODEX/NEXT_TASK.md`, current `desktop_shell/*`, and related start/launch tests.
+- Expected result: one bounded startup chooser and supporting launch helpers that make start paths explicit, remove implicit restore ambiguity, route the chosen path into the existing chart-first workspace, and keep startup scope narrow.
+- Outcome: added an explicit startup chooser and bounded launch helpers that separate prepared dataset, raw import, new session, and resume last local session as user-visible entry paths, remove accidental restore ambiguity, and route each selected path into the existing chart-first workspace without creating a launcher platform.

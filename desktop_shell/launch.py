@@ -1,10 +1,10 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import argparse
 import os
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Sequence
 
@@ -16,6 +16,7 @@ from .controller import DesktopShellController
 
 ASCII_TK_PYTHON = Path(r"C:\Python311\python.exe")
 TK_FALLBACK_ENV = "TRADER_TRAINER_TK_FALLBACK"
+_PENDING_STARTUP_SELECTION: "DesktopStartSelection | None" = None
 
 
 @dataclass(frozen=True)
@@ -28,6 +29,22 @@ class DesktopLaunchConfig:
     price_precision: int = 5
     timezone_canonical: str = "UTC"
     import_output_root: Path | None = None
+
+
+@dataclass(frozen=True)
+class DesktopStartPathOption:
+    key: str
+    label: str
+    detail: str
+    enabled: bool = True
+
+
+@dataclass(frozen=True)
+class DesktopStartSelection:
+    key: str
+    label: str
+    detail: str
+    selected_path: str | None = None
 
 
 def build_default_launch_config(project_root: str | Path | None = None) -> DesktopLaunchConfig:
@@ -63,6 +80,104 @@ def parse_launch_args(argv: Sequence[str] | None = None, project_root: str | Pat
     )
 
 
+def build_start_flow_options(config: DesktopLaunchConfig) -> list[DesktopStartPathOption]:
+    dataset_label = _summarize_dataset_handle(config.dataset_handle)
+    resume_available = has_local_session_state(config.storage_dir)
+    resume_detail = (
+        f"Resume the last local session from {config.storage_dir}."
+        if resume_available
+        else f"No recoverable local session found in {config.storage_dir} yet."
+    )
+    return [
+        DesktopStartPathOption(
+            key="open_prepared_dataset",
+            label="Open prepared dataset",
+            detail="Choose a normalized dataset folder, then enter the trainer workspace with a clean local session.",
+        ),
+        DesktopStartPathOption(
+            key="import_raw_historical_data",
+            label="Import raw historical data",
+            detail="Choose a raw CSV/TSV/JSON tick file, import it, then enter the trainer workspace with a clean local session.",
+        ),
+        DesktopStartPathOption(
+            key="start_new_session",
+            label="Start new session",
+            detail=f"Ignore saved local recovery and open a clean workspace session with the current dataset: {dataset_label}.",
+        ),
+        DesktopStartPathOption(
+            key="resume_last_local_session",
+            label="Resume last local session",
+            detail=resume_detail,
+            enabled=resume_available,
+        ),
+    ]
+
+
+def has_local_session_state(storage_dir: str | Path) -> bool:
+    return (Path(storage_dir) / "local_runtime_state.json").exists()
+
+
+def reset_local_session_state(storage_dir: str | Path) -> None:
+    storage_path = Path(storage_dir) / "local_runtime_state.json"
+    if storage_path.exists():
+        storage_path.unlink()
+
+
+def resolve_start_selection(
+    config: DesktopLaunchConfig,
+    selection_key: str,
+    selected_path: str | Path | None = None,
+) -> tuple[DesktopLaunchConfig, DesktopStartSelection]:
+    selected = Path(selected_path) if selected_path is not None else None
+    if selection_key == "open_prepared_dataset":
+        if selected is None:
+            raise ValueError("Prepared dataset path is required for open_prepared_dataset.")
+        resolved_config = replace(config, dataset_handle=str(selected))
+        reset_local_session_state(resolved_config.storage_dir)
+        return resolved_config, DesktopStartSelection(
+            key=selection_key,
+            label="Open prepared dataset",
+            detail="Entered workspace from an explicit prepared dataset choice.",
+            selected_path=str(selected),
+        )
+    if selection_key == "import_raw_historical_data":
+        if selected is None:
+            raise ValueError("Raw dataset path is required for import_raw_historical_data.")
+        resolved_config = replace(config, dataset_handle=str(selected))
+        reset_local_session_state(resolved_config.storage_dir)
+        return resolved_config, DesktopStartSelection(
+            key=selection_key,
+            label="Import raw historical data",
+            detail="Entered workspace from an explicit raw import choice.",
+            selected_path=str(selected),
+        )
+    if selection_key == "start_new_session":
+        reset_local_session_state(config.storage_dir)
+        return config, DesktopStartSelection(
+            key=selection_key,
+            label="Start new session",
+            detail="Entered workspace from an explicit clean-session choice.",
+            selected_path=None,
+        )
+    if selection_key == "resume_last_local_session":
+        return config, DesktopStartSelection(
+            key=selection_key,
+            label="Resume last local session",
+            detail="Entered workspace from an explicit local-session resume choice.",
+            selected_path=None,
+        )
+    raise ValueError(f"Unsupported start selection: {selection_key}")
+
+
+def build_controller_from_start_selection(
+    config: DesktopLaunchConfig,
+    selection_key: str,
+    selected_path: str | Path | None = None,
+) -> tuple[DesktopShellController, DesktopStartSelection]:
+    resolved_config, selection = resolve_start_selection(config, selection_key, selected_path=selected_path)
+    return build_controller_from_launch_config(resolved_config), selection
+
+
 def resolve_dataset_handle(config: DesktopLaunchConfig) -> str:
     dataset_path = Path(config.dataset_handle)
     if dataset_path.is_file():
@@ -87,10 +202,79 @@ def build_controller_from_launch_config(config: DesktopLaunchConfig) -> DesktopS
     )
 
 
-def launch_desktop_app(controller: DesktopShellController) -> None:
+def launch_desktop_app(controller: DesktopShellController, startup_selection: DesktopStartSelection | None = None) -> None:
     from .tk_app import TraderTrainerDesktopApp
 
-    TraderTrainerDesktopApp(controller).run()
+    active_selection = startup_selection if startup_selection is not None else _PENDING_STARTUP_SELECTION
+    TraderTrainerDesktopApp(controller, startup_selection=active_selection).run()
+
+
+def prompt_start_selection(config: DesktopLaunchConfig) -> DesktopStartSelection | None:
+    import tkinter as tk
+    from tkinter import filedialog, ttk
+
+    options = build_start_flow_options(config)
+    result: dict[str, str | None] = {"key": None, "selected_path": None}
+
+    root = tk.Tk()
+    root.title("Enter Trainer Workspace")
+    root.geometry("760x340")
+    root.resizable(False, False)
+
+    container = ttk.Frame(root, padding=16)
+    container.grid(row=0, column=0, sticky="nsew")
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
+    container.columnconfigure(0, weight=1)
+
+    ttk.Label(container, text="Choose how to enter the desktop trainer workspace", justify="left", anchor="w").grid(row=0, column=0, sticky="ew")
+    ttk.Label(
+        container,
+        text=f"Current dataset: {_summarize_dataset_handle(config.dataset_handle)} | Storage: {config.storage_dir}",
+        justify="left",
+        anchor="w",
+    ).grid(row=1, column=0, sticky="ew", pady=(4, 12))
+
+    def choose(option: DesktopStartPathOption) -> None:
+        selected_path: str | None = None
+        if option.key == "open_prepared_dataset":
+            selected_path = filedialog.askdirectory(
+                title="Open prepared dataset",
+                initialdir=str(Path(config.dataset_handle).parent if Path(config.dataset_handle).exists() else Path.cwd()),
+                mustexist=True,
+            )
+            if not selected_path:
+                return
+        elif option.key == "import_raw_historical_data":
+            selected_path = filedialog.askopenfilename(
+                title="Import raw historical data",
+                initialdir=str(Path(config.dataset_handle).parent if Path(config.dataset_handle).exists() else Path.cwd()),
+                filetypes=[("Raw market data", "*.csv *.tsv *.json"), ("All files", "*.*")],
+            )
+            if not selected_path:
+                return
+        result["key"] = option.key
+        result["selected_path"] = selected_path
+        root.destroy()
+
+    for index, option in enumerate(options, start=2):
+        frame = ttk.LabelFrame(container, text=option.label, padding=10)
+        frame.grid(row=index, column=0, sticky="ew", pady=(0, 8))
+        frame.columnconfigure(0, weight=1)
+        ttk.Label(frame, text=option.detail, justify="left", anchor="w").grid(row=0, column=0, sticky="ew", padx=(0, 8))
+        button = ttk.Button(frame, text=option.label, command=lambda current=option: choose(current))
+        button.grid(row=0, column=1, sticky="e")
+        if not option.enabled:
+            button.configure(state="disabled")
+
+    ttk.Button(container, text="Cancel", command=root.destroy).grid(row=len(options) + 2, column=0, sticky="e", pady=(8, 0))
+    root.mainloop()
+
+    key = result["key"]
+    if not key:
+        return None
+    _, selection = resolve_start_selection(config, str(key), selected_path=result["selected_path"])
+    return selection
 
 
 def format_launch_failure_message(config: DesktopLaunchConfig, exc: Exception) -> str:
@@ -103,6 +287,8 @@ def format_launch_failure_message(config: DesktopLaunchConfig, exc: Exception) -
         "A non-GUI readiness snapshot is shown below so work can continue while Tk/Tcl is fixed.\n\n"
         f"{readiness_report}"
     )
+
+
 
 
 def _looks_like_tk_environment_error(exc: Exception) -> bool:
@@ -128,8 +314,18 @@ def _try_relaunch_with_ascii_tk_python(argv: Sequence[str] | None = None) -> boo
 def run_desktop_shell(argv: Sequence[str] | None = None) -> None:
     config = parse_launch_args(argv=argv)
     try:
-        controller = build_controller_from_launch_config(config)
+        selection = prompt_start_selection(config)
+        if selection is None:
+            return
+        controller, resolved_selection = build_controller_from_start_selection(
+            config,
+            selection.key,
+            selected_path=selection.selected_path,
+        )
+        global _PENDING_STARTUP_SELECTION
+        _PENDING_STARTUP_SELECTION = resolved_selection
         launch_desktop_app(controller)
+        _PENDING_STARTUP_SELECTION = None
     except DatasetImportError:
         raise
     except Exception as exc:
@@ -138,3 +334,10 @@ def run_desktop_shell(argv: Sequence[str] | None = None) -> None:
                 return
             raise SystemExit(format_launch_failure_message(config, exc)) from None
         raise
+
+
+def _summarize_dataset_handle(dataset_handle: str | Path) -> str:
+    path = Path(dataset_handle)
+    if path.name:
+        return path.name
+    return str(path)
