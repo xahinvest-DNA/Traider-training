@@ -495,21 +495,21 @@ Implement `T-115: Partial Close Slice`.
 Synchronize the operating-layer source-of-truth documents before implementation so the repository has one unambiguous active frontier for T-115 Partial Close.
 
 ### Files updated
--  0_INDEX.md
--  1_MASTER/CURRENT_STATE.md
--  5_CODEX/TASKS.md
--  5_CODEX/CODEX_WORKLOG.md
+- 0_INDEX.md
+- 1_MASTER/CURRENT_STATE.md
+- 5_CODEX/TASKS.md
+- 5_CODEX/CODEX_WORKLOG.md
 
 ### What was stale
--  0_INDEX.md still pointed to the older Current Trade Review Digest frontier in its header, active focus, implementation-doc link, and next-step guidance.
--  1_MASTER/CURRENT_STATE.md still contained one stale historical bullet that named Current Trade Review Digest as the selected next slice, which contradicted the current top-level Partial Close frontier.
--  5_CODEX/TASKS.md contained duplicated active T-115 blocks with contradictory stale outcomes from older history branches.
+- 0_INDEX.md still pointed to the older Current Trade Review Digest frontier in its header, active focus, implementation-doc link, and next-step guidance.
+- 1_MASTER/CURRENT_STATE.md still contained one stale historical bullet that named Current Trade Review Digest as the selected next slice, which contradicted the current top-level Partial Close frontier.
+- 5_CODEX/TASKS.md contained duplicated active T-115 blocks with contradictory stale outcomes from older history branches.
 
 ### What was synchronized
-- Updated  0_INDEX.md so the active module, current focus, implementation-doc pointer, and next steps all point to T-115 Partial Close.
-- Removed the stale contradictory digest-selection bullet from  1_MASTER/CURRENT_STATE.md while preserving the rest of the implementation history.
-- Cleaned  5_CODEX/TASKS.md so T-114 remains completed and exactly one active T-115 block remains.
-- Kept  5_CODEX/NEXT_TASK.md unchanged because it was already aligned to T-115, allowed files, and acceptance criteria.
+- Updated 0_INDEX.md so the active module, current focus, implementation-doc pointer, and next steps all point to T-115 Partial Close.
+- Removed the stale contradictory digest-selection bullet from 1_MASTER/CURRENT_STATE.md while preserving the rest of the implementation history.
+- Cleaned 5_CODEX/TASKS.md so T-114 remains completed and exactly one active T-115 block remains.
+- Kept 5_CODEX/NEXT_TASK.md unchanged because it was already aligned to T-115, allowed files, and acceptance criteria.
 
 ### Why this mattered before implementation
 The repository had real operating drift: different top-level documents named different active frontiers, and TASKS.md exposed multiple conflicting active T-115 entries. Fixing that first restores one clean SSOT path before any runtime or desktop behavior changes begin.
@@ -518,7 +518,7 @@ The repository had real operating drift: different top-level documents named dif
 - Runtime code was not changed.
 - Desktop shell code was not changed.
 - Tests were not changed.
-- Module documents, tech schemas, and  1_MASTER/DECISIONS.md were not changed.
+- Module documents, tech schemas, and 1_MASTER/DECISIONS.md were not changed.
 
 ### Recommended next step
 Read the active T-115 source-of-truth set and implement the bounded Partial Close slice.
@@ -688,3 +688,47 @@ Run one bounded validation pass on the already implemented desktop-first/local-f
 ### Recommended next step
 If implementation resumes, activate one bounded `Desktop Transition-State Coherence` slice and keep it strictly inside existing workflow/result/finalization/readiness surfaces.
 
+## 2026-04-05 - T-118 Desktop Transition-State Coherence
+
+### Goal
+Implement one bounded semantics/coherence correction so the current desktop-first/local-first workflow stops forcing the user to reconcile inconsistent or misleading transition-state language across existing `trade`, `workflow`, `result`, `finalization`, `readiness`, and `pause-point` surfaces.
+
+### Files created
+- `desktop_shell/transition_state.py`
+
+### Files updated
+- `00_INDEX.md`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+- `desktop_shell/context_surface.py`
+- `desktop_shell/control_surface.py`
+- `desktop_shell/readiness.py`
+- `desktop_shell/tk_app.py`
+- `desktop_shell/workflow_surface.py`
+- `tests/test_desktop_shell.py`
+
+### What was done
+- Added one compact desktop-only transition-state helper that normalizes lifecycle and clean-vs-warned dataset messaging from existing replay/trading/journal facts without changing runtime/domain ownership.
+- Updated existing trade/finalization/workflow surfaces so pending-entry states are explicitly described as staged entry rather than implicitly as already open active trade state.
+- Updated readiness/pause-point/finalization/recovery reporting so clean dataset states no longer surface warned-dataset language, while genuinely warned dataset flows still keep their warning wording.
+- Kept partial-close and finalized/recovered messaging aligned across existing surfaces instead of introducing a new summary owner or orchestration layer.
+- Added narrow desktop-shell coverage for clean finalization/recovery wording plus pending-entry and partially closed state coherence.
+- Verified the bounded slice with the full `tests/test_desktop_shell.py` suite outside the sandbox after sandbox temp-directory permissions produced false-negative filesystem errors.
+
+### What was not changed
+- Runtime/domain logic was not changed.
+- `03_MODULES/*` was not changed.
+- `04_TECH/*` was not changed.
+- `01_MASTER/DECISIONS.md` was not changed.
+- No new persistence, subsystem, dashboard, mentor/media/mobile/sync scope, pending-order growth, protection automation, or broader position-management growth was introduced.
+
+### Why this matters
+The current desktop loop now tells one coherent state story at the exact moments where user trust was breaking before: staged pending entry, partial-close continuation, review-pending closure, and finalized/recovered reporting. This improves clarity and continuity without pretending to add new trading capability.
+
+### Remaining gap after this step
+- The repository should validate the completed coherence fix once more before activating any new implementation lane, so the next frontier is selected from observed remaining friction instead of adjacency bias.
+
+### Recommended next step
+Run one bounded post-implementation validation pass on `T-118 Desktop Transition-State Coherence`.

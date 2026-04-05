@@ -2478,8 +2478,8 @@ def test_desktop_shell_surfaces_dataset_quality_finalization_link_in_readiness_p
     readiness_report = format_readiness_report(readiness)
     pause_point = build_mvp_pause_point_snapshot(config)
     pause_report = format_mvp_pause_point_report(pause_point)
-    finalization_lines = build_finalization_lines(workspace["journal"])
-    blocker_lines = build_finalization_blocker_lines(workspace["journal"])
+    finalization_lines = build_finalization_lines(workspace["journal"], workspace["trading"])
+    blocker_lines = build_finalization_blocker_lines(workspace["journal"], workspace["trading"])
 
     assert readiness.finalization_link_status == "finalized_warned_link"
     assert "Finalization link: finalized_warned_link" in readiness_report
@@ -2489,6 +2489,39 @@ def test_desktop_shell_surfaces_dataset_quality_finalization_link_in_readiness_p
     assert any(line == "Finalization dataset link: finalized_warned_link" for line in finalization_lines)
     assert any("session closed with warned dataset context" in line for line in finalization_lines)
     assert any(line == "Finalization dataset link: finalized_warned_link" for line in blocker_lines)
+
+
+def test_desktop_shell_surfaces_clean_finalization_state_stays_clean_across_reports() -> None:
+    controller = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=_reset_dir(TMP_ROOT / "clean_finalization_state_surfaces"),
+    )
+    controller.buy_market()
+    controller.play()
+    controller.advance_frame()
+    controller.manual_close()
+    controller.advance_frame()
+    controller.pause()
+    controller.create_post_trade_review(content="Clean dataset review", setup_tag="BW_FRACTAL_LONG", compliance_label="valid_setup")
+    workspace = controller.finalize_session(reason="user_completed")
+
+    config = DesktopLaunchConfig(dataset_handle=FIXTURE, storage_dir=controller.storage_dir, replay_mode="training")
+    readiness = build_readiness_snapshot(config)
+    readiness_report = format_readiness_report(readiness)
+    pause_point = build_mvp_pause_point_snapshot(config)
+    pause_report = format_mvp_pause_point_report(pause_point)
+    finalization_lines = build_finalization_lines(workspace["journal"], workspace["trading"])
+    blocker_lines = build_finalization_blocker_lines(workspace["journal"], workspace["trading"])
+
+    assert readiness.finalization_link_status == "finalized_clean_context"
+    assert "Finalization link: finalized_clean_context" in readiness_report
+    assert "warned dataset context" not in readiness_report
+    assert pause_point.finalization_link_status == "finalized_clean_context"
+    assert "Finalization link: finalized_clean_context" in pause_report
+    assert "warned dataset context" not in pause_report
+    assert any(line == "Finalization dataset link: finalized_clean_context" for line in finalization_lines)
+    assert any("session closed with clean dataset context" in line for line in finalization_lines)
+    assert any(line == "Finalization dataset link: finalized_clean_context" for line in blocker_lines)
 
 
 def test_desktop_shell_surfaces_review_dataset_quality_link_for_warned_review_flow() -> None:
@@ -2647,6 +2680,43 @@ def test_desktop_shell_surfaces_dataset_quality_recovery_note_after_reopen() -> 
     assert "Recovery note: recovered_warned_close_context" in readiness_report
     assert "reopened finalized session still carries warned dataset close context" in readiness_report
 
+def test_desktop_shell_surfaces_clean_recovery_state_stays_warning_free() -> None:
+    storage_dir = _reset_dir(TMP_ROOT / "clean_recovery_state_surfaces")
+    controller_1 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=storage_dir)
+    controller_1.buy_market()
+    controller_1.play()
+    controller_1.advance_frame()
+    controller_1.manual_close()
+    controller_1.advance_frame()
+    controller_1.pause()
+    controller_1.create_post_trade_review(
+        content="Clean dataset review",
+        setup_tag="BW_FRACTAL_LONG",
+        compliance_label="valid_setup",
+    )
+    controller_1.finalize_session(reason="user_completed")
+
+    controller_2 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=storage_dir)
+    recovered_workspace = controller_2.get_workspace_view()
+    recovered_guidance = build_workflow_guidance_lines(
+        recovered_workspace["replay"],
+        recovered_workspace["trading"],
+        recovered_workspace["journal"],
+    )
+    feedback_lines = build_action_feedback_lines(None, recovered_workspace["journal"])
+    button_map = build_button_state_map(recovered_workspace["replay"], recovered_workspace["trading"], recovered_workspace["journal"])
+    readiness = build_readiness_snapshot(
+        DesktopLaunchConfig(dataset_handle=FIXTURE, storage_dir=storage_dir, replay_mode="training")
+    )
+
+    assert recovered_workspace["journal"]["recovered"] is True
+    assert readiness.recovery_note_status == "recovered_clean_context"
+    assert readiness.recovery_acknowledgment_status == "not_applicable"
+    assert any("reopened finalized session returns with clean dataset context" in line for line in recovered_guidance)
+    assert feedback_lines[1] == "No action yet in this desktop session."
+    assert button_map["acknowledge_recovery"] is False
+
+
 def test_desktop_shell_surfaces_recovery_feedback_cue_after_reopen() -> None:
     raw_dir = _reset_dir(TMP_ROOT / "dataset_quality_recovery_feedback_surfaces")
     raw_path = raw_dir / "eurusd_raw.csv"
@@ -2686,7 +2756,6 @@ def test_desktop_shell_surfaces_recovery_feedback_cue_after_reopen() -> None:
 
     assert feedback_lines[0] == "Recent action:"
     assert feedback_lines[1] == "INFO: Review reopened warning"
-    assert any("reopened finalized session still carries warned dataset close context" in line for line in feedback_lines)
     assert any("reopened finalized session still carries warned dataset close context" in line for line in feedback_lines)
 
 
@@ -3084,7 +3153,13 @@ def test_desktop_shell_surfaces_pending_stop_entry_and_restart_recovery() -> Non
     assert any(line == "Pending stop trigger: 1.10344" for line in pending_trade_lines_1)
     assert any(line == "Pending stop status: placed" for line in pending_trade_lines_1)
     assert any(line == "Pending stop SL / TP: 1.1036 / 1.1033" for line in pending_trade_lines_1)
+    pending_finalization_lines_1 = build_finalization_lines(pending_workspace_1["journal"], pending_workspace_1["trading"])
+    pending_blocker_lines_1 = build_finalization_blocker_lines(pending_workspace_1["journal"], pending_workspace_1["trading"])
     assert any(line == "Pending stop entry is staged for the current one-trade replay loop." for line in pending_workflow_lines_1)
+    assert any(line == "Trade lifecycle focus: pending_entry_staged" for line in pending_trade_lines_1)
+    assert any(line == "Trade lifecycle text: Pending entry is staged; no active trade is open yet." for line in pending_trade_lines_1)
+    assert any(line == "Trade lifecycle in progress: pending_entry_staged" for line in pending_finalization_lines_1)
+    assert any(line == "A pending entry is still staged." for line in pending_blocker_lines_1)
     assert pending_button_map_1["cancel_entry"] is True
     assert pending_button_map_1["buy_stop"] is False
     assert pending_button_map_1["sell_stop"] is False
@@ -3206,6 +3281,8 @@ def test_desktop_shell_surfaces_partial_close_and_restart_recovery(monkeypatch: 
     assert trading_view["trade_partially_closed"] is True
     assert trading_view["current_open_volume"] == pytest.approx(0.5)
     assert any(line == "Trade partially closed: yes" for line in trade_lines)
+    assert any(line == "Trade lifecycle focus: active_trade_partially_closed" for line in trade_lines)
+    assert any(line == "Trade lifecycle text: Active trade remains open after a partial close." for line in trade_lines)
     assert any(line == "Partial close available: yes" for line in trade_lines)
     assert latest_result_lines[0] == "Latest result: active trade is partially closed"
     assert any(line == "Remaining open volume: 0.5" for line in latest_result_lines)

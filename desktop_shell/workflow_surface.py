@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from .transition_state import build_transition_state_view
+
 
 def build_workflow_guidance_lines(
     replay_view: dict[str, Any],
@@ -11,7 +13,11 @@ def build_workflow_guidance_lines(
     summary = journal_view["session_review_summary"]
     finalization = journal_view["session_finalization"]
     dataset_quality = journal_view.get("dataset_quality_context") or replay_view.get("dataset_quality") or {}
-    recovery_ack = journal_view.get("dataset_quality_recovery_acknowledgment") or {}
+    transition_state = build_transition_state_view(journal_view, trading_view)
+    recovery_ack = {
+        "acknowledgment_status": transition_state["recovery_acknowledgment_status"],
+        "status_text": transition_state["recovery_acknowledgment_text"],
+    }
     latest_trade_id = summary.get("latest_trade_id") or "-"
     latest_trade_result = journal_view["derived_review_output"].get("latest_trade_result")
 
@@ -21,12 +27,10 @@ def build_workflow_guidance_lines(
             "Session finalized. Review the latest result or restart with a new local session.",
             f"Finalization reason: {finalization['finalization_reason'] or '-'}",
         ]
-        quality_link = finalization.get("dataset_quality_finalization_link") or {}
-        recovery_note = journal_view.get("dataset_quality_recovery_note") or {}
-        if quality_link.get("link_text"):
-            lines.append(quality_link["link_text"])
-        if recovery_note.get("note_text"):
-            lines.append(recovery_note["note_text"])
+        if transition_state["finalization_link_text"] != "none":
+            lines.append(transition_state["finalization_link_text"])
+        if transition_state["recovery_note_text"] != "none":
+            lines.append(transition_state["recovery_note_text"])
         _append_recovery_acknowledgment_guidance(lines, recovery_ack)
         return _append_dataset_quality_context(lines, dataset_quality)
 
@@ -284,17 +288,23 @@ def _append_plan_context_lines(lines: list[str], plan_context: dict[str, Any] | 
         lines.append(f"Risk plan: {plan_context.get('risk_plan')}")
 
 
-def build_finalization_blocker_lines(journal_view: dict[str, Any]) -> list[str]:
+def build_finalization_blocker_lines(
+    journal_view: dict[str, Any],
+    trading_view: dict[str, Any] | None = None,
+) -> list[str]:
     finalization = journal_view["session_finalization"]
-    quality_link = finalization.get("dataset_quality_finalization_link") or {}
+    transition_state = build_transition_state_view(journal_view, trading_view)
+    recovery_ack = {
+        "acknowledgment_status": transition_state["recovery_acknowledgment_status"],
+        "status_text": transition_state["recovery_acknowledgment_text"],
+    }
     blockers = ["Finalization blockers:"]
 
     if finalization["is_session_finalized"]:
-        recovery_ack = journal_view.get("dataset_quality_recovery_acknowledgment") or {}
-        if quality_link.get("link_status"):
-            blockers.append(f"Finalization dataset link: {quality_link.get('link_status')}")
-        if quality_link.get("link_text"):
-            blockers.append(quality_link.get("link_text"))
+        if transition_state["finalization_link_status"] != "no_finalization_link":
+            blockers.append(f"Finalization dataset link: {transition_state['finalization_link_status']}")
+        if transition_state["finalization_link_text"] != "none":
+            blockers.append(transition_state["finalization_link_text"])
         _append_recovery_acknowledgment_blocker_lines(blockers, recovery_ack)
         blockers.append("Session already finalized.")
         blockers.append(f"Reason: {finalization['finalization_reason'] or '-'}")
@@ -302,7 +312,11 @@ def build_finalization_blocker_lines(journal_view: dict[str, Any]) -> list[str]:
 
     if finalization["replay_running"]:
         blockers.append("Replay is still running.")
-    if finalization["active_trade_present"]:
+    if transition_state["pending_entry_staged"]:
+        blockers.append("A pending entry is still staged.")
+    elif transition_state["active_trade_open"] and transition_state["trade_partially_closed"]:
+        blockers.append("The remaining active trade volume must be closed before finalizing.")
+    elif transition_state["active_trade_open"]:
         blockers.append("An active trade is still open.")
     if finalization["pending_review_trade_count"]:
         blockers.append(f"Pending reviews: {', '.join(finalization['pending_review_trade_ids'])}")
@@ -310,10 +324,10 @@ def build_finalization_blocker_lines(journal_view: dict[str, Any]) -> list[str]:
     if len(blockers) == 1:
         blockers.append("No blockers. Standard Finalize is available.")
     blockers.append(f"Force finalize available: {'yes' if finalization['can_finalize_with_force'] else 'no'}")
-    if quality_link.get("link_status"):
-        blockers.append(f"Finalization dataset link: {quality_link.get('link_status')}")
-    if quality_link.get("link_text"):
-        blockers.append(quality_link.get("link_text"))
+    if transition_state["finalization_link_status"] != "no_finalization_link":
+        blockers.append(f"Finalization dataset link: {transition_state['finalization_link_status']}")
+    if transition_state["finalization_link_text"] != "none":
+        blockers.append(transition_state["finalization_link_text"])
     return blockers
 
 
@@ -342,11 +356,10 @@ def build_action_feedback_lines(feedback: dict[str, str] | None, journal_view: d
 def _build_recovery_feedback(journal_view: dict[str, Any] | None) -> dict[str, str] | None:
     if not journal_view:
         return None
-    recovery_note = journal_view.get("dataset_quality_recovery_note") or {}
-    note_text = recovery_note.get("note_text")
-    recovery_ack = journal_view.get("dataset_quality_recovery_acknowledgment") or {}
-    ack_status = recovery_ack.get("acknowledgment_status")
-    if ack_status == "acknowledgment_needed" and note_text:
+    transition_state = build_transition_state_view(journal_view)
+    note_text = transition_state["recovery_note_text"]
+    ack_status = transition_state["recovery_acknowledgment_status"]
+    if ack_status == "acknowledgment_needed" and note_text != "none":
         return {
             "level": "info",
             "summary": "Review reopened warning",
@@ -356,7 +369,7 @@ def _build_recovery_feedback(journal_view: dict[str, Any] | None) -> dict[str, s
         return {
             "level": "info",
             "summary": "Reopened warning reviewed",
-            "detail": str(recovery_ack.get("status_text") or "The reopened warning was already reviewed for this session."),
+            "detail": str(transition_state["recovery_acknowledgment_text"] or "The reopened warning was already reviewed for this session."),
         }
     return None
 

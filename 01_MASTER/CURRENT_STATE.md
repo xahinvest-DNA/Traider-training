@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-05
-Current stage: bounded desktop workflow validation is completed after the post-Partial-Close audit; one recurring transition-state coherence friction is now the strongest validated later slice candidate
-Active module: `T-117 Desktop Workflow Validation / Friction Discovery Pass` is completed, with `Desktop Transition-State Coherence` identified as the strongest justified later slice candidate
-Active question: whether to activate the bounded transition-state coherence candidate as the next coding pass without letting the repository drift into broader feature growth
+Current stage: bounded desktop transition-state coherence implementation is completed after validation selected it as the strongest justified local friction fix
+Active module: `T-118 Desktop Transition-State Coherence` is completed
+Active question: whether the completed coherence fix removes the strongest recurring desktop friction strongly enough to justify a hold state or one further bounded validation/audit pass before any new implementation lane is chosen
 
 ## Where the project is now
 
@@ -102,6 +102,7 @@ At this point:
 - bounded Pending Stop Entry is implemented across runtime trading contracts, desktop trading/context/workflow surfaces, and restart recovery so the one-trade replay workflow now supports one visible `BuyStop` / `SellStop` trigger-based entry path plus minimal manual cancel before trigger, without creating pending-order orchestration, multiple pending orders, expiry logic, or new persistence;
 - bounded Partial Close is implemented across runtime trading contracts, desktop trading/context/result/workflow surfaces, and restart recovery so the one-trade replay workflow now supports accepted active-trade volume reduction inside the same trade lifecycle without creating a broader position-management subsystem, richer risk automation, or new persistence;
 - the bounded post-Pending-Stop-Entry audit rejects further pending-order management, protection-lane continuation, plan-management drift, review backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync/new-persistence drift, and selects Partial Close as the strongest next bounded local desktop slice because the live trade loop still lacks accepted active-trade volume reduction inside the existing one-trade lifecycle;
+- bounded desktop transition-state coherence is implemented across existing `trade`, `workflow`, `result`, `finalization`, `readiness`, `pause-point`, and control-availability surfaces so pending-entry, partially-closed active, closed-review-pending, finalized, and recovered states now tell one semantically aligned next-step story without changing runtime/domain ownership;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
 - desktop launch now accepts raw dataset files, auto-imports them into local normalized artifacts before controller bootstrap, auto-relaunches through the ASCII-path Tk-capable interpreter `C:\Python311\python.exe` when the current Python cannot initialize Tk/Tcl, and still falls back to a non-GUI readiness report if no working Tk runtime is available;
 - compact dataset-quality status and raw-import warning previews are now surfaced in replay headers and non-GUI readiness reports without adding new persistence or provider-management layers;
@@ -157,7 +158,7 @@ At this point:
 
 ## Next step
 
-If implementation resumes, activate one bounded `Desktop Transition-State Coherence` slice so the current desktop loop stops forcing the user to reconcile inconsistent transition-state messages across existing surfaces.
+Run one bounded post-implementation validation pass on the completed `Desktop Transition-State Coherence` slice before selecting any new implementation frontier.
 
 ## What must not be lost in a new chat
 

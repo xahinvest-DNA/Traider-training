@@ -2,59 +2,42 @@
 
 Last updated: 2026-04-05
 Status: completed
-Task ID: T-117
-Task type: validation
+Task ID: T-118
+Task type: implementation
 
 ## Goal
-Run one bounded local desktop workflow validation pass on the already implemented product loop and identify the strongest recurring user-visible friction point, if any, that could justify exactly one later bounded slice.
+Implement one bounded `Desktop Transition-State Coherence` slice so the current desktop-first/local-first workflow stops forcing the user to reconcile inconsistent or misleading transition-state language across existing `trade`, `workflow`, `result`, `finalization`, `readiness`, and `pause-point` surfaces.
 
 ## Result
-`T-117 Desktop Workflow Validation / Friction Discovery Pass` is completed. The validation does find one sufficiently strong recurring product-facing friction: transition-state language is not fully coherent across existing `trade`, `workflow`, `result`, `finalization`, `readiness`, and `pause-point` surfaces. A future bounded slice candidate is justified and recorded as `05_CODEX/DESKTOP_TRANSITION_STATE_COHERENCE.md`. No code implementation was started in this pass.
+`T-118 Desktop Transition-State Coherence` is completed. Existing desktop-facing surfaces now tell one semantically aligned transition-state story for pending entry, clean dataset finalization/recovery, partially closed active trades, and closed/review-pending or finalized/recovered states, without changing runtime/domain logic, schemas, or ownership.
 
-## Validation coverage
-1. Empty desktop start and readiness-to-action state.
-2. Market entry into active trade without declared plan context.
-3. Active trade with initial protection.
-4. Pending stop staging and manual cancellation.
-5. Pending stop trigger into active trade.
-6. Partial close while the trade remains active.
-7. Full workflow through note, review, finalization, and finalized session state.
-8. Restart recovery for a partially closed active trade.
-9. Closed trade with review still pending.
-
-## Observed friction points
-1. Transition-state language across existing surfaces is recurring, product-facing, and slice-worthy. It appears in pending-entry, partial-close, review-pending, finalization, readiness, and recovery states where the user must reconcile multiple surfaces to infer the real next step.
-2. Scientific-notation PnL formatting is visible but not selected as the strongest friction because it is mostly presentation-level and does not repeatedly distort workflow continuity by itself.
-3. Rich review/evidence guidance remains dense, but validation does not show it as the strongest next-step blocker compared with the stronger cross-surface state-coherence issue.
-
-## Rejected non-friction / weak candidates
-1. Cosmetic-only layout or text-polish ideas without repeated continuity break.
-2. Learning-curve discomfort that comes from the product already exposing rich but valid review vocabulary.
-3. Broader adjacent feature growth in position management, pending-order orchestration, protection automation, or review backfill.
-4. Mentor/dashboard/media/mobile/sync/new-persistence drift.
-5. Hidden architecture rewrite or new subsystem temptation.
-
-## Strongest conclusion
-The strongest recurring friction point is bounded desktop transition-state coherence across existing workflow/result/finalization/readiness surfaces.
+## What was implemented
+1. Added one bounded desktop helper for transition-state normalization from existing replay/trading/journal facts only.
+2. Updated existing `trade`, `workflow`, `finalization`, `readiness`, `pause-point`, and control-availability surfaces so pending-entry states are not described like an already open active trade.
+3. Normalized clean dataset finalization/recovery wording in desktop-facing reporting so warned-dataset copy no longer leaks into clean states.
+4. Kept partially closed active-trade messaging aligned across trade/workflow/result surfaces and finalized/recovered messaging aligned across workflow/finalization/readiness surfaces.
+5. Added only narrow desktop-shell tests required for the bounded slice.
 
 ## Constraints kept
-- no runtime files changed
-- no desktop-shell files changed
-- no tests changed
+- no runtime/domain logic changes
+- no schema changes
+- no new persistence
+- no new subsystem or architectural ownership change
 - `03_MODULES/*` not changed
 - `04_TECH/*` not changed
 - `01_MASTER/DECISIONS.md` not changed
 
 ## Acceptance criteria status
-- The current desktop-first/local-first workflow is validated through realistic bounded scenario coverage: completed
-- The output distinguishes real recurring friction from noise, polish, and later-phase drift: completed
-- Weak adjacent candidates are explicitly rejected when they are not truly justified by validation evidence: completed
-- The result ends with exactly one strongest conclusion: completed
-- No runtime, desktop, test, module, or tech-schema files were changed: completed
-- `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` are synchronized to the validation result: completed
+- Pending-entry states are described consistently across trade/workflow/finalization surfaces and are not misleadingly treated as an already open active trade: completed
+- Clean dataset states do not emit warned-dataset copy in finalization/readiness/pause-point reporting: completed
+- Partially closed active states keep one semantically aligned next-step message across existing trade/workflow/result surfaces: completed
+- Closed-but-review-pending and finalized/recovered states keep one semantically aligned next-step story across workflow/finalization/readiness surfaces: completed
+- No runtime, schema, persistence, or architectural ownership changes were introduced unless truly unavoidable and explicitly justified: completed
+- No broader feature growth was introduced: completed
+- `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` are synchronized to the implementation result: completed
 
 ## Recommended next step
-If implementation resumes, activate one bounded `Desktop Transition-State Coherence` slice using `05_CODEX/DESKTOP_TRANSITION_STATE_COHERENCE.md`.
+Run one bounded post-implementation validation pass on `T-118 Desktop Transition-State Coherence` before selecting any further implementation frontier.
 
 ## Required handoff format
 Use `05_CODEX/HANDOFF_TEMPLATE.md` exactly.

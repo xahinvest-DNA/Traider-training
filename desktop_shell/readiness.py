@@ -5,6 +5,7 @@ from dataclasses import asdict, dataclass
 from typing import Sequence
 
 from .launch import DesktopLaunchConfig, build_controller_from_launch_config, parse_launch_args, resolve_dataset_handle
+from .transition_state import build_transition_state_view
 
 
 @dataclass(frozen=True)
@@ -48,9 +49,7 @@ def build_readiness_snapshot(config: DesktopLaunchConfig) -> DesktopReadinessSna
     )
     workspace = controller.get_workspace_view()
     dataset_quality = workspace["replay"].get("dataset_quality") or {}
-    finalization_link = workspace["journal"]["session_finalization"].get("dataset_quality_finalization_link") or {}
-    recovery_note = workspace["journal"].get("dataset_quality_recovery_note") or {}
-    recovery_ack = workspace["journal"].get("dataset_quality_recovery_acknowledgment") or {}
+    transition_state = build_transition_state_view(workspace["journal"], workspace["trading"])
     return DesktopReadinessSnapshot(
         dataset_handle=resolved_dataset_handle,
         storage_dir=str(config.storage_dir),
@@ -60,13 +59,13 @@ def build_readiness_snapshot(config: DesktopLaunchConfig) -> DesktopReadinessSna
         dataset_quality_status=str(dataset_quality.get("status") or "unknown"),
         import_warning_count=int(dataset_quality.get("warning_count") or 0),
         import_warning_preview=str(dataset_quality.get("warning_preview") or "none"),
-        finalization_link_status=str(finalization_link.get("link_status") or "no_finalization_link"),
-        finalization_link_text=str(finalization_link.get("link_text") or "none"),
-        recovery_note_status=str(recovery_note.get("note_status") or "no_recovery_note"),
-        recovery_note_text=str(recovery_note.get("note_text") or "none"),
-        recovery_acknowledgment_status=str(recovery_ack.get("acknowledgment_status") or "not_applicable"),
-        recovery_acknowledgment_text=str(recovery_ack.get("status_text") or recovery_ack.get("prompt_text") or "none"),
-        recovery_acknowledged_at=str(recovery_ack.get("acknowledged_at") or "none"),
+        finalization_link_status=transition_state["finalization_link_status"],
+        finalization_link_text=transition_state["finalization_link_text"],
+        recovery_note_status=transition_state["recovery_note_status"],
+        recovery_note_text=transition_state["recovery_note_text"],
+        recovery_acknowledgment_status=transition_state["recovery_acknowledgment_status"],
+        recovery_acknowledgment_text=transition_state["recovery_acknowledgment_text"],
+        recovery_acknowledged_at=transition_state["recovery_acknowledged_at"],
         session_status=workspace["journal"]["session_status"],
         summary_status=workspace["journal"]["session_review_summary"]["summary_status"],
         review_pending_trade_id=workspace["journal"]["review_pending_trade_id"],

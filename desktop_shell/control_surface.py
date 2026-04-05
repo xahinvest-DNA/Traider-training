@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from .transition_state import build_transition_state_view
+
 
 def build_button_state_map(
     replay_view: dict[str, Any],
@@ -10,7 +12,7 @@ def build_button_state_map(
 ) -> dict[str, bool]:
     allowed_replay = replay_view["allowed_controls"]
     finalization = journal_view["session_finalization"]
-    recovery_ack = journal_view.get("dataset_quality_recovery_acknowledgment") or {}
+    transition_state = build_transition_state_view(journal_view, trading_view)
     is_finalized = finalization["is_session_finalized"]
     has_closed_trade = journal_view["derived_review_output"]["closed_trade_count"] > 0
     review_pending = journal_view["review_pending_trade_id"] is not None
@@ -31,7 +33,7 @@ def build_button_state_map(
         "partial_close": trading_view.get("partial_close_available", False) and not is_finalized,
         "finalize": finalization["can_finalize_without_force"] and not is_finalized,
         "force_finalize": finalization["can_finalize_with_force"] and not is_finalized,
-        "acknowledge_recovery": recovery_ack.get("acknowledgment_status") == "acknowledgment_needed",
+        "acknowledge_recovery": transition_state["recovery_acknowledgment_status"] == "acknowledgment_needed",
         "add_note": not is_finalized,
         "add_review": review_pending and not is_finalized,
         "add_flag": has_closed_trade and not is_finalized,

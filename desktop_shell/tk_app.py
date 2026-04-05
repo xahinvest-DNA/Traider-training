@@ -351,7 +351,7 @@ class TraderTrainerDesktopApp:
         self.session_context_label.configure(text="\n".join(build_session_context_lines(journal_view)))
         self.trade_context_label.configure(text="\n".join(build_trade_context_lines(trading_view, journal_view)))
         self.review_summary_label.configure(text="\n".join(build_review_summary_lines(journal_view)))
-        self.finalization_label.configure(text="\n".join(build_finalization_lines(journal_view)))
+        self.finalization_label.configure(text="\n".join(build_finalization_lines(journal_view, trading_view)))
         self.latest_result_label.configure(text="\n".join(build_latest_result_lines(journal_view, trading_view)))
 
     def _render_authoring_surface(self, journal_view: dict) -> None:
@@ -370,7 +370,7 @@ class TraderTrainerDesktopApp:
 
     def _render_workflow_surface(self, replay_view: dict, trading_view: dict, journal_view: dict) -> None:
         self.workflow_guidance_label.configure(text="\n".join(build_workflow_guidance_lines(replay_view, trading_view, journal_view)))
-        self.blocker_status_label.configure(text="\n".join(build_finalization_blocker_lines(journal_view)))
+        self.blocker_status_label.configure(text="\n".join(build_finalization_blocker_lines(journal_view, trading_view)))
         self.action_feedback_label.configure(text="\n".join(build_action_feedback_lines(self.last_action_feedback, journal_view)))
 
     def _render_json(self, widget: tk.Text, payload: dict) -> None:

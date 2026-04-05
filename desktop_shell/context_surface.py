@@ -2,10 +2,13 @@
 
 from typing import Any
 
+from .transition_state import build_transition_state_view
+
 
 def build_session_context_lines(journal_view: dict[str, Any]) -> list[str]:
     finalization = journal_view["session_finalization"]
-    recovery_ack = journal_view.get("dataset_quality_recovery_acknowledgment") or {}
+    transition_state = build_transition_state_view(journal_view)
+    recovery_text = transition_state["recovery_acknowledgment_text"]
     return [
         f"Session: {journal_view['session_id']}",
         f"Status: {journal_view['session_status']}",
@@ -14,7 +17,7 @@ def build_session_context_lines(journal_view: dict[str, Any]) -> list[str]:
         f"Timeframe: {journal_view['active_timeframe']}",
         f"Recovered: {'yes' if journal_view['recovered'] else 'no'}",
         f"Finalization: {finalization['finalization_status']}",
-        f"Recovery follow-up: {recovery_ack.get('status_text') or '-'}",
+        f"Recovery follow-up: {recovery_text if recovery_text != 'none' else '-'}",
     ]
 
 
@@ -23,6 +26,7 @@ def build_trade_context_lines(trading_view: dict[str, Any], journal_view: dict[s
     execution_label = last_execution["execution_type"] if last_execution else "none"
     dataset_quality = trading_view.get("dataset_quality_context") or {}
     plan_context = (journal_view or {}).get("current_trade_plan_context") or {}
+    transition_state = build_transition_state_view(journal_view or {"session_finalization": {"is_session_finalized": False, "replay_running": False}, "session_review_summary": {}}, trading_view) if journal_view else None
     pending_trigger_price = trading_view.get("pending_stop_trigger_price")
     pending_stop_loss = trading_view.get("pending_stop_stop_loss")
     pending_take_profit = trading_view.get("pending_stop_take_profit")
@@ -30,6 +34,8 @@ def build_trade_context_lines(trading_view: dict[str, Any], journal_view: dict[s
         f"Lifecycle: {trading_view['lifecycle_state']}",
         f"Trade status: {trading_view['trade_status']}",
         f"Active trade: {'yes' if trading_view['active_trade_present'] else 'no'}",
+        f"Trade lifecycle focus: {transition_state['lifecycle_label'] if transition_state else ('active_trade_open' if trading_view['active_trade_present'] else 'idle')}",
+        f"Trade lifecycle text: {transition_state['lifecycle_text'] if transition_state else ('Active trade is open.' if trading_view['active_trade_present'] else 'No trade lifecycle is currently in progress.')}",
         f"Pending stop: {'yes' if trading_view.get('pending_stop_present') else 'no'}",
         f"Pending stop side: {trading_view.get('pending_stop_side') or '-'}",
         f"Pending stop trigger: {pending_trigger_price if pending_trigger_price is not None else '-'}",
@@ -238,22 +244,22 @@ def build_review_summary_lines(journal_view: dict[str, Any]) -> list[str]:
     ]
 
 
-def build_finalization_lines(journal_view: dict[str, Any]) -> list[str]:
+def build_finalization_lines(journal_view: dict[str, Any], trading_view: dict[str, Any] | None = None) -> list[str]:
     finalization = journal_view["session_finalization"]
-    quality_link = finalization.get("dataset_quality_finalization_link") or {}
-    recovery_ack = journal_view.get("dataset_quality_recovery_acknowledgment") or {}
+    transition_state = build_transition_state_view(journal_view, trading_view)
     pending_ids = ", ".join(finalization["pending_review_trade_ids"]) or "none"
     return [
         f"Finalized: {'yes' if finalization['is_session_finalized'] else 'no'}",
         f"Reason: {finalization['finalization_reason'] or '-'}",
         f"Replay running: {'yes' if finalization['replay_running'] else 'no'}",
-        f"Active trade present: {'yes' if finalization['active_trade_present'] else 'no'}",
+        f"Trade lifecycle in progress: {transition_state['lifecycle_label']}",
+        f"Lifecycle text: {transition_state['lifecycle_text']}",
         f"Pending review ids: {pending_ids}",
         f"Can finalize: {'yes' if finalization['can_finalize_without_force'] else 'no'}",
         f"Can force finalize: {'yes' if finalization['can_finalize_with_force'] else 'no'}",
-        f"Finalization dataset link: {quality_link.get('link_status') or '-'}",
-        f"Finalization dataset text: {quality_link.get('link_text') or '-'}",
-        f"Recovery follow-up: {recovery_ack.get('status_text') or recovery_ack.get('prompt_text') or '-'}",
+        f"Finalization dataset link: {transition_state['finalization_link_status']}",
+        f"Finalization dataset text: {transition_state['finalization_link_text']}",
+        f"Recovery follow-up: {transition_state['recovery_acknowledgment_text'] if transition_state['recovery_acknowledgment_text'] != 'none' else '-'}",
     ]
 
 
