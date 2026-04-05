@@ -1,4 +1,4 @@
-# Current State
+﻿# Current State
 
 Last updated: 2026-04-05
 Current stage: post-Pending-Stop-Entry audit completed; Partial Close selected as the next bounded local desktop frontier
@@ -101,7 +101,6 @@ At this point:
 - the bounded post-Current-Trade-Plan-Context audit rejects further plan management, plan scoring, richer note workflow, checklist or acknowledgment logic, protection-lane continuation, review/digest/evidence backfill, cosmetic polish, mentor/dashboard/media/mobile/sync drift, and selects Pending Stop Entry as the strongest next local desktop slice because the live trade loop still lacks the accepted trigger-based entry path already implied by the trading and desktop contracts;
 - bounded Pending Stop Entry is implemented across runtime trading contracts, desktop trading/context/workflow surfaces, and restart recovery so the one-trade replay workflow now supports one visible `BuyStop` / `SellStop` trigger-based entry path plus minimal manual cancel before trigger, without creating pending-order orchestration, multiple pending orders, expiry logic, or new persistence;
 - the bounded post-Pending-Stop-Entry audit rejects further pending-order management, protection-lane continuation, plan-management drift, review backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync/new-persistence drift, and selects Partial Close as the strongest next bounded local desktop slice because the live trade loop still lacks accepted active-trade volume reduction inside the existing one-trade lifecycle;
-- the audit selects Current Trade Review Digest as the strongest next slice because the main remaining product gap is no longer evidence diagnosis or evidence actionability, but fragmented review feedback across many small signals;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
 - desktop launch now accepts raw dataset files, auto-imports them into local normalized artifacts before controller bootstrap, auto-relaunches through the ASCII-path Tk-capable interpreter `C:\Python311\python.exe` when the current Python cannot initialize Tk/Tcl, and still falls back to a non-GUI readiness report if no working Tk runtime is available;
 - compact dataset-quality status and raw-import warning previews are now surfaced in replay headers and non-GUI readiness reports without adding new persistence or provider-management layers;
@@ -172,6 +171,7 @@ The next working step is to implement one bounded Partial Close slice so the cur
 - `CURRENT_TRADE_PLAN_CONTEXT.md` now fixes the bounded live-trade plan-recall contract; follow-up work must not silently turn plan visibility into plan management, mentor scoring, note orchestration, or a new plan-summary owner.
 - `PENDING_STOP_ENTRY.md` now fixes the next bounded live-trade frontier; follow-up work must not silently turn pending stop support into a broader pending-order orchestration or risk-management subsystem.
 - Any step beyond the bounded local-first desktop workflow requires a separate Project Brain fixation.
+
 
 
 

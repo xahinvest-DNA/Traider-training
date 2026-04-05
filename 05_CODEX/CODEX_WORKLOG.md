@@ -488,3 +488,37 @@ Run one bounded managerial/product audit after Pending Stop Entry so the reposit
 
 ### Recommended next step
 Implement `T-115: Partial Close Slice`.
+
+## 2026-04-05 - Phase A SSOT sync for T-115 Partial Close
+
+### Goal
+Synchronize the operating-layer source-of-truth documents before implementation so the repository has one unambiguous active frontier for T-115 Partial Close.
+
+### Files updated
+-  0_INDEX.md
+-  1_MASTER/CURRENT_STATE.md
+-  5_CODEX/TASKS.md
+-  5_CODEX/CODEX_WORKLOG.md
+
+### What was stale
+-  0_INDEX.md still pointed to the older Current Trade Review Digest frontier in its header, active focus, implementation-doc link, and next-step guidance.
+-  1_MASTER/CURRENT_STATE.md still contained one stale historical bullet that named Current Trade Review Digest as the selected next slice, which contradicted the current top-level Partial Close frontier.
+-  5_CODEX/TASKS.md contained duplicated active T-115 blocks with contradictory stale outcomes from older history branches.
+
+### What was synchronized
+- Updated  0_INDEX.md so the active module, current focus, implementation-doc pointer, and next steps all point to T-115 Partial Close.
+- Removed the stale contradictory digest-selection bullet from  1_MASTER/CURRENT_STATE.md while preserving the rest of the implementation history.
+- Cleaned  5_CODEX/TASKS.md so T-114 remains completed and exactly one active T-115 block remains.
+- Kept  5_CODEX/NEXT_TASK.md unchanged because it was already aligned to T-115, allowed files, and acceptance criteria.
+
+### Why this mattered before implementation
+The repository had real operating drift: different top-level documents named different active frontiers, and TASKS.md exposed multiple conflicting active T-115 entries. Fixing that first restores one clean SSOT path before any runtime or desktop behavior changes begin.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop shell code was not changed.
+- Tests were not changed.
+- Module documents, tech schemas, and  1_MASTER/DECISIONS.md were not changed.
+
+### Recommended next step
+Read the active T-115 source-of-truth set and implement the bounded Partial Close slice.
