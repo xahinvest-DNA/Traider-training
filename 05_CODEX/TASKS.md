@@ -930,3 +930,13 @@
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/REPLAY_ENGINE.md`, `03_MODULES/TRADING_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`, `05_CODEX/NEXT_TASK.md`, current `desktop_shell/*`, and related desktop shell tests.
 - Expected result: bounded review-entry helper and workspace-surface changes that make post-close review routing explicit from the main workspace, with focused tests and synchronized state files.
 - Outcome: review entry now surfaces compact waiting/required/available states, names the relevant closed trade, and offers one dynamic primary action into `PostTradeReview`, review refinement, or `PreTradeNote` without turning the main surface into a review narrative.
+
+
+### T-130
+
+- Status: completed
+- Module: Desktop Trainer Workspace Acceptance Pass
+- Goal: validate the assembled desktop-reset lane as one coherent trainer loop, fix only true acceptance blockers if found, and avoid opening a new feature frontier under the label of validation.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/REPLAY_ENGINE.md`, `03_MODULES/TRADING_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`, `05_CODEX/NEXT_TASK.md`, current `desktop_shell/*`, and related desktop shell tests.
+- Expected result: one acceptance-oriented validation pass over the assembled workspace loop, plus only small fixes if real blockers appear, with synchronized state files and a clear passed / passed with fixes / not yet passed result.
+- Outcome: acceptance passed without new workspace blockers; the desktop trainer workspace is now validated as a coherent `dataset -> chart -> replay -> trade -> close -> review` loop, and remaining gaps are next-frontier candidates rather than acceptance defects.

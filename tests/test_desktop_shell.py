@@ -832,6 +832,88 @@ def test_desktop_shell_mvp_acceptance_smoke_pass() -> None:
     assert any(line == "Closed trades: 1" for line in recovered_history_lines)
 
 
+def test_desktop_trainer_workspace_acceptance_loop_is_coherent() -> None:
+    storage_dir = _reset_dir(TMP_ROOT / "workspace_acceptance_loop")
+    config = DesktopLaunchConfig(dataset_handle=str(FIXTURE), storage_dir=storage_dir, replay_mode="training", instrument_id="EURUSD")
+
+    start_options = build_start_flow_options(config)
+    layout = build_main_screen_layout_spec()
+    controller, selection = build_controller_from_start_selection(
+        config,
+        "open_prepared_dataset",
+        selected_path=FIXTURE,
+    )
+
+    assert [option.label for option in start_options] == [
+        "Open prepared dataset",
+        "Import raw historical data",
+        "Start new session",
+        "Resume last local session",
+    ]
+    assert selection.label == "Open prepared dataset"
+    assert layout["zones"]["chart_area"]["dominance"] == "largest"
+    assert layout["zones"]["right_workspace_rail"]["role"] == "trader_operating_rail"
+    assert layout["zones"]["secondary_debug"]["placement"] == "below_primary_workspace"
+
+    workspace_0 = controller.get_workspace_view()
+    chart_footer_0 = build_primary_chart_footer_lines(workspace_0["replay"]["chart_context"])
+    assert workspace_0["replay"]["dataset_id"] == "eurusd-sample-v1"
+    assert workspace_0["journal"]["recovered"] is False
+    assert any(line.startswith("Bars:") for line in chart_footer_0)
+    assert any(line.startswith("AO pane:") for line in chart_footer_0)
+    assert all("Recent bars:" not in line for line in chart_footer_0)
+
+    controller.create_pre_trade_note(
+        content="Acceptance note",
+        setup_tag="BW_FRACTAL_LONG",
+        thesis_summary="breakout continuation",
+        risk_plan="manual close on weakness",
+    )
+    controller.buy_market()
+    controller.play()
+    controller.advance_frame()
+    active_workspace = controller.get_workspace_view()
+    active_button_map = build_button_state_map(
+        active_workspace["replay"],
+        active_workspace["trading"],
+        active_workspace["journal"],
+    )
+    trader_actions = build_trader_panel_action_lines(active_button_map)
+    compact_context = build_compact_context_lines(active_workspace["trading"], active_workspace["journal"])
+
+    assert active_workspace["trading"]["active_trade_present"] is True
+    assert trader_actions[0] == "Trader actions:"
+    assert any("Close" in line for line in trader_actions if line.startswith("Manage now:"))
+    assert any(line == "Active trade: yes" for line in compact_context)
+    assert all("Workflow guidance:" not in line for line in compact_context)
+
+    controller.manual_close()
+    controller.advance_frame()
+    controller.pause()
+    pending_workspace = controller.get_workspace_view()
+    review_lines = build_review_entry_lines(pending_workspace["journal"])
+    review_action = build_review_entry_action(pending_workspace["journal"])
+
+    assert pending_workspace["journal"]["session_review_summary"]["summary_status"] == "review_pending"
+    assert review_lines[0] == "Review cue: action required"
+    assert any(line.startswith("Closed trade awaiting review: trade-") for line in review_lines)
+    assert review_action["primary_label"] == "Open PostTradeReview"
+    assert review_action["primary_target"] == "review"
+
+    controller.create_post_trade_review(
+        content="Acceptance review",
+        setup_tag="BW_FRACTAL_LONG",
+        compliance_label="valid_setup",
+    )
+    reviewed_workspace = controller.get_workspace_view()
+    reviewed_lines = build_review_entry_lines(reviewed_workspace["journal"])
+    reviewed_action = build_review_entry_action(reviewed_workspace["journal"])
+
+    assert reviewed_lines[0] == "Review cue: latest review available"
+    assert reviewed_action["primary_target"] == "review"
+    assert any(line.startswith("Latest reviewed trade: trade-") for line in reviewed_lines)
+
+
 def test_desktop_shell_controller_runs_and_recovers_mvp_flow() -> None:
     storage_dir = _reset_dir(TMP_ROOT / "mvp_flow")
 

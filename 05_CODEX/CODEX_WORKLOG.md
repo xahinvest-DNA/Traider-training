@@ -520,3 +520,39 @@ The desktop trainer workspace now closes the intended learning loop in a more na
 
 ### Recommended next step
 - Open one bounded validation packet for `T-130 Desktop Trainer Workspace Acceptance Pass`.
+
+
+## 2026-04-05 - T-130 Desktop Trainer Workspace Acceptance Pass
+
+### Goal
+Run one bounded acceptance/cohesion validation pass over the assembled desktop-reset lane and confirm whether the current workspace is already accepted as a coherent trainer loop from dataset to review.
+
+### Files updated
+- `tests/test_desktop_shell.py`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Added one acceptance-oriented desktop-shell test that validates the assembled workspace as one coherent loop spanning explicit start path, chart-first reading, trader rail coherence, active trade management, close flow, and explicit review route.
+- Re-ran the bounded desktop-shell test pass and confirmed the assembled workspace passes as a coherent trainer loop without introducing new feature work.
+- Recorded the validation outcome in the repository state so future work can start from an accepted workspace baseline instead of from an unfinished desktop-reset lane.
+
+### What was not changed
+- No new workspace feature slice was opened.
+- No chart/startup/trader-panel/review-form redesign was started.
+- No replay/trading/journal ownership changes were made.
+- No dashboard, mentor, mobile, sync, or platform scope was opened.
+
+### Verification
+- `pytest -p no:cacheprovider tests/test_desktop_shell.py -q`
+
+### Why this matters
+The repository now has a clear managerial answer: the current desktop trainer workspace is accepted as a coherent training loop, so the next step should be deliberate frontier selection rather than more validation or ad hoc UI changes.
+
+### Remaining gap after this step
+- Remaining gaps are no longer validation blockers; they are candidates for the next separately selected product-facing frontier.
+
+### Recommended next step
+- Open one bounded planning packet for `T-131 Post-Acceptance Desktop Frontier Selection`.

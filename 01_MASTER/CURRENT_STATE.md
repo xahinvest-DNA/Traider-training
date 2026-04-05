@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-05
-Current stage: bounded desktop review entry path and post-close flow slice is completed; the desktop workspace now closes the core trainer loop from market to trade to close to review without reopening chart-first, startup, or trader-rail scope
-Active module: `T-129 Desktop Review Entry Path and Post-Close Flow` is completed
-Active question: whether the now-complete desktop-reset lane should go through one bounded workspace acceptance and cohesion pass before any broader follow-up is selected
+Current stage: bounded desktop trainer workspace acceptance pass is completed; the assembled desktop workspace is accepted as a coherent chart-first trainer loop covering dataset -> chart -> replay -> trade -> close -> review
+Active module: `T-130 Desktop Trainer Workspace Acceptance Pass` is completed
+Active question: which next product frontier should be selected now that the assembled desktop trainer workspace has passed acceptance as a coherent loop
 
 ## Where the project is now
 
@@ -11,6 +11,7 @@ The project is in the sequential implementation stage of the first working proto
 
 At this point:
 
+- bounded desktop trainer workspace acceptance pass is completed in `tests/test_desktop_shell.py`, so the assembled desktop workspace is now validated as one coherent `dataset -> chart -> replay -> trade -> close -> review` loop without shell regression or ownership drift;
 - bounded desktop review entry path and post-close flow is implemented in `desktop_shell/`, so closed-trade review-needed and review-available states now surface as compact action-oriented cues with a direct workspace route into `PostTradeReview` or the next relevant review action;
 - bounded desktop trader panel and compact context surface is implemented in `desktop_shell/`, so the right-side rail now reads as one coherent trader-facing operating surface with grouped trade actions, order ticket inputs, and factual trade context beside the chart-first workspace;
 - bounded desktop main-surface text reduction and secondary/debug separation is implemented in `desktop_shell/`, so the primary workspace now keeps only compact action-supporting status near chart and trading while verbose workflow and raw/debug details stay accessible below in secondary/debug surfaces;
@@ -167,7 +168,7 @@ At this point:
 
 ## Next step
 
-Open one bounded validation packet for `T-130 Desktop Trainer Workspace Acceptance Pass` so the full desktop-reset lane can be checked as one coherent end-to-end trainer loop before any further product or implementation frontier is chosen.
+Open one bounded planning packet for `T-131 Post-Acceptance Desktop Frontier Selection` so the repository can choose the next strongest product-facing frontier from an accepted workspace baseline instead of continuing ad hoc feature growth.
 
 ## What must not be lost in a new chat
 
