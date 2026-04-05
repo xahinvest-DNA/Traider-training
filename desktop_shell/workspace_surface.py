@@ -87,6 +87,17 @@ def build_main_screen_layout_spec() -> dict[str, Any]:
             "debug_like_text_blocks",
             "raw_chart_bar_dump",
         ],
+        "compact_context_allowed_facts": [
+            "active_trade",
+            "pending_entry_state",
+            "side",
+            "entry",
+            "volume",
+            "remaining_open_volume",
+            "stop_loss",
+            "take_profit",
+            "review_needed",
+        ],
         "zones": {
             "top_bar": {
                 "role": "replay_session_bar",
@@ -108,11 +119,13 @@ def build_main_screen_layout_spec() -> dict[str, Any]:
                 "primary_footer": "compact_chart_summary_only",
             },
             "right_workspace_rail": {
-                "role": "supporting_primary",
+                "role": "trader_operating_rail",
                 "weight": 2,
                 "includes": [
-                    "trading_panel",
-                    "compact_context",
+                    "trade_state_snapshot",
+                    "order_ticket_inputs",
+                    "trade_action_groups",
+                    "compact_trade_context",
                     "review_entry",
                 ],
             },

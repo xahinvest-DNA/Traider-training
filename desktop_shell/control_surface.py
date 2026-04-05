@@ -52,3 +52,26 @@ def build_control_hint_lines(button_state_map: dict[str, bool]) -> list[str]:
         f"Review -> Note {yn('add_note')} | Review {yn('add_review')} | Flag {yn('add_flag')} | Violation {yn('add_violation')}",
         f"Session -> Finalize {yn('finalize')} | Force finalize {yn('force_finalize')} | Review warning {yn('acknowledge_recovery')}",
     ]
+
+
+def build_trader_panel_action_lines(button_state_map: dict[str, bool]) -> list[str]:
+    def enabled_labels(pairs: list[tuple[str, str]]) -> str:
+        labels = [label for key, label in pairs if button_state_map.get(key)]
+        return ", ".join(labels) if labels else "none"
+
+    open_now = enabled_labels([
+        ("buy", "Buy Market"),
+        ("sell", "Sell Market"),
+        ("buy_stop", "Buy Stop"),
+        ("sell_stop", "Sell Stop"),
+    ])
+    manage_now = enabled_labels([
+        ("cancel_entry", "Cancel Entry"),
+        ("partial_close", "Partial Close"),
+        ("close", "Close"),
+    ])
+    return [
+        "Trader actions:",
+        f"Open now: {open_now}",
+        f"Manage now: {manage_now}",
+    ]

@@ -438,3 +438,44 @@ This is the first point where the chart-first workspace becomes product-credible
 
 ### Recommended next step
 Open one bounded coding packet for `T-127 Desktop Main-Surface Text Reduction and Secondary-Debug Separation`.
+
+
+## 2026-04-05 - T-128 Desktop Trader Panel and Compact Context Surface
+
+### Goal
+Implement one bounded desktop slice so the right-side workspace rail reads as a coherent trader-facing operating surface with grouped trading actions and factual trade/session context beside the accepted chart-first Bill Williams surface.
+
+### Files updated
+- `desktop_shell/control_surface.py`
+- `desktop_shell/workspace_surface.py`
+- `desktop_shell/tk_app.py`
+- `desktop_shell/__init__.py`
+- `tests/test_desktop_shell.py`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Regrouped the right-side workspace rail into one `Trader Panel` that now contains the compact action snapshot, order-ticket inputs, entry actions, position actions, and factual trade context in one surface.
+- Added compact trader-action availability lines so the user can see what trade actions are currently available without opening secondary diagnostics.
+- Kept review entry visible as its own panel below the trader rail and left verbose workflow/debug information in secondary surfaces below the workspace.
+- Extended the workspace contract and desktop-shell tests so the repository now explicitly treats the right-side rail as a trader operating surface rather than a leftover control cluster.
+
+### What was not changed
+- The Bill Williams chart boundary from `T-126` was not redesigned.
+- Startup flow from `T-125` was not redesigned.
+- Review form structure, trading engine semantics, replay ownership, and journal ownership were not changed.
+- No broker-terminal expansion, portfolio behavior, new workflow orchestrator, or UI platform layer was introduced.
+
+### Verification
+- `pytest -p no:cacheprovider tests/test_desktop_shell.py -q`
+
+### Why this matters
+The screen now reads as `market on the left, trader operating rail on the right`, with actions and factual state clearly connected. That makes the workspace feel like a trainer workstation instead of a shell with controls parked beside the chart.
+
+### Remaining gap after this step
+- The path from closed trade state into review can still be made more explicit and better tied to post-close actionability from the main workspace.
+
+### Recommended next step
+- Open one bounded coding packet for `T-129 Desktop Review Entry Path and Post-Close Flow`.

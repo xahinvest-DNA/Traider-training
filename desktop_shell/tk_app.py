@@ -40,7 +40,7 @@ from .context_surface import (
     build_session_context_lines,
     build_trade_context_lines,
 )
-from .control_surface import build_button_state_map, build_control_hint_lines
+from .control_surface import build_button_state_map, build_control_hint_lines, build_trader_panel_action_lines
 from .history_surface import (
     build_history_status_lines,
     build_latest_trade_result_lines,
@@ -186,54 +186,80 @@ class TraderTrainerDesktopApp:
         sidebar = ttk.Frame(main_workspace)
         sidebar.grid(row=0, column=1, sticky="nsew")
         sidebar.columnconfigure(0, weight=1)
-        sidebar.rowconfigure(0, weight=3)
+        sidebar.rowconfigure(0, weight=5)
         sidebar.rowconfigure(1, weight=2)
-        sidebar.rowconfigure(2, weight=2)
 
-        trading_panel = ttk.LabelFrame(sidebar, text="Trading Panel", padding=8)
+        trading_panel = ttk.LabelFrame(sidebar, text="Trader Panel", padding=8)
         trading_panel.grid(row=0, column=0, sticky="nsew", pady=(0, 8))
         trading_panel.columnconfigure(0, weight=1)
-        trading_panel.columnconfigure(1, weight=1)
-        trading_panel.columnconfigure(2, weight=1)
+        trading_panel.rowconfigure(3, weight=1)
 
-        ttk.Label(trading_panel, text="Trigger").grid(row=0, column=0, sticky="w")
-        ttk.Label(trading_panel, text="Initial SL").grid(row=0, column=1, sticky="w")
-        ttk.Label(trading_panel, text="Initial TP").grid(row=0, column=2, sticky="w")
-        ttk.Entry(trading_panel, textvariable=self.pending_stop_trigger_value, width=12).grid(row=1, column=0, sticky="ew", padx=(0, 4), pady=(0, 6))
-        ttk.Entry(trading_panel, textvariable=self.initial_stop_loss_value, width=12).grid(row=1, column=1, sticky="ew", padx=4, pady=(0, 6))
-        ttk.Entry(trading_panel, textvariable=self.initial_take_profit_value, width=12).grid(row=1, column=2, sticky="ew", padx=(4, 0), pady=(0, 6))
+        trade_state_frame = ttk.Frame(trading_panel)
+        trade_state_frame.grid(row=0, column=0, sticky="ew", pady=(0, 8))
+        trade_state_frame.columnconfigure(0, weight=1)
+        self.primary_status_label = ttk.Label(trade_state_frame, justify="left", anchor="w")
+        self.primary_status_label.grid(row=0, column=0, sticky="ew")
+        self.trader_actions_label = ttk.Label(trade_state_frame, justify="left", anchor="w")
+        self.trader_actions_label.grid(row=1, column=0, sticky="ew", pady=(6, 0))
 
-        trade_button_specs = [
+        order_ticket_frame = ttk.LabelFrame(trading_panel, text="Order Ticket", padding=8)
+        order_ticket_frame.grid(row=1, column=0, sticky="ew", pady=(0, 8))
+        order_ticket_frame.columnconfigure(0, weight=1)
+        order_ticket_frame.columnconfigure(1, weight=1)
+        order_ticket_frame.columnconfigure(2, weight=1)
+        ttk.Label(order_ticket_frame, text="Trigger").grid(row=0, column=0, sticky="w")
+        ttk.Label(order_ticket_frame, text="Initial SL").grid(row=0, column=1, sticky="w")
+        ttk.Label(order_ticket_frame, text="Initial TP").grid(row=0, column=2, sticky="w")
+        ttk.Entry(order_ticket_frame, textvariable=self.pending_stop_trigger_value, width=12).grid(row=1, column=0, sticky="ew", padx=(0, 4), pady=(0, 4))
+        ttk.Entry(order_ticket_frame, textvariable=self.initial_stop_loss_value, width=12).grid(row=1, column=1, sticky="ew", padx=4, pady=(0, 4))
+        ttk.Entry(order_ticket_frame, textvariable=self.initial_take_profit_value, width=12).grid(row=1, column=2, sticky="ew", padx=(4, 0), pady=(0, 4))
+
+        entry_actions_frame = ttk.LabelFrame(trading_panel, text="Entry Actions", padding=8)
+        entry_actions_frame.grid(row=2, column=0, sticky="ew", pady=(0, 8))
+        entry_actions_frame.columnconfigure(0, weight=1)
+        entry_actions_frame.columnconfigure(1, weight=1)
+        for index, (key, label, handler) in enumerate([
             ("buy", "Buy Market", self._action_buy),
             ("sell", "Sell Market", self._action_sell),
             ("buy_stop", "Buy Stop", self._action_buy_stop),
             ("sell_stop", "Sell Stop", self._action_sell_stop),
-            ("cancel_entry", "Cancel Entry", self._action_cancel_entry),
-            ("close", "Close", self._action_close),
-        ]
-        for index, (key, label, handler) in enumerate(trade_button_specs):
-            row = 2 + index // 2
+        ]):
+            row = index // 2
             column = index % 2
-            button = ttk.Button(trading_panel, text=label, command=handler)
+            button = ttk.Button(entry_actions_frame, text=label, command=handler)
             button.grid(row=row, column=column, sticky="ew", padx=4, pady=4)
             self.control_buttons[key] = button
 
-        ttk.Label(trading_panel, text="Close vol").grid(row=5, column=0, sticky="w", padx=4, pady=(8, 0))
-        ttk.Entry(trading_panel, textvariable=self.partial_close_volume_value, width=10).grid(row=6, column=0, sticky="ew", padx=4, pady=(0, 4))
-        partial_button = ttk.Button(trading_panel, text="Partial Close", command=self._action_partial_close)
-        partial_button.grid(row=6, column=1, sticky="ew", padx=4, pady=(0, 4))
+        management_frame = ttk.Frame(trading_panel)
+        management_frame.grid(row=3, column=0, sticky="nsew")
+        management_frame.columnconfigure(0, weight=1)
+        management_frame.rowconfigure(1, weight=1)
+
+        position_actions_frame = ttk.LabelFrame(management_frame, text="Position Actions", padding=8)
+        position_actions_frame.grid(row=0, column=0, sticky="ew", pady=(0, 8))
+        position_actions_frame.columnconfigure(0, weight=1)
+        position_actions_frame.columnconfigure(1, weight=1)
+        position_actions_frame.columnconfigure(2, weight=1)
+        cancel_button = ttk.Button(position_actions_frame, text="Cancel Entry", command=self._action_cancel_entry)
+        cancel_button.grid(row=0, column=0, sticky="ew", padx=(0, 4), pady=(0, 6))
+        self.control_buttons["cancel_entry"] = cancel_button
+        close_button = ttk.Button(position_actions_frame, text="Close", command=self._action_close)
+        close_button.grid(row=0, column=1, sticky="ew", padx=4, pady=(0, 6))
+        self.control_buttons["close"] = close_button
+        ttk.Label(position_actions_frame, text="Close vol").grid(row=1, column=0, sticky="w", padx=(0, 4))
+        ttk.Entry(position_actions_frame, textvariable=self.partial_close_volume_value, width=10).grid(row=2, column=0, sticky="ew", padx=(0, 4), pady=(0, 4))
+        partial_button = ttk.Button(position_actions_frame, text="Partial Close", command=self._action_partial_close)
+        partial_button.grid(row=2, column=1, sticky="ew", padx=4, pady=(0, 4))
         self.control_buttons["partial_close"] = partial_button
 
-        self.compact_context_frame = ttk.LabelFrame(sidebar, text="Compact Context", padding=8)
-        self.compact_context_frame.grid(row=1, column=0, sticky="nsew", pady=(0, 8))
-        self.compact_context_frame.columnconfigure(0, weight=1)
-        self.primary_status_label = ttk.Label(self.compact_context_frame, justify="left", anchor="w")
-        self.primary_status_label.grid(row=0, column=0, sticky="ew", pady=(0, 8))
-        self.compact_context_label = ttk.Label(self.compact_context_frame, justify="left", anchor="w")
-        self.compact_context_label.grid(row=1, column=0, sticky="nsew")
+        compact_context_frame = ttk.LabelFrame(management_frame, text="Trade Context", padding=8)
+        compact_context_frame.grid(row=1, column=0, sticky="nsew")
+        compact_context_frame.columnconfigure(0, weight=1)
+        self.compact_context_label = ttk.Label(compact_context_frame, justify="left", anchor="w")
+        self.compact_context_label.grid(row=0, column=0, sticky="nsew")
 
         review_frame = ttk.LabelFrame(sidebar, text="Review Entry", padding=8)
-        review_frame.grid(row=2, column=0, sticky="nsew")
+        review_frame.grid(row=1, column=0, sticky="nsew")
         review_frame.columnconfigure(0, weight=1)
         self.review_entry_label = ttk.Label(review_frame, justify="left", anchor="w")
         self.review_entry_label.grid(row=0, column=0, sticky="ew", pady=(0, 8))
@@ -496,6 +522,7 @@ class TraderTrainerDesktopApp:
 
     def _render_control_surface(self, replay_view: dict, trading_view: dict, journal_view: dict) -> None:
         button_state_map = build_button_state_map(replay_view, trading_view, journal_view)
+        self.trader_actions_label.configure(text="\n".join(build_trader_panel_action_lines(button_state_map)))
         self.control_hint_label.configure(text="\n".join(build_control_hint_lines(button_state_map)))
         for key, button in self.control_buttons.items():
             button.configure(state="normal" if button_state_map[key] else "disabled")

@@ -25,6 +25,7 @@ from desktop_shell import (
     build_button_state_map,
     build_compact_context_lines,
     build_control_hint_lines,
+    build_trader_panel_action_lines,
     build_controller_from_launch_config,
     build_controller_from_start_selection,
     build_default_launch_config,
@@ -3434,6 +3435,11 @@ def test_desktop_main_screen_layout_spec_makes_chart_primary_and_debug_secondary
     assert "raw_chart_bar_dump" in layout["primary_surface_excludes"]
     assert "debug_chart_detail" in layout["zones"]["secondary_debug"]["includes"]
     assert layout["zones"]["chart_area"]["primary_footer"] == "compact_chart_summary_only"
+    assert layout["zones"]["right_workspace_rail"]["role"] == "trader_operating_rail"
+    assert "trade_action_groups" in layout["zones"]["right_workspace_rail"]["includes"]
+    assert "compact_trade_context" in layout["zones"]["right_workspace_rail"]["includes"]
+    assert "stop_loss" in layout["compact_context_allowed_facts"]
+    assert "take_profit" in layout["compact_context_allowed_facts"]
 
 
 def test_desktop_primary_chart_footer_stays_compact_while_debug_keeps_recent_bars() -> None:
@@ -3496,6 +3502,29 @@ def test_desktop_primary_workflow_snapshot_stays_short_and_actionable() -> None:
     assert all("Verbose details stay secondary." not in line for line in snapshot_lines)
 
 
+def test_desktop_trader_panel_actions_and_context_form_one_operating_surface() -> None:
+    controller = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=_reset_dir(TMP_ROOT / "trader_panel_surface"),
+    )
+
+    controller.buy_market()
+    controller.play()
+    controller.advance_frame()
+    workspace = controller.get_workspace_view()
+    button_map = build_button_state_map(workspace["replay"], workspace["trading"], workspace["journal"])
+    action_lines = build_trader_panel_action_lines(button_map)
+    compact_lines = build_compact_context_lines(workspace["trading"], workspace["journal"])
+
+    assert action_lines[0] == "Trader actions:"
+    assert any(line == "Open now: none" for line in action_lines)
+    assert any("Partial Close" in line and "Close" in line for line in action_lines if line.startswith("Manage now:"))
+    assert any(line == "Active trade: yes" for line in compact_lines)
+    assert any(line.startswith("Volume / remaining:") for line in compact_lines)
+    assert all("Workflow guidance:" not in line for line in compact_lines)
+    assert all("Dataset quality context:" not in line for line in compact_lines)
+
+
 def test_desktop_compact_context_and_review_entry_stay_factual() -> None:
     controller = DesktopShellController(
         dataset_handle=FIXTURE,
@@ -3515,6 +3544,8 @@ def test_desktop_compact_context_and_review_entry_stay_factual() -> None:
     assert any(line.startswith("PreTradeNotes:") for line in review_lines)
     assert any(line.startswith("Review pending trade:") for line in review_lines)
     assert any(line.startswith("Next review action:") for line in review_lines)
+    assert all("Workflow guidance:" not in line for line in review_lines)
+    assert all("Control availability:" not in line for line in review_lines)
 
 
 def test_desktop_shell_start_flow_new_session_and_resume_split_recovery_honestly() -> None:

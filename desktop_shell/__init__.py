@@ -38,6 +38,7 @@ from .context_surface import (
 from .control_surface import (
     build_button_state_map,
     build_control_hint_lines,
+    build_trader_panel_action_lines,
 )
 from .history_surface import (
     build_history_status_lines,
@@ -105,6 +106,7 @@ __all__ = [
     "build_primary_chart_footer_lines",
     "build_compact_context_lines",
     "build_control_hint_lines",
+    "build_trader_panel_action_lines",
     "build_controller_from_launch_config",
     "build_controller_from_start_selection",
     "build_default_launch_config",
