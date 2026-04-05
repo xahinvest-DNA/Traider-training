@@ -179,7 +179,7 @@ class ReplaySession:
                 "ask": tick.ask,
                 "mid": tick.mid,
             }
-            for tick in self.state.recent_ticks[-20:]
+            for tick in self.state.recent_ticks[-120:]
         ]
         return {
             "instrument_id": self.state.instrument_id,

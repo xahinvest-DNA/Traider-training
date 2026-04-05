@@ -13,6 +13,12 @@ from desktop_shell import (
     MVPPausePointSnapshot,
     DesktopShellController,
     build_action_feedback_lines,
+    build_alligator_lines,
+    build_ao_histogram_segments,
+    build_ao_values,
+    build_bar_segments,
+    build_chart_visual_summary,
+    build_fractal_markers,
     build_authoring_status_lines,
     build_button_state_map,
     build_compact_context_lines,
@@ -27,6 +33,8 @@ from desktop_shell import (
     build_latest_result_lines,
     build_latest_trade_result_lines,
     build_mid_price_line_points,
+    build_overlay_line_points,
+    build_price_bar_model,
     build_main_screen_layout_spec,
     build_mvp_pause_point_snapshot,
     build_note_section_lines,
@@ -252,30 +260,49 @@ def test_desktop_shell_controller_bootstraps_workspace_views() -> None:
     assert workspace["journal"]["session_review_summary"]["summary_status"] == "no_closed_trades"
 
 
-def test_desktop_shell_chart_surface_helpers_build_visual_model() -> None:
+def test_desktop_shell_chart_surface_helpers_build_mandatory_bill_williams_boundary() -> None:
     controller = DesktopShellController(
         dataset_handle=FIXTURE,
         storage_dir=_reset_dir(TMP_ROOT / "chart_helpers"),
     )
     controller.play()
-    controller.advance_frame()
-    controller.advance_frame()
+    for _ in range(40):
+        controller.advance_frame()
     replay_view = controller.get_workspace_view()["replay"]
     chart_context = replay_view["chart_context"]
 
     header_lines = build_replay_header_lines(replay_view)
-    tick_lines = build_tick_table_lines(chart_context, limit=3)
-    points = build_mid_price_line_points(chart_context["recent_points"], width=640, height=320)
-    flat_points = flatten_canvas_points(points)
+    footer_lines = build_tick_table_lines(chart_context, limit=3)
+    bars = build_price_bar_model(chart_context["recent_points"])
+    alligator = build_alligator_lines(bars)
+    fractals = build_fractal_markers(bars)
+    ao_values = build_ao_values(bars)
+    bar_segments = build_bar_segments(bars, width=640, height=320)
+    overlay_points = build_overlay_line_points(alligator["jaw"], width=640, height=320, low=min(float(bar["low"]) for bar in bars), high=max(float(bar["high"]) for bar in bars))
+    ao_segments = build_ao_histogram_segments(ao_values, width=640, height=120)
+    visual_summary = build_chart_visual_summary(chart_context)
 
     assert header_lines[0] == "Instrument: EURUSD"
     assert any(line.startswith("Simulation time:") for line in header_lines)
-    assert tick_lines[0] == "Recent ticks:"
-    assert len(points) == len(chart_context["recent_points"])
-    assert len(flat_points) == len(points) * 2
-    assert all(isinstance(value, float) for point in points for value in point)
-    assert min(y for _, y in points) >= 16
-    assert max(y for _, y in points) <= 304
+    assert footer_lines[0] == "Recent bars:"
+    assert len(bars) >= 4
+    assert all(set(bar.keys()) >= {"open", "high", "low", "close", "median"} for bar in bars)
+    assert len(bar_segments) == len(bars)
+    assert all(segment["high_y"] <= segment["low_y"] for segment in bar_segments)
+    assert len(alligator["jaw"]) == len(bars)
+    assert len(alligator["teeth"]) == len(bars)
+    assert len(alligator["lips"]) == len(bars)
+    assert any(value is not None for value in alligator["jaw"])
+    assert any(value is not None for value in alligator["teeth"])
+    assert any(value is not None for value in alligator["lips"])
+    assert isinstance(fractals["up"], list)
+    assert isinstance(fractals["down"], list)
+    assert len(ao_values) == len(bars)
+    assert len(ao_segments) == len(ao_values)
+    assert overlay_points
+    assert any(line == "Bars: {} | Mode: bar chart only".format(len(bars)) for line in visual_summary)
+    assert any(line.startswith("AO pane:") for line in visual_summary)
+    assert all("Replay trace" not in line for line in visual_summary)
 
 
 def test_desktop_shell_context_surface_helpers_build_readable_blocks() -> None:
@@ -2396,6 +2423,7 @@ def test_desktop_shell_launch_returns_friendly_message_when_tk_environment_is_mi
     import desktop_shell.launch as launch_module
 
     monkeypatch.setattr(launch_module, "_try_relaunch_with_ascii_tk_python", lambda argv=None: False)
+    monkeypatch.setattr(launch_module, "prompt_start_selection", lambda config: launch_module.DesktopStartSelection(key="start_new_session", label="Start new session", detail="test"))
     monkeypatch.setattr(launch_module, "launch_desktop_app", lambda controller: (_ for _ in ()).throw(RuntimeError("Can't find a usable init.tcl")))
 
     with pytest.raises(SystemExit) as exc_info:
@@ -2417,6 +2445,7 @@ def test_desktop_shell_launch_relaunches_with_ascii_tk_python_before_friendly_fa
         return True
 
     monkeypatch.setattr(launch_module, "_try_relaunch_with_ascii_tk_python", _mark_relaunch)
+    monkeypatch.setattr(launch_module, "prompt_start_selection", lambda config: launch_module.DesktopStartSelection(key="start_new_session", label="Start new session", detail="test"))
     monkeypatch.setattr(launch_module, "launch_desktop_app", lambda controller: (_ for _ in ()).throw(RuntimeError("Can't find a usable init.tcl")))
 
     launch_module.run_desktop_shell([])

@@ -19,7 +19,15 @@ from .authoring_surface import (
     get_setup_variant_options,
 )
 from .chart_surface import (
-    build_mid_price_line_points,
+    build_alligator_lines,
+    build_ao_histogram_segments,
+    build_ao_values,
+    build_bar_segments,
+    build_chart_visual_summary,
+    build_fractal_canvas_markers,
+    build_fractal_markers,
+    build_overlay_line_points,
+    build_price_bar_model,
     build_replay_header_lines,
     build_tick_table_lines,
     flatten_canvas_points,
@@ -160,14 +168,18 @@ class TraderTrainerDesktopApp:
         chart_frame = ttk.LabelFrame(main_workspace, text="Main Chart Area", padding=8)
         chart_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
         chart_frame.columnconfigure(0, weight=1)
-        chart_frame.rowconfigure(1, weight=1)
+        chart_frame.rowconfigure(1, weight=5)
+        chart_frame.rowconfigure(2, weight=2)
         self.chart_header = ttk.Label(chart_frame, justify="left", anchor="w")
         self.chart_header.grid(row=0, column=0, sticky="ew", pady=(0, 6))
         self.chart_canvas = tk.Canvas(chart_frame, background="#10151c", highlightthickness=0)
         self.chart_canvas.grid(row=1, column=0, sticky="nsew")
         self.chart_canvas.bind("<Configure>", lambda _event: self.refresh())
+        self.ao_canvas = tk.Canvas(chart_frame, background="#0c1218", highlightthickness=0, height=120)
+        self.ao_canvas.grid(row=2, column=0, sticky="nsew", pady=(8, 0))
+        self.ao_canvas.bind("<Configure>", lambda _event: self.refresh())
         self.chart_footer = ttk.Label(chart_frame, justify="left", anchor="w")
-        self.chart_footer.grid(row=2, column=0, sticky="ew", pady=(6, 0))
+        self.chart_footer.grid(row=3, column=0, sticky="ew", pady=(6, 0))
 
         sidebar = ttk.Frame(main_workspace)
         sidebar.grid(row=0, column=1, sticky="nsew")
@@ -408,24 +420,65 @@ class TraderTrainerDesktopApp:
         header_lines = build_replay_header_lines(replay_view)
         current_tick = chart_context["current_tick"]
         header_lines.append(f"Current tick: bid={current_tick['bid']:.5f} ask={current_tick['ask']:.5f} mid={current_tick['mid']:.5f}")
+        header_lines.append("Chart boundary: bar chart only | Alligator | Fractals | AO")
+        bars = build_price_bar_model(chart_context["recent_points"])
+        alligator = build_alligator_lines(bars)
+        fractals = build_fractal_markers(bars)
+        ao_values = build_ao_values(bars)
+        footer_lines = build_chart_visual_summary(chart_context) + build_tick_table_lines(chart_context, limit=4)
         self.chart_header.configure(text="\n".join(header_lines))
-        self.chart_footer.configure(text="\n".join(build_tick_table_lines(chart_context)))
+        self.chart_footer.configure(text="\n".join(footer_lines))
 
         width = max(640, self.chart_canvas.winfo_width())
         height = max(420, self.chart_canvas.winfo_height())
-        points = build_mid_price_line_points(chart_context["recent_points"], width=width, height=height)
         self.chart_canvas.delete("all")
         self.chart_canvas.create_rectangle(0, 0, width, height, outline="", fill="#10151c")
-        self.chart_canvas.create_text(16, 16, anchor="nw", text="Replay trace", fill="#d7e3f4", font=("TkDefaultFont", 11, "bold"))
-        if not points:
-            self.chart_canvas.create_text(width / 2, height / 2, text="Not enough replay points yet", fill="#8aa0b8")
+        self.chart_canvas.create_text(16, 16, anchor="nw", text="Bill Williams Price Chart", fill="#d7e3f4", font=("TkDefaultFont", 11, "bold"))
+
+        if not bars:
+            self.chart_canvas.create_text(width / 2, height / 2, text="Not enough replay points yet for bar chart", fill="#8aa0b8")
+            self._render_ao_pane(ao_values)
             return
 
-        last_x, last_y = points[-1]
-        self.chart_canvas.create_line(*flatten_canvas_points(points), fill="#4fc3f7", width=2, smooth=True)
-        self.chart_canvas.create_oval(last_x - 4, last_y - 4, last_x + 4, last_y + 4, fill="#ffb74d", outline="")
+        segments = build_bar_segments(bars, width=width, height=height)
+        low = min(float(bar["low"]) for bar in bars)
+        high = max(float(bar["high"]) for bar in bars)
+        for segment in segments:
+            self.chart_canvas.create_line(segment["x"], segment["high_y"], segment["x"], segment["low_y"], fill="#d7e3f4", width=1)
+            self.chart_canvas.create_line(segment["left"], segment["open_y"], segment["x"], segment["open_y"], fill="#8dd3ff", width=2)
+            self.chart_canvas.create_line(segment["x"], segment["close_y"], segment["right"], segment["close_y"], fill="#ffcc80", width=2)
+
+        overlay_colors = {"jaw": "#5dade2", "teeth": "#f5b041", "lips": "#58d68d"}
+        for key, color in overlay_colors.items():
+            overlay_points = build_overlay_line_points(alligator[key], width=width, height=height, low=low, high=high)
+            if len(overlay_points) >= 2:
+                self.chart_canvas.create_line(*flatten_canvas_points(overlay_points), fill=color, width=2, smooth=True)
+
+        marker_points = build_fractal_canvas_markers(fractals, width=width, height=height, low=low, high=high, bar_count=len(bars))
+        for x, y in marker_points["up"]:
+            self.chart_canvas.create_text(x, y, text="v", fill="#ffd54f", font=("TkDefaultFont", 10, "bold"))
+        for x, y in marker_points["down"]:
+            self.chart_canvas.create_text(x, y, text="^", fill="#81c784", font=("TkDefaultFont", 10, "bold"))
+
         self.chart_canvas.create_line(16, height - 16, width - 16, height - 16, fill="#33485f")
         self.chart_canvas.create_line(16, 28, 16, height - 16, fill="#33485f")
+        self._render_ao_pane(ao_values)
+
+    def _render_ao_pane(self, ao_values: list[float]) -> None:
+        width = max(640, self.ao_canvas.winfo_width())
+        height = max(120, self.ao_canvas.winfo_height())
+        self.ao_canvas.delete("all")
+        self.ao_canvas.create_rectangle(0, 0, width, height, outline="", fill="#0c1218")
+        self.ao_canvas.create_text(12, 12, anchor="nw", text="AO", fill="#d7e3f4", font=("TkDefaultFont", 10, "bold"))
+        segments = build_ao_histogram_segments(ao_values, width=width, height=height)
+        if not segments:
+            self.ao_canvas.create_text(width / 2, height / 2, text="AO is building from replay context", fill="#7f93a8")
+            return
+        zero_y = segments[0]["zero_y"]
+        self.ao_canvas.create_line(12, zero_y, width - 12, zero_y, fill="#33485f")
+        for segment in segments:
+            color = "#58d68d" if segment["value"] >= 0 else "#ec7063"
+            self.ao_canvas.create_rectangle(segment["left"], segment["top"], segment["right"], segment["bottom"], outline="", fill=color)
 
     def _render_control_surface(self, replay_view: dict, trading_view: dict, journal_view: dict) -> None:
         button_state_map = build_button_state_map(replay_view, trading_view, journal_view)

@@ -396,3 +396,45 @@ The workspace from `T-124` now has a clear and intentional way to be entered. Us
 
 ### Recommended next step
 Open one bounded coding packet for `T-126 Desktop Trainer Mandatory Chart Boundary`.
+
+
+## 2026-04-05 ? T-126 Desktop Trainer Mandatory Chart Boundary
+
+### Goal
+Implement one bounded chart slice so the existing chart-first desktop workspace reaches the accepted product minimum: `bar chart only`, `Alligator`, `Fractals`, and a separate lower `AO` pane, without chart-platform drift or ownership rewrite.
+
+### Files updated
+- `desktop_shell/chart_surface.py`
+- `desktop_shell/tk_app.py`
+- `desktop_shell/__init__.py`
+- `runtime_bootstrap/replay_session.py`
+- `tests/test_desktop_shell.py`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Replaced the old generic replay-trace helper path with a bounded Bill Williams chart-model layer that builds price bars, Alligator overlays, Fractal markers, AO values, and AO histogram segments from the existing replay chart context.
+- Expanded replay chart context only enough to expose a longer recent-point window so the desktop chart can render the accepted mandatory boundary without moving replay truth into the UI.
+- Reworked the main chart rendering in the existing Tk workspace so the price chart is bar-only, Alligator and Fractals render on the main pane, and a separate lower AO pane renders below it.
+- Kept the rest of the workspace hierarchy from `T-124`/`T-125` intact, including trading, compact context, review entry, startup chooser, and secondary/debug surfaces.
+- Added bounded tests that verify the chart area now conforms to the mandatory Bill Williams boundary and no longer reads as a generic replay trace.
+
+### What was not changed
+- Startup flow was not redesigned again.
+- Trading-panel layout and trading engine semantics were not changed.
+- Review flow and journal ownership were not changed.
+- No chart manager, candle mode, drawing toolkit, indicator library expansion, or broader chart platform was introduced.
+
+### Verification
+- `pytest -p no:cacheprovider tests/test_desktop_shell.py -q`
+
+### Why this matters
+This is the first point where the chart-first workspace becomes product-credible as a Bill Williams trainer surface rather than just a technically working replay shell. The user now sees the accepted minimum chart boundary directly inside the existing workspace.
+
+### Remaining gap after this step
+- The chart surface is now credible, but verbose workflow/finalization/readiness/recovery text can still put too much pressure on the main workspace compared with the intended product boundary.
+
+### Recommended next step
+Open one bounded coding packet for `T-127 Desktop Main-Surface Text Reduction and Secondary-Debug Separation`.
