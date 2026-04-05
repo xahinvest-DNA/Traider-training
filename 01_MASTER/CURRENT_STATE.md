@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-05
-Current stage: bounded desktop trader panel and compact context surface slice is completed; the desktop workspace now presents a coherent trader-side operating rail next to the accepted chart-first Bill Williams surface without reopening shell-text pressure or ownership drift
-Active module: `T-128 Desktop Trader Panel and Compact Context Surface` is completed
-Active question: whether the next desktop-reset frontier should now make review entry and post-close flow more explicit and usable without reopening chart/startup/trader-panel scope
+Current stage: bounded desktop review entry path and post-close flow slice is completed; the desktop workspace now closes the core trainer loop from market to trade to close to review without reopening chart-first, startup, or trader-rail scope
+Active module: `T-129 Desktop Review Entry Path and Post-Close Flow` is completed
+Active question: whether the now-complete desktop-reset lane should go through one bounded workspace acceptance and cohesion pass before any broader follow-up is selected
 
 ## Where the project is now
 
@@ -11,6 +11,7 @@ The project is in the sequential implementation stage of the first working proto
 
 At this point:
 
+- bounded desktop review entry path and post-close flow is implemented in `desktop_shell/`, so closed-trade review-needed and review-available states now surface as compact action-oriented cues with a direct workspace route into `PostTradeReview` or the next relevant review action;
 - bounded desktop trader panel and compact context surface is implemented in `desktop_shell/`, so the right-side rail now reads as one coherent trader-facing operating surface with grouped trade actions, order ticket inputs, and factual trade context beside the chart-first workspace;
 - bounded desktop main-surface text reduction and secondary/debug separation is implemented in `desktop_shell/`, so the primary workspace now keeps only compact action-supporting status near chart and trading while verbose workflow and raw/debug details stay accessible below in secondary/debug surfaces;
 - bounded desktop trainer mandatory chart boundary is implemented in `desktop_shell/`, so the main chart area now renders `bar chart only` with `Alligator` and `Fractals` overlays plus a separate lower `AO` pane inside the existing chart-first workspace;
@@ -166,7 +167,7 @@ At this point:
 
 ## Next step
 
-Open one bounded coding packet for `T-129 Desktop Review Entry Path and Post-Close Flow` so the accepted chart-first workspace can make the transition from closed trade to review explicit and usable without reopening chart/startup/trader-panel scope.
+Open one bounded validation packet for `T-130 Desktop Trainer Workspace Acceptance Pass` so the full desktop-reset lane can be checked as one coherent end-to-end trainer loop before any further product or implementation frontier is chosen.
 
 ## What must not be lost in a new chat
 

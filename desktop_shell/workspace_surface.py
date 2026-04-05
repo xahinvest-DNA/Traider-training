@@ -45,20 +45,84 @@ def build_compact_context_lines(trading_view: dict[str, Any], journal_view: dict
 
 def build_review_entry_lines(journal_view: dict[str, Any]) -> list[str]:
     review_summary = journal_view.get("session_review_summary") or {}
-    pending_trade_id = journal_view.get("review_pending_trade_id") or "-"
+    finalization = journal_view.get("session_finalization") or {}
+    latest_trade_id = review_summary.get("latest_trade_id") or "-"
+    pending_trade_id = journal_view.get("review_pending_trade_id") or review_summary.get("latest_pending_review_trade_id") or "-"
+    latest_reviewed_trade_id = review_summary.get("latest_reviewed_trade_id") or latest_trade_id
     pending_review_count = review_summary.get("pending_review_trade_count", 0)
+    closed_trade_count = review_summary.get("closed_trade_count", 0)
+
     if pending_review_count:
-        next_step = "open PostTradeReview for the latest closed trade"
-    elif journal_view.get("session_status") == "active":
-        next_step = "PreTradeNote is available before the next trade"
-    else:
-        next_step = "review is up to date for the current session"
+        return [
+            "Review cue: action required",
+            f"Closed trade awaiting review: {pending_trade_id}",
+            "Primary action: Open PostTradeReview",
+            f"Next step: complete review for {pending_trade_id}",
+        ]
+    if closed_trade_count > 0:
+        if finalization.get("is_session_finalized"):
+            return [
+                "Review cue: session review archived",
+                f"Latest reviewed trade: {latest_reviewed_trade_id}",
+                "Primary action: Open History",
+                "Next step: inspect the finalized session review trail",
+            ]
+        return [
+            "Review cue: latest review available",
+            f"Latest reviewed trade: {latest_reviewed_trade_id}",
+            "Primary action: Refine PostTradeReview or inspect History",
+            "Next step: continue session or refine the latest review",
+        ]
     return [
+        "Review cue: waiting for a closed trade",
         f"PreTradeNotes: {journal_view.get('pre_trade_note_count', 0)} | PostTradeReviews: {journal_view.get('post_trade_review_count', 0)}",
-        f"Review pending trade: {pending_trade_id}",
-        f"Review status: {'pending' if pending_review_count else 'ready'}",
-        f"Next review action: {next_step}",
+        "Primary action: Open PreTradeNote",
+        "Next step: review unlocks after the next closed trade",
     ]
+
+
+
+
+def build_review_entry_action(journal_view: dict[str, Any]) -> dict[str, str]:
+    review_summary = journal_view.get("session_review_summary") or {}
+    finalization = journal_view.get("session_finalization") or {}
+    pending_trade_id = journal_view.get("review_pending_trade_id") or review_summary.get("latest_pending_review_trade_id") or "-"
+    latest_trade_id = review_summary.get("latest_trade_id") or "-"
+    latest_reviewed_trade_id = review_summary.get("latest_reviewed_trade_id") or latest_trade_id
+    pending_review_count = review_summary.get("pending_review_trade_count", 0)
+    closed_trade_count = review_summary.get("closed_trade_count", 0)
+
+    if pending_review_count:
+        return {
+            "primary_label": "Open PostTradeReview",
+            "primary_target": "review",
+            "primary_trade_id": str(pending_trade_id),
+            "secondary_label": "History",
+            "secondary_target": "history",
+        }
+    if closed_trade_count > 0:
+        if finalization.get("is_session_finalized"):
+            return {
+                "primary_label": "Open History",
+                "primary_target": "history",
+                "primary_trade_id": str(latest_reviewed_trade_id),
+                "secondary_label": "History",
+                "secondary_target": "history",
+            }
+        return {
+            "primary_label": "Refine latest review",
+            "primary_target": "review",
+            "primary_trade_id": str(latest_reviewed_trade_id),
+            "secondary_label": "History",
+            "secondary_target": "history",
+        }
+    return {
+        "primary_label": "Open PreTradeNote",
+        "primary_target": "note",
+        "primary_trade_id": "-",
+        "secondary_label": "History",
+        "secondary_target": "history",
+    }
 
 
 def build_main_screen_layout_spec() -> dict[str, Any]:
@@ -127,6 +191,7 @@ def build_main_screen_layout_spec() -> dict[str, Any]:
                     "trade_action_groups",
                     "compact_trade_context",
                     "review_entry",
+                    "post_close_review_route",
                 ],
             },
             "secondary_debug": {

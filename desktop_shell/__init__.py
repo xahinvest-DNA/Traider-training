@@ -82,6 +82,7 @@ from .workflow_surface import (
 from .workspace_surface import (
     build_compact_context_lines,
     build_main_screen_layout_spec,
+    build_review_entry_action,
     build_review_entry_lines,
     build_workspace_bar_lines,
 )
@@ -126,6 +127,7 @@ __all__ = [
     "build_readiness_snapshot",
     "build_price_bar_model",
     "build_replay_header_lines",
+    "build_review_entry_action",
     "build_review_entry_lines",
     "build_review_section_lines",
     "build_review_summary_lines",

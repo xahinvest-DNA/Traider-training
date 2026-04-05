@@ -44,6 +44,7 @@ from desktop_shell import (
     build_readiness_snapshot,
     format_mvp_pause_point_report,
     build_replay_header_lines,
+    build_review_entry_action,
     build_review_entry_lines,
     build_workspace_bar_lines,
     format_readiness_report,
@@ -3438,6 +3439,7 @@ def test_desktop_main_screen_layout_spec_makes_chart_primary_and_debug_secondary
     assert layout["zones"]["right_workspace_rail"]["role"] == "trader_operating_rail"
     assert "trade_action_groups" in layout["zones"]["right_workspace_rail"]["includes"]
     assert "compact_trade_context" in layout["zones"]["right_workspace_rail"]["includes"]
+    assert "post_close_review_route" in layout["zones"]["right_workspace_rail"]["includes"]
     assert "stop_loss" in layout["compact_context_allowed_facts"]
     assert "take_profit" in layout["compact_context_allowed_facts"]
 
@@ -3525,6 +3527,33 @@ def test_desktop_trader_panel_actions_and_context_form_one_operating_surface() -
     assert all("Dataset quality context:" not in line for line in compact_lines)
 
 
+def test_desktop_review_entry_becomes_explicit_after_trade_close() -> None:
+    controller = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=_reset_dir(TMP_ROOT / "review_entry_post_close"),
+    )
+
+    controller.buy_market()
+    controller.play()
+    controller.advance_frame()
+    controller.manual_close()
+    controller.advance_frame()
+    workspace = controller.get_workspace_view()
+
+    review_lines = build_review_entry_lines(workspace["journal"])
+    review_action = build_review_entry_action(workspace["journal"])
+
+    assert review_lines[0] == "Review cue: action required"
+    assert any(line.startswith("Closed trade awaiting review: trade-") for line in review_lines)
+    assert any(line == "Primary action: Open PostTradeReview" for line in review_lines)
+    assert any(line.startswith("Next step: complete review for trade-") for line in review_lines)
+    assert review_action["primary_label"] == "Open PostTradeReview"
+    assert review_action["primary_target"] == "review"
+    assert review_action["primary_trade_id"].startswith("trade-")
+    assert all("Workflow guidance:" not in line for line in review_lines)
+    assert all("Control availability:" not in line for line in review_lines)
+
+
 def test_desktop_compact_context_and_review_entry_stay_factual() -> None:
     controller = DesktopShellController(
         dataset_handle=FIXTURE,
@@ -3541,11 +3570,40 @@ def test_desktop_compact_context_and_review_entry_stay_factual() -> None:
     assert any(line.startswith("SL / TP: 1.1034 / 1.1037") for line in compact_lines)
     assert all("Trade lifecycle text:" not in line for line in compact_lines)
     assert all("Recovery follow-up:" not in line for line in compact_lines)
+    assert review_lines[0] == "Review cue: waiting for a closed trade"
     assert any(line.startswith("PreTradeNotes:") for line in review_lines)
-    assert any(line.startswith("Review pending trade:") for line in review_lines)
-    assert any(line.startswith("Next review action:") for line in review_lines)
+    assert any(line == "Primary action: Open PreTradeNote" for line in review_lines)
+    assert any(line == "Next step: review unlocks after the next closed trade" for line in review_lines)
     assert all("Workflow guidance:" not in line for line in review_lines)
     assert all("Control availability:" not in line for line in review_lines)
+
+
+def test_desktop_review_entry_shifts_to_refine_after_review_is_done() -> None:
+    controller = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=_reset_dir(TMP_ROOT / "review_entry_reviewed"),
+    )
+
+    controller.buy_market()
+    controller.play()
+    controller.advance_frame()
+    controller.manual_close()
+    controller.advance_frame()
+    controller.create_post_trade_review(
+        content="Reviewed trade",
+        setup_tag="BW_FRACTAL_LONG",
+        compliance_label="valid_setup",
+    )
+    workspace = controller.get_workspace_view()
+
+    review_lines = build_review_entry_lines(workspace["journal"])
+    review_action = build_review_entry_action(workspace["journal"])
+
+    assert review_lines[0] == "Review cue: latest review available"
+    assert any(line.startswith("Latest reviewed trade: trade-") for line in review_lines)
+    assert any(line == "Primary action: Refine PostTradeReview or inspect History" for line in review_lines)
+    assert review_action["primary_label"] == "Refine latest review"
+    assert review_action["primary_target"] == "review"
 
 
 def test_desktop_shell_start_flow_new_session_and_resume_split_recovery_honestly() -> None:

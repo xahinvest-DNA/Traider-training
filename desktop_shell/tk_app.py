@@ -54,6 +54,7 @@ from .workflow_surface import (
 )
 from .workspace_surface import (
     build_compact_context_lines,
+    build_review_entry_action,
     build_review_entry_lines,
     build_workspace_bar_lines,
 )
@@ -87,6 +88,7 @@ class TraderTrainerDesktopApp:
         self.initial_stop_loss_value = tk.StringVar()
         self.initial_take_profit_value = tk.StringVar()
         self.partial_close_volume_value = tk.StringVar(value="0.5")
+        self.review_primary_button_label = tk.StringVar(value="Open PreTradeNote")
         self.pending_note_snapshot_id: str | None = None
         self.pending_review_snapshot_ids: list[str] = []
         startup_detail = "Desktop shell refreshed into the chart-first trainer workspace skeleton."
@@ -267,8 +269,8 @@ class TraderTrainerDesktopApp:
         review_buttons.grid(row=1, column=0, sticky="ew")
         for column in range(3):
             review_buttons.columnconfigure(column, weight=1)
-        ttk.Button(review_buttons, text="PreTradeNote", command=lambda: self._focus_secondary_tab("authoring")).grid(row=0, column=0, sticky="ew", padx=(0, 4))
-        ttk.Button(review_buttons, text="PostTradeReview", command=lambda: self._focus_secondary_tab("authoring")).grid(row=0, column=1, sticky="ew", padx=4)
+        self.review_primary_button = ttk.Button(review_buttons, textvariable=self.review_primary_button_label, command=self._open_review_primary_action)
+        self.review_primary_button.grid(row=0, column=0, columnspan=2, sticky="ew", padx=(0, 4))
         ttk.Button(review_buttons, text="History", command=lambda: self._focus_secondary_tab("history")).grid(row=0, column=2, sticky="ew", padx=(4, 0))
 
         secondary = ttk.Notebook(root)
@@ -534,6 +536,8 @@ class TraderTrainerDesktopApp:
     def _render_context_surface(self, trading_view: dict, journal_view: dict) -> None:
         self.compact_context_label.configure(text="\n".join(build_compact_context_lines(trading_view, journal_view)))
         self.review_entry_label.configure(text="\n".join(build_review_entry_lines(journal_view)))
+        review_action = build_review_entry_action(journal_view)
+        self.review_primary_button_label.set(review_action["primary_label"])
         self.session_context_label.configure(text="\n".join(build_session_context_lines(journal_view)))
         self.trade_context_label.configure(text="\n".join(build_trade_context_lines(trading_view, journal_view)))
         self.review_summary_label.configure(text="\n".join(build_review_summary_lines(journal_view)))
@@ -607,6 +611,16 @@ class TraderTrainerDesktopApp:
         tab = self.secondary_tabs.get(tab_name)
         if tab is not None:
             self.secondary_notebook.select(tab)
+
+    def _open_review_primary_action(self) -> None:
+        journal_view = self.controller.get_workspace_view()["journal"]
+        review_action = build_review_entry_action(journal_view)
+        target = review_action.get("primary_target")
+        self._focus_secondary_tab("authoring" if target in {"review", "note"} else "history")
+        if target == "review":
+            self.review_text.focus_set()
+        elif target == "note":
+            self.note_text.focus_set()
 
     def _run_action(self, action, success_summary: str) -> None:
         try:

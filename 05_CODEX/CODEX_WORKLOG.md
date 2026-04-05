@@ -479,3 +479,44 @@ The screen now reads as `market on the left, trader operating rail on the right`
 
 ### Recommended next step
 - Open one bounded coding packet for `T-129 Desktop Review Entry Path and Post-Close Flow`.
+
+
+## 2026-04-05 - T-129 Desktop Review Entry Path and Post-Close Flow
+
+### Goal
+Implement one bounded desktop slice so the transition from closed trade to review becomes explicit, compact, and action-oriented from the main workspace without reopening chart/startup/trader-panel scope or creating a new review subsystem.
+
+### Files updated
+- `desktop_shell/workspace_surface.py`
+- `desktop_shell/tk_app.py`
+- `desktop_shell/__init__.py`
+- `tests/test_desktop_shell.py`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Reworked the compact review-entry helper so the workspace now surfaces three concise states: waiting for a closed trade, action required for a just-closed trade, and latest review available.
+- Added an explicit review-entry action helper that names the current primary route from the workspace into `PostTradeReview`, review refinement, `PreTradeNote`, or history when the session is already finalized.
+- Updated the right-side `Review Entry` panel so it now uses one dynamic primary action button instead of static generic buttons, while keeping the chart-first workspace and trader rail intact.
+- Extended layout and desktop-shell tests so the repository now verifies the post-close review cue stays short, trade-linked, and free of verbose workflow/debug text.
+
+### What was not changed
+- The Bill Williams chart boundary from `T-126` was not redesigned.
+- Startup flow from `T-125` was not redesigned.
+- Trader panel composition from `T-128` was not redesigned.
+- Review form structure, trading engine semantics, replay ownership, and journal ownership were not changed.
+- No review engine, mentor flow, dashboard history layer, or broader desktop rewrite was introduced.
+
+### Verification
+- `pytest -p no:cacheprovider tests/test_desktop_shell.py -q`
+
+### Why this matters
+The desktop trainer workspace now closes the intended learning loop in a more natural way: after the trade closes, the user immediately sees whether review is needed, which trade it belongs to, and what to do next from the same workspace surface.
+
+### Remaining gap after this step
+- The desktop-reset lane is now functionally assembled, but it should go through one bounded acceptance/cohesion pass before any new broader feature frontier is chosen.
+
+### Recommended next step
+- Open one bounded validation packet for `T-130 Desktop Trainer Workspace Acceptance Pass`.
