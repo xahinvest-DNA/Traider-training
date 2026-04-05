@@ -451,3 +451,40 @@ The live trade loop is no longer market-entry-only. The user can now stage one a
 
 ### Recommended next step
 Run `T-114: Post-Pending-Stop-Entry Next-Slice Audit`.
+
+
+## 2026-04-05 - T-114 Post-Pending-Stop-Entry Next-Slice Audit
+
+### Goal
+Run one bounded managerial/product audit after Pending Stop Entry so the repository selects the next strongest local desktop product-facing slice without mechanically extending pending-order handling, reopening protection/review/plan micro-lanes, or drifting into mentor, dashboard/media, workflow-engine, mobile, sync, or new-persistence scope.
+
+### Files created
+- `05_CODEX/PARTIAL_CLOSE.md`
+
+### Files updated
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Audited the frontier after `T-113` against user-visible gain, desktop-first/local-first boundaries, and anti-drift rules instead of continuing the pending-order lane by inertia.
+- Explicitly rejected weak candidates: pending-order expiry, multi-order coordination, richer order editing history, OCO/bracket behavior, trailing stops, break-even automation, protection-lane continuation, plan-management drift, review/digest/evidence backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync/new-persistence drift.
+- Selected `Partial Close` as the strongest next bounded slice because the live trade loop still lacks accepted active-trade volume reduction inside the one-trade lifecycle, making it a stronger user-visible gain than any further pending-order expansion.
+- Added one new implementation-facing boundary document for the selected slice and promoted it into the active task packet as `T-115`.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop shell code was not changed.
+- Tests were not changed.
+- Module documents and tech schemas were not changed.
+- `DECISIONS.md` was not changed because no project-level decision was required.
+
+### Why this matters
+`T-113` already made the entry side of the live loop meaningfully stronger. The next highest product gain is now to improve management of an already opened trade, not to keep adding more pending-order handling. Partial close expands the executable trade loop itself while staying inside already accepted trading/storage ownership.
+
+### Remaining gap after this step
+- `Partial Close` is now defined but not yet implemented in runtime, desktop projections, or tests.
+
+### Recommended next step
+Implement `T-115: Partial Close Slice`.
