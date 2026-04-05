@@ -308,3 +308,48 @@ Create one bounded planning document that decomposes the accepted chart-first de
 
 ### Recommended next step
 When the repository is ready to open the desktop-reset lane explicitly, create one bounded coding packet for `Desktop Trainer Main Screen Reset` using `DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md` as the planning base.
+
+
+## 2026-04-05 ? T-124 Desktop Trainer Main Screen Reset
+
+### Goal
+Implement the first bounded desktop-reset coding slice so the current `desktop_shell/` stops reading like a text/status-heavy shell and starts reading like a chart-first trader workspace skeleton without replay/trading/journal rewrite or platform drift.
+
+### Files created
+- `desktop_shell/workspace_surface.py`
+
+### Files updated
+- `desktop_shell/__init__.py`
+- `desktop_shell/tk_app.py`
+- `tests/test_desktop_shell.py`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Added compact workspace-surface helpers for the new replay/session bar, compact context zone, visible review-entry block, and pure main-screen layout contract.
+- Rebuilt the Tk desktop shell hierarchy so the screen now reads as: compact replay/session bar, dominant chart area, dedicated trading panel, compact context, review entry, then secondary/debug notebook surfaces.
+- Kept full workflow, history, authoring, and raw-state diagnostics accessible, but moved them below the primary workspace so they no longer dominate the main screen.
+- Preserved replay, trading, journal, persistence, and existing source-of-truth ownership without runtime/schema rewrite.
+- Added bounded desktop-shell tests that assert the new layout hierarchy contract and the compact workspace helpers.
+
+### What was not changed
+- Replay engine contracts were not changed.
+- Trading engine semantics were not changed.
+- Journal/schema ownership was not changed.
+- The mandatory chart-boundary slice (`bar chart only`, `Alligator`, `Fractals`, `AO`) was not implemented yet.
+- No separate contradiction requiring immediate rewrite of `03_MODULES/DESKTOP_WORKSPACE.md` was found during this slice.
+
+### Verification
+- `pytest -p no:cacheprovider tests/test_desktop_shell.py -q`
+
+### Why this matters
+This slice is the first point where the desktop product stops reading like an internal console and starts reading like a trader workspace. It creates the stable surface hierarchy needed for later startup clarification and mandatory chart-boundary work without losing the current diagnostics or reopening architecture.
+
+### Remaining gap after this step
+- Startup into the workspace is still product-ambiguous across prepared dataset, raw import, new session, and restore paths.
+- The chart area is now primary by layout, but it still does not enforce the accepted `bar chart only + Alligator + Fractals + AO` boundary.
+
+### Recommended next step
+Open one bounded coding packet for `T-125 Desktop Trainer Start Flow Clarification`, then continue to the mandatory chart-boundary slice once startup into the workspace is unambiguous.

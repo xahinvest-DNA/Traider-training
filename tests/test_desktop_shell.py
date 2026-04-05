@@ -15,6 +15,7 @@ from desktop_shell import (
     build_action_feedback_lines,
     build_authoring_status_lines,
     build_button_state_map,
+    build_compact_context_lines,
     build_control_hint_lines,
     build_controller_from_launch_config,
     build_default_launch_config,
@@ -24,11 +25,14 @@ from desktop_shell import (
     build_latest_result_lines,
     build_latest_trade_result_lines,
     build_mid_price_line_points,
+    build_main_screen_layout_spec,
     build_mvp_pause_point_snapshot,
     build_note_section_lines,
     build_readiness_snapshot,
     format_mvp_pause_point_report,
     build_replay_header_lines,
+    build_review_entry_lines,
+    build_workspace_bar_lines,
     format_readiness_report,
     build_review_section_lines,
     build_review_summary_lines,
@@ -3354,3 +3358,58 @@ def test_desktop_shell_readiness_and_pause_reports_surface_recovered_market_entr
     assert "Lifecycle text: Market entry is already staged and awaiting the next replay fill; no active trade is open yet." in readiness_report
     assert "Trade lifecycle: market_entry_pending" in pause_report
     assert "Lifecycle text: Market entry is already staged and awaiting the next replay fill; no active trade is open yet." in pause_report
+
+
+def test_desktop_main_screen_layout_spec_makes_chart_primary_and_debug_secondary() -> None:
+    layout = build_main_screen_layout_spec()
+
+    assert layout["screen_reading_order"] == [
+        "chart_area",
+        "replay_and_trading_actions",
+        "compact_context",
+        "review_entry",
+        "secondary_debug",
+    ]
+    assert layout["zones"]["chart_area"]["dominance"] == "largest"
+    assert layout["zones"]["chart_area"]["weight"] > layout["zones"]["right_workspace_rail"]["weight"]
+    assert layout["zones"]["secondary_debug"]["placement"] == "below_primary_workspace"
+
+
+def test_desktop_workspace_bar_lines_surface_compact_replay_and_trade_state() -> None:
+    controller = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=_reset_dir(TMP_ROOT / "workspace_bar_lines"),
+    )
+
+    workspace = controller.get_workspace_view()
+    bar_lines = build_workspace_bar_lines(workspace["replay"], workspace["trading"])
+
+    assert len(bar_lines) == 2
+    assert "Instrument:" in bar_lines[0]
+    assert "Dataset:" in bar_lines[0]
+    assert "Mode:" in bar_lines[0]
+    assert "Time:" in bar_lines[1]
+    assert "Replay:" in bar_lines[1]
+    assert "Speed:" in bar_lines[1]
+    assert "Trade:" in bar_lines[1]
+
+
+def test_desktop_compact_context_and_review_entry_stay_factual() -> None:
+    controller = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=_reset_dir(TMP_ROOT / "workspace_compact_context"),
+    )
+
+    controller.buy_stop(trigger_price=1.10364, stop_loss=1.10340, take_profit=1.10370)
+    workspace = controller.get_workspace_view()
+    compact_lines = build_compact_context_lines(workspace["trading"], workspace["journal"])
+    review_lines = build_review_entry_lines(workspace["journal"])
+
+    assert any(line == "Active trade: no" for line in compact_lines)
+    assert any(line == "Pending entry: yes (buy stop @ 1.10364)" for line in compact_lines)
+    assert any(line.startswith("SL / TP: 1.1034 / 1.1037") for line in compact_lines)
+    assert all("Trade lifecycle text:" not in line for line in compact_lines)
+    assert all("Recovery follow-up:" not in line for line in compact_lines)
+    assert any(line.startswith("PreTradeNotes:") for line in review_lines)
+    assert any(line.startswith("Review pending trade:") for line in review_lines)
+    assert any(line.startswith("Next review action:") for line in review_lines)

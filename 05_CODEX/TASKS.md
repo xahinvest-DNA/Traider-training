@@ -870,3 +870,13 @@
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/REPLAY_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/TASKS.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md`
 - Expected result: `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md` with an explicit alignment decision, realistic bounded slice order, risks, and one strongest next desktop implementation slice.
 - Outcome: fixed the desktop-reset implementation order, decided that no separate pre-alignment pass for `03_MODULES/DESKTOP_WORKSPACE.md` is required before future coding, and selected `Desktop Trainer Main Screen Reset` as the strongest next desktop implementation slice once the repository intentionally opens the desktop-reset lane.
+
+
+### T-124
+
+- Status: completed
+- Module: Desktop Trainer Main Screen Reset
+- Goal: implement the first bounded desktop-reset coding slice so the current `desktop_shell/` stops reading like a text/status-heavy shell and starts reading like a chart-first trader workspace skeleton without replay/trading/journal rewrite or platform drift.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/REPLAY_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`, current `desktop_shell/*`, and related tests.
+- Expected result: a chart-first main-screen reset inside `desktop_shell/` with compact replay/session bar, dominant chart area, dedicated trading panel, compact context zone, visible review entry, secondary/debug demotion, plus bounded tests and synchronized state files.
+- Outcome: rebuilt the Tk desktop shell into a chart-first workspace skeleton with a compact top replay/session bar, visually dominant main chart area, dedicated trader panel, compact factual context, visible review entry, and secondary notebook-backed workflow/history/debug surfaces while preserving existing runtime ownership and diagnostics.

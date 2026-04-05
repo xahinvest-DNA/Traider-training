@@ -60,6 +60,12 @@ from .workflow_surface import (
     build_finalization_blocker_lines,
     build_workflow_guidance_lines,
 )
+from .workspace_surface import (
+    build_compact_context_lines,
+    build_main_screen_layout_spec,
+    build_review_entry_lines,
+    build_workspace_bar_lines,
+)
 from .controller import DesktopShellController
 
 __all__ = [
@@ -70,6 +76,7 @@ __all__ = [
     "build_action_feedback_lines",
     "build_authoring_status_lines",
     "build_button_state_map",
+    "build_compact_context_lines",
     "build_control_hint_lines",
     "build_controller_from_launch_config",
     "build_default_launch_config",
@@ -78,11 +85,13 @@ __all__ = [
     "build_history_status_lines",
     "build_latest_result_lines",
     "build_latest_trade_result_lines",
+    "build_main_screen_layout_spec",
     "build_mid_price_line_points",
     "build_mvp_pause_point_snapshot",
     "build_note_section_lines",
     "build_readiness_snapshot",
     "build_replay_header_lines",
+    "build_review_entry_lines",
     "build_review_section_lines",
     "build_review_summary_lines",
     "build_session_context_lines",
@@ -90,6 +99,7 @@ __all__ = [
     "build_timeline_preview_lines",
     "build_trade_context_lines",
     "build_workflow_guidance_lines",
+    "build_workspace_bar_lines",
     "flatten_canvas_points",
     "format_mvp_pause_point_report",
     "format_readiness_report",

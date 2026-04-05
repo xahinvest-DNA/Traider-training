@@ -42,6 +42,11 @@ from .workflow_surface import (
     build_finalization_blocker_lines,
     build_workflow_guidance_lines,
 )
+from .workspace_surface import (
+    build_compact_context_lines,
+    build_review_entry_lines,
+    build_workspace_bar_lines,
+)
 from .controller import DesktopShellController
 
 
@@ -49,8 +54,8 @@ class TraderTrainerDesktopApp:
     def __init__(self, controller: DesktopShellController) -> None:
         self.controller = controller
         self.root = tk.Tk()
-        self.root.title("Trader Trainer Desktop Shell")
-        self.root.geometry("1480x980")
+        self.root.title("Trader Trainer Workspace")
+        self.root.geometry("1560x980")
 
         self.note_setup_tag = tk.StringVar(value="BW_FRACTAL_LONG")
         self.note_thesis = tk.StringVar()
@@ -75,10 +80,11 @@ class TraderTrainerDesktopApp:
         self.pending_review_snapshot_ids: list[str] = []
         self.last_action_feedback: dict[str, str] | None = {
             "level": "info",
-            "summary": "Desktop shell ready",
-            "detail": "Local runtime bootstrapped successfully.",
+            "summary": "Workspace ready",
+            "detail": "Desktop shell refreshed into the chart-first trainer workspace skeleton.",
         }
         self.control_buttons: dict[str, ttk.Button] = {}
+        self.secondary_tabs: dict[str, ttk.Frame] = {}
 
         self._build_layout()
         self.refresh()
@@ -100,142 +106,218 @@ class TraderTrainerDesktopApp:
         self._render_authoring_surface(journal_view)
         self._render_history_surface(journal_view)
         self._render_workflow_surface(replay_view, trading_view, journal_view)
+        self.replay_bar_label.configure(text="\n".join(build_workspace_bar_lines(replay_view, trading_view)))
 
     def _build_layout(self) -> None:
         root = self.root
-        root.columnconfigure(0, weight=3)
-        root.columnconfigure(1, weight=2)
-        root.rowconfigure(1, weight=1)
-        root.rowconfigure(2, weight=1)
+        root.columnconfigure(0, weight=1)
+        root.rowconfigure(1, weight=5)
+        root.rowconfigure(2, weight=3)
 
-        controls = ttk.Frame(root, padding=8)
-        controls.grid(row=0, column=0, columnspan=2, sticky="ew")
+        top_bar = ttk.LabelFrame(root, text="Replay / Session Bar", padding=8)
+        top_bar.grid(row=0, column=0, sticky="ew", padx=8, pady=(8, 4))
+        top_bar.columnconfigure(0, weight=3)
+        top_bar.columnconfigure(1, weight=2)
 
-        button_specs = [
+        self.replay_bar_label = ttk.Label(top_bar, justify="left", anchor="w")
+        self.replay_bar_label.grid(row=0, column=0, sticky="ew", padx=(0, 12))
+
+        replay_controls = ttk.Frame(top_bar)
+        replay_controls.grid(row=0, column=1, sticky="e")
+        for column in range(9):
+            replay_controls.columnconfigure(column, weight=0)
+
+        top_button_specs = [
             ("play", "Play", self._action_play),
             ("pause", "Pause", self._action_pause),
             ("advance", "Advance", self._action_advance),
-            ("buy", "Buy", self._action_buy),
-            ("sell", "Sell", self._action_sell),
-            ("buy_stop", "BuyStop", self._action_buy_stop),
-            ("sell_stop", "SellStop", self._action_sell_stop),
+        ]
+        for index, (key, label, handler) in enumerate(top_button_specs):
+            button = ttk.Button(replay_controls, text=label, command=handler)
+            button.grid(row=0, column=index, padx=3)
+            self.control_buttons[key] = button
+
+        ttk.Label(replay_controls, text="Speed").grid(row=0, column=3, padx=(10, 4))
+        ttk.Entry(replay_controls, textvariable=self.speed_value, width=6).grid(row=0, column=4, padx=3)
+        speed_button = ttk.Button(replay_controls, text="Set", command=self._action_set_speed)
+        speed_button.grid(row=0, column=5, padx=3)
+        self.control_buttons["set_speed"] = speed_button
+
+        main_workspace = ttk.Frame(root, padding=(8, 4, 8, 4))
+        main_workspace.grid(row=1, column=0, sticky="nsew")
+        main_workspace.columnconfigure(0, weight=5)
+        main_workspace.columnconfigure(1, weight=2)
+        main_workspace.rowconfigure(0, weight=1)
+
+        chart_frame = ttk.LabelFrame(main_workspace, text="Main Chart Area", padding=8)
+        chart_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+        chart_frame.columnconfigure(0, weight=1)
+        chart_frame.rowconfigure(1, weight=1)
+        self.chart_header = ttk.Label(chart_frame, justify="left", anchor="w")
+        self.chart_header.grid(row=0, column=0, sticky="ew", pady=(0, 6))
+        self.chart_canvas = tk.Canvas(chart_frame, background="#10151c", highlightthickness=0)
+        self.chart_canvas.grid(row=1, column=0, sticky="nsew")
+        self.chart_canvas.bind("<Configure>", lambda _event: self.refresh())
+        self.chart_footer = ttk.Label(chart_frame, justify="left", anchor="w")
+        self.chart_footer.grid(row=2, column=0, sticky="ew", pady=(6, 0))
+
+        sidebar = ttk.Frame(main_workspace)
+        sidebar.grid(row=0, column=1, sticky="nsew")
+        sidebar.columnconfigure(0, weight=1)
+        sidebar.rowconfigure(0, weight=3)
+        sidebar.rowconfigure(1, weight=2)
+        sidebar.rowconfigure(2, weight=2)
+
+        trading_panel = ttk.LabelFrame(sidebar, text="Trading Panel", padding=8)
+        trading_panel.grid(row=0, column=0, sticky="nsew", pady=(0, 8))
+        trading_panel.columnconfigure(0, weight=1)
+        trading_panel.columnconfigure(1, weight=1)
+        trading_panel.columnconfigure(2, weight=1)
+
+        ttk.Label(trading_panel, text="Trigger").grid(row=0, column=0, sticky="w")
+        ttk.Label(trading_panel, text="Initial SL").grid(row=0, column=1, sticky="w")
+        ttk.Label(trading_panel, text="Initial TP").grid(row=0, column=2, sticky="w")
+        ttk.Entry(trading_panel, textvariable=self.pending_stop_trigger_value, width=12).grid(row=1, column=0, sticky="ew", padx=(0, 4), pady=(0, 6))
+        ttk.Entry(trading_panel, textvariable=self.initial_stop_loss_value, width=12).grid(row=1, column=1, sticky="ew", padx=4, pady=(0, 6))
+        ttk.Entry(trading_panel, textvariable=self.initial_take_profit_value, width=12).grid(row=1, column=2, sticky="ew", padx=(4, 0), pady=(0, 6))
+
+        trade_button_specs = [
+            ("buy", "Buy Market", self._action_buy),
+            ("sell", "Sell Market", self._action_sell),
+            ("buy_stop", "Buy Stop", self._action_buy_stop),
+            ("sell_stop", "Sell Stop", self._action_sell_stop),
             ("cancel_entry", "Cancel Entry", self._action_cancel_entry),
-            ("partial_close", "Partial Close", self._action_partial_close),
             ("close", "Close", self._action_close),
+        ]
+        for index, (key, label, handler) in enumerate(trade_button_specs):
+            row = 2 + index // 2
+            column = index % 2
+            button = ttk.Button(trading_panel, text=label, command=handler)
+            button.grid(row=row, column=column, sticky="ew", padx=4, pady=4)
+            self.control_buttons[key] = button
+
+        ttk.Label(trading_panel, text="Close vol").grid(row=5, column=0, sticky="w", padx=4, pady=(8, 0))
+        ttk.Entry(trading_panel, textvariable=self.partial_close_volume_value, width=10).grid(row=6, column=0, sticky="ew", padx=4, pady=(0, 4))
+        partial_button = ttk.Button(trading_panel, text="Partial Close", command=self._action_partial_close)
+        partial_button.grid(row=6, column=1, sticky="ew", padx=4, pady=(0, 4))
+        self.control_buttons["partial_close"] = partial_button
+
+        self.compact_context_frame = ttk.LabelFrame(sidebar, text="Compact Context", padding=8)
+        self.compact_context_frame.grid(row=1, column=0, sticky="nsew", pady=(0, 8))
+        self.compact_context_frame.columnconfigure(0, weight=1)
+        self.compact_context_label = ttk.Label(self.compact_context_frame, justify="left", anchor="w")
+        self.compact_context_label.grid(row=0, column=0, sticky="nsew")
+
+        review_frame = ttk.LabelFrame(sidebar, text="Review Entry", padding=8)
+        review_frame.grid(row=2, column=0, sticky="nsew")
+        review_frame.columnconfigure(0, weight=1)
+        self.review_entry_label = ttk.Label(review_frame, justify="left", anchor="w")
+        self.review_entry_label.grid(row=0, column=0, sticky="ew", pady=(0, 8))
+        review_buttons = ttk.Frame(review_frame)
+        review_buttons.grid(row=1, column=0, sticky="ew")
+        for column in range(3):
+            review_buttons.columnconfigure(column, weight=1)
+        ttk.Button(review_buttons, text="PreTradeNote", command=lambda: self._focus_secondary_tab("authoring")).grid(row=0, column=0, sticky="ew", padx=(0, 4))
+        ttk.Button(review_buttons, text="PostTradeReview", command=lambda: self._focus_secondary_tab("authoring")).grid(row=0, column=1, sticky="ew", padx=4)
+        ttk.Button(review_buttons, text="History", command=lambda: self._focus_secondary_tab("history")).grid(row=0, column=2, sticky="ew", padx=(4, 0))
+
+        secondary = ttk.Notebook(root)
+        secondary.grid(row=2, column=0, sticky="nsew", padx=8, pady=(4, 8))
+        self.secondary_notebook = secondary
+
+        authoring_frame = ttk.Frame(secondary, padding=8)
+        authoring_frame.columnconfigure(0, weight=1)
+        authoring_frame.rowconfigure(0, weight=1)
+        self._build_note_review_form(authoring_frame)
+        secondary.add(authoring_frame, text="Authoring / Review")
+        self.secondary_tabs["authoring"] = authoring_frame
+
+        workflow_frame = ttk.Frame(secondary, padding=8)
+        workflow_frame.columnconfigure(0, weight=1)
+        workflow_frame.columnconfigure(1, weight=1)
+        for row in range(4):
+            workflow_frame.rowconfigure(row, weight=1)
+        self.workflow_guidance_label = ttk.Label(workflow_frame, justify="left", anchor="nw")
+        self.workflow_guidance_label.grid(row=0, column=0, sticky="nsew", padx=(0, 8), pady=(0, 6))
+        self.blocker_status_label = ttk.Label(workflow_frame, justify="left", anchor="nw")
+        self.blocker_status_label.grid(row=0, column=1, sticky="nsew", pady=(0, 6))
+        self.action_feedback_label = ttk.Label(workflow_frame, justify="left", anchor="nw")
+        self.action_feedback_label.grid(row=1, column=0, columnspan=2, sticky="nsew", pady=(0, 6))
+        self.session_context_label = ttk.Label(workflow_frame, justify="left", anchor="nw")
+        self.session_context_label.grid(row=2, column=0, sticky="nsew", padx=(0, 8), pady=(0, 6))
+        self.trade_context_label = ttk.Label(workflow_frame, justify="left", anchor="nw")
+        self.trade_context_label.grid(row=2, column=1, sticky="nsew", pady=(0, 6))
+        workflow_controls = ttk.LabelFrame(workflow_frame, text="Secondary Controls", padding=8)
+        workflow_controls.grid(row=3, column=0, columnspan=2, sticky="ew")
+        for column in range(4):
+            workflow_controls.columnconfigure(column, weight=1)
+        for index, (key, label, handler) in enumerate([
             ("finalize", "Finalize", self._action_finalize),
             ("force_finalize", "Force Finalize", self._action_force_finalize),
             ("acknowledge_recovery", "Review Warning", self._action_acknowledge_recovery),
-        ]
-        for index, (key, label, handler) in enumerate(button_specs):
-            button = ttk.Button(controls, text=label, command=handler)
-            button.grid(row=0, column=index, padx=4, pady=4)
+        ]):
+            button = ttk.Button(workflow_controls, text=label, command=handler)
+            button.grid(row=0, column=index, sticky="ew", padx=4)
             self.control_buttons[key] = button
+        self.control_hint_label = ttk.Label(workflow_controls, justify="left", anchor="w")
+        self.control_hint_label.grid(row=1, column=0, columnspan=4, sticky="ew", pady=(8, 0))
+        secondary.add(workflow_frame, text="Workflow / Diagnostics")
+        self.secondary_tabs["workflow"] = workflow_frame
 
-        ttk.Label(controls, text="Speed").grid(row=0, column=len(button_specs), padx=(16, 4))
-        ttk.Entry(controls, textvariable=self.speed_value, width=8).grid(row=0, column=len(button_specs) + 1, padx=4)
-        speed_button = ttk.Button(controls, text="Set Speed", command=self._action_set_speed)
-        speed_button.grid(row=0, column=len(button_specs) + 2, padx=4)
-        self.control_buttons["set_speed"] = speed_button
-        ttk.Label(controls, text="Stop trigger").grid(row=0, column=len(button_specs) + 3, padx=(16, 4))
-        ttk.Entry(controls, textvariable=self.pending_stop_trigger_value, width=12).grid(row=0, column=len(button_specs) + 4, padx=4)
-        ttk.Label(controls, text="Initial SL").grid(row=0, column=len(button_specs) + 5, padx=(12, 4))
-        ttk.Entry(controls, textvariable=self.initial_stop_loss_value, width=12).grid(row=0, column=len(button_specs) + 6, padx=4)
-        ttk.Label(controls, text="Initial TP").grid(row=0, column=len(button_specs) + 7, padx=(12, 4))
-        ttk.Entry(controls, textvariable=self.initial_take_profit_value, width=12).grid(row=0, column=len(button_specs) + 8, padx=4)
-        ttk.Label(controls, text="Close vol").grid(row=0, column=len(button_specs) + 9, padx=(12, 4))
-        ttk.Entry(controls, textvariable=self.partial_close_volume_value, width=10).grid(row=0, column=len(button_specs) + 10, padx=4)
-
-        self.control_hint_label = ttk.Label(controls, justify="left", anchor="w")
-        self.control_hint_label.grid(row=1, column=0, columnspan=len(button_specs) + 11, sticky="ew", pady=(6, 0))
-        left_top = ttk.LabelFrame(root, text="Chart / Replay Surface", padding=8)
-        left_top.grid(row=1, column=0, sticky="nsew", padx=8, pady=8)
-        left_top.columnconfigure(0, weight=1)
-        left_top.rowconfigure(1, weight=1)
-        self.chart_header = ttk.Label(left_top, justify="left", anchor="w")
-        self.chart_header.grid(row=0, column=0, sticky="ew", pady=(0, 6))
-        self.chart_canvas = tk.Canvas(left_top, background="#10151c", highlightthickness=0)
-        self.chart_canvas.grid(row=1, column=0, sticky="nsew")
-        self.chart_canvas.bind("<Configure>", lambda _event: self.refresh())
-        self.chart_footer = ttk.Label(left_top, justify="left", anchor="w")
-        self.chart_footer.grid(row=2, column=0, sticky="ew", pady=(6, 0))
-
-        left_bottom = ttk.LabelFrame(root, text="Session / Trade Context Surface", padding=8)
-        left_bottom.grid(row=2, column=0, sticky="nsew", padx=8, pady=(0, 8))
-        left_bottom.columnconfigure(0, weight=1)
-        left_bottom.columnconfigure(1, weight=1)
-        for row in range(3):
-            left_bottom.rowconfigure(row, weight=1)
-
-        self.session_context_label = ttk.Label(left_bottom, justify="left", anchor="nw")
-        self.session_context_label.grid(row=0, column=0, sticky="nsew", padx=(0, 8), pady=(0, 6))
-        self.trade_context_label = ttk.Label(left_bottom, justify="left", anchor="nw")
-        self.trade_context_label.grid(row=0, column=1, sticky="nsew", pady=(0, 6))
-        self.review_summary_label = ttk.Label(left_bottom, justify="left", anchor="nw")
-        self.review_summary_label.grid(row=1, column=0, sticky="nsew", padx=(0, 8), pady=(0, 6))
-        self.finalization_label = ttk.Label(left_bottom, justify="left", anchor="nw")
-        self.finalization_label.grid(row=1, column=1, sticky="nsew", pady=(0, 6))
-        self.latest_result_label = ttk.Label(left_bottom, justify="left", anchor="nw")
-        self.latest_result_label.grid(row=2, column=0, columnspan=2, sticky="nsew")
-
-        right_top = ttk.LabelFrame(root, text="Workflow / Review Surface", padding=8)
-        right_top.grid(row=1, column=1, sticky="nsew", padx=(0, 8), pady=8)
-        for column in range(2):
-            right_top.columnconfigure(column, weight=1)
-        right_top.rowconfigure(3, weight=1)
-
-        self.workflow_guidance_label = ttk.Label(right_top, justify="left", anchor="w")
-        self.workflow_guidance_label.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 6))
-        self.blocker_status_label = ttk.Label(right_top, justify="left", anchor="w")
-        self.blocker_status_label.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(0, 6))
-        self.action_feedback_label = ttk.Label(right_top, justify="left", anchor="w")
-        self.action_feedback_label.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(0, 6))
-        self._build_note_review_form(right_top)
-
-        right_bottom = ttk.Notebook(root)
-        right_bottom.grid(row=2, column=1, sticky="nsew", padx=(0, 8), pady=(0, 8))
-
-        history_frame = ttk.Frame(right_bottom, padding=8)
+        history_frame = ttk.Frame(secondary, padding=8)
         history_frame.columnconfigure(0, weight=1)
+        history_frame.columnconfigure(1, weight=1)
         for row in range(3):
             history_frame.rowconfigure(row, weight=1)
         self.history_status_label = ttk.Label(history_frame, justify="left", anchor="nw")
-        self.history_status_label.grid(row=0, column=0, sticky="nsew", pady=(0, 6))
+        self.history_status_label.grid(row=0, column=0, sticky="nsew", padx=(0, 8), pady=(0, 6))
+        self.review_summary_label = ttk.Label(history_frame, justify="left", anchor="nw")
+        self.review_summary_label.grid(row=0, column=1, sticky="nsew", pady=(0, 6))
         self.latest_trade_result_label = ttk.Label(history_frame, justify="left", anchor="nw")
-        self.latest_trade_result_label.grid(row=1, column=0, sticky="nsew", pady=(0, 6))
+        self.latest_trade_result_label.grid(row=1, column=0, sticky="nsew", padx=(0, 8), pady=(0, 6))
+        self.finalization_label = ttk.Label(history_frame, justify="left", anchor="nw")
+        self.finalization_label.grid(row=1, column=1, sticky="nsew", pady=(0, 6))
         self.timeline_preview_label = ttk.Label(history_frame, justify="left", anchor="nw")
-        self.timeline_preview_label.grid(row=2, column=0, sticky="nsew")
-        right_bottom.add(history_frame, text="History / Timeline")
+        self.timeline_preview_label.grid(row=2, column=0, sticky="nsew", padx=(0, 8))
+        self.latest_result_label = ttk.Label(history_frame, justify="left", anchor="nw")
+        self.latest_result_label.grid(row=2, column=1, sticky="nsew")
+        secondary.add(history_frame, text="History / Timeline")
+        self.secondary_tabs["history"] = history_frame
 
-        journal_frame = ttk.Frame(right_bottom, padding=8)
-        journal_frame.columnconfigure(0, weight=1)
-        journal_frame.rowconfigure(0, weight=1)
-        self.journal_text = tk.Text(journal_frame, wrap="none")
-        self.journal_text.grid(row=0, column=0, sticky="nsew")
-        self.journal_text.configure(state="disabled")
-        right_bottom.add(journal_frame, text="Journal / Result")
-
-        replay_frame = ttk.Frame(right_bottom, padding=8)
+        replay_frame = ttk.Frame(secondary, padding=8)
         replay_frame.columnconfigure(0, weight=1)
         replay_frame.rowconfigure(0, weight=1)
         self.replay_text = tk.Text(replay_frame, wrap="none")
         self.replay_text.grid(row=0, column=0, sticky="nsew")
         self.replay_text.configure(state="disabled")
-        right_bottom.add(replay_frame, text="Replay State")
+        secondary.add(replay_frame, text="Replay State")
 
-        trading_frame = ttk.Frame(right_bottom, padding=8)
+        trading_frame = ttk.Frame(secondary, padding=8)
         trading_frame.columnconfigure(0, weight=1)
         trading_frame.rowconfigure(0, weight=1)
         self.trading_text = tk.Text(trading_frame, wrap="none")
         self.trading_text.grid(row=0, column=0, sticky="nsew")
         self.trading_text.configure(state="disabled")
-        right_bottom.add(trading_frame, text="Trading State")
+        secondary.add(trading_frame, text="Trading State")
 
-    def _build_note_review_form(self, parent: ttk.LabelFrame) -> None:
+        journal_frame = ttk.Frame(secondary, padding=8)
+        journal_frame.columnconfigure(0, weight=1)
+        journal_frame.rowconfigure(0, weight=1)
+        self.journal_text = tk.Text(journal_frame, wrap="none")
+        self.journal_text.grid(row=0, column=0, sticky="nsew")
+        self.journal_text.configure(state="disabled")
+        secondary.add(journal_frame, text="Journal / Result")
+
+    def _build_note_review_form(self, parent: ttk.Frame) -> None:
+        parent.columnconfigure(0, weight=1)
+        parent.columnconfigure(1, weight=1)
+        parent.rowconfigure(1, weight=1)
+
         self.authoring_status_label = ttk.Label(parent, justify="left", anchor="w")
-        self.authoring_status_label.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(0, 6))
+        self.authoring_status_label.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 6))
 
         note_frame = ttk.LabelFrame(parent, text="PreTradeNote", padding=8)
-        note_frame.grid(row=4, column=0, sticky="nsew", padx=(0, 4))
+        note_frame.grid(row=1, column=0, sticky="nsew", padx=(0, 4))
         note_frame.columnconfigure(0, weight=1)
         note_frame.rowconfigure(1, weight=1)
 
@@ -263,7 +345,7 @@ class TraderTrainerDesktopApp:
         ttk.Button(buttons_note, text="Clear", command=self._clear_note_form).grid(row=0, column=2, sticky="ew")
 
         review_frame = ttk.LabelFrame(parent, text="PostTradeReview", padding=8)
-        review_frame.grid(row=4, column=1, sticky="nsew", padx=(4, 0))
+        review_frame.grid(row=1, column=1, sticky="nsew", padx=(4, 0))
         review_frame.columnconfigure(0, weight=1)
         review_frame.rowconfigure(1, weight=1)
 
@@ -306,8 +388,8 @@ class TraderTrainerDesktopApp:
             buttons_review.columnconfigure(idx, weight=1)
         self.review_add_button = ttk.Button(buttons_review, text="Add Review", command=self._action_add_review)
         self.review_add_button.grid(row=0, column=0, sticky="ew", padx=(0, 4))
-        self.flag_add_button = ttk.Button(buttons_review, text="Add Flag", command=self._action_add_flag)
         ttk.Button(buttons_review, text="Mark Review Snapshot", command=self._action_capture_review_snapshot).grid(row=0, column=1, sticky="ew", padx=4)
+        self.flag_add_button = ttk.Button(buttons_review, text="Add Flag", command=self._action_add_flag)
         self.flag_add_button.grid(row=0, column=2, sticky="ew", padx=4)
         self.violation_add_button = ttk.Button(buttons_review, text="Add Violation", command=self._action_add_violation)
         self.violation_add_button.grid(row=0, column=3, sticky="ew", padx=4)
@@ -321,12 +403,12 @@ class TraderTrainerDesktopApp:
         self.chart_header.configure(text="\n".join(header_lines))
         self.chart_footer.configure(text="\n".join(build_tick_table_lines(chart_context)))
 
-        width = max(320, self.chart_canvas.winfo_width())
-        height = max(220, self.chart_canvas.winfo_height())
+        width = max(640, self.chart_canvas.winfo_width())
+        height = max(420, self.chart_canvas.winfo_height())
         points = build_mid_price_line_points(chart_context["recent_points"], width=width, height=height)
         self.chart_canvas.delete("all")
         self.chart_canvas.create_rectangle(0, 0, width, height, outline="", fill="#10151c")
-        self.chart_canvas.create_text(12, 12, anchor="nw", text="Mid-price trace", fill="#d7e3f4", font=("TkDefaultFont", 10, "bold"))
+        self.chart_canvas.create_text(16, 16, anchor="nw", text="Replay trace", fill="#d7e3f4", font=("TkDefaultFont", 11, "bold"))
         if not points:
             self.chart_canvas.create_text(width / 2, height / 2, text="Not enough replay points yet", fill="#8aa0b8")
             return
@@ -335,7 +417,7 @@ class TraderTrainerDesktopApp:
         self.chart_canvas.create_line(*flatten_canvas_points(points), fill="#4fc3f7", width=2, smooth=True)
         self.chart_canvas.create_oval(last_x - 4, last_y - 4, last_x + 4, last_y + 4, fill="#ffb74d", outline="")
         self.chart_canvas.create_line(16, height - 16, width - 16, height - 16, fill="#33485f")
-        self.chart_canvas.create_line(16, 24, 16, height - 16, fill="#33485f")
+        self.chart_canvas.create_line(16, 28, 16, height - 16, fill="#33485f")
 
     def _render_control_surface(self, replay_view: dict, trading_view: dict, journal_view: dict) -> None:
         button_state_map = build_button_state_map(replay_view, trading_view, journal_view)
@@ -348,6 +430,8 @@ class TraderTrainerDesktopApp:
         self.violation_add_button.configure(state="normal" if button_state_map["add_violation"] else "disabled")
 
     def _render_context_surface(self, trading_view: dict, journal_view: dict) -> None:
+        self.compact_context_label.configure(text="\n".join(build_compact_context_lines(trading_view, journal_view)))
+        self.review_entry_label.configure(text="\n".join(build_review_entry_lines(journal_view)))
         self.session_context_label.configure(text="\n".join(build_session_context_lines(journal_view)))
         self.trade_context_label.configure(text="\n".join(build_trade_context_lines(trading_view, journal_view)))
         self.review_summary_label.configure(text="\n".join(build_review_summary_lines(journal_view)))
@@ -415,6 +499,11 @@ class TraderTrainerDesktopApp:
         self.review_clarity_label.set("high_clarity")
         self.review_snapshot_ref.set("")
         self.pending_review_snapshot_ids = []
+
+    def _focus_secondary_tab(self, tab_name: str) -> None:
+        tab = self.secondary_tabs.get(tab_name)
+        if tab is not None:
+            self.secondary_notebook.select(tab)
 
     def _run_action(self, action, success_summary: str) -> None:
         try:
@@ -497,7 +586,6 @@ class TraderTrainerDesktopApp:
             f"Partial close requested: {self.partial_close_volume_value.get() or '0'}",
         )
 
-
     def _action_close(self) -> None:
         self._run_action(self.controller.manual_close, "Manual close requested")
 
@@ -545,16 +633,6 @@ class TraderTrainerDesktopApp:
 
     def _action_add_violation(self) -> None:
         self._run_action(lambda: self.controller.create_rule_violation(self.violation_code.get() or "manual_plan_deviation"), f"RuleViolation saved: {self.violation_code.get() or 'manual_plan_deviation'}")
-
-
-
-
-
-
-
-
-
-
 
     def _action_capture_note_snapshot(self) -> None:
         self._capture_snapshot(
@@ -604,6 +682,3 @@ class TraderTrainerDesktopApp:
             }
             self.refresh()
             messagebox.showerror("Trader Trainer", str(exc))
-
-
-
