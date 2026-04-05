@@ -34,6 +34,17 @@ def build_workflow_guidance_lines(
         _append_recovery_acknowledgment_guidance(lines, recovery_ack)
         return _append_dataset_quality_context(lines, dataset_quality)
 
+    if transition_state["pending_entry_staged"] and not trading_view.get("pending_stop_present"):
+        lines = [
+            "Workflow guidance:",
+            "A market entry is already staged for the current one-trade replay loop.",
+            "Advance replay or resume playback to let the staged entry fill before attempting another trade action.",
+        ]
+        if replay_view["status"] == "running":
+            lines.append("Replay is already running. Monitor the next fill instead of trying to open a second entry.")
+        else:
+            lines.append("Replay is paused. Resume playback or advance replay to continue the staged entry lifecycle.")
+        return _append_dataset_quality_context(lines, dataset_quality)
     if trading_view.get("pending_stop_present"):
         lines = [
             "Workflow guidance:",
@@ -399,5 +410,6 @@ def _append_recovery_acknowledgment_blocker_lines(lines: list[str], recovery_ack
         lines.append("Recovery follow-up: review needed")
     elif status == "acknowledged":
         lines.append("Recovery follow-up: already reviewed")
+
 
 

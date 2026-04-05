@@ -136,3 +136,4 @@ def _format_recovery_followup(status: str, text_value: str) -> str:
     if status in {"acknowledgment_needed", "acknowledged"}:
         return text_value
     return "none"
+

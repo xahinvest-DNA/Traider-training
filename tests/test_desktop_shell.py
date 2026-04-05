@@ -3306,3 +3306,51 @@ def test_desktop_shell_surfaces_partial_close_and_restart_recovery(monkeypatch: 
     final_workspace = recovered.get_workspace_view()
     assert final_workspace["trading"]["trade_status"] == "closed"
     assert final_workspace["trading"]["last_close_reason"] == "stop_loss_hit"
+
+
+def test_desktop_shell_surfaces_recovered_market_entry_pending_startup_state() -> None:
+    storage_dir = _reset_dir(TMP_ROOT / "market_entry_pending_startup")
+    controller_1 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=storage_dir)
+    controller_1.buy_market()
+    controller_1.play()
+
+    controller_2 = DesktopShellController(dataset_handle=FIXTURE, storage_dir=storage_dir)
+    workspace = controller_2.get_workspace_view()
+    trade_lines = build_trade_context_lines(workspace["trading"], workspace["journal"])
+    workflow_lines = build_workflow_guidance_lines(workspace["replay"], workspace["trading"], workspace["journal"])
+    finalization_lines = build_finalization_lines(workspace["journal"], workspace["trading"])
+    blocker_lines = build_finalization_blocker_lines(workspace["journal"], workspace["trading"])
+    button_map = build_button_state_map(workspace["replay"], workspace["trading"], workspace["journal"])
+
+    assert workspace["journal"]["recovered"] is True
+    assert workspace["trading"]["lifecycle_state"] == "EntryRequested"
+    assert workspace["trading"]["entry_pending_present"] is True
+    assert any(line == "Pending entry: yes" for line in trade_lines)
+    assert any(line == "Trade lifecycle focus: market_entry_pending" for line in trade_lines)
+    assert any(line == "Trade lifecycle text: Market entry is already staged and awaiting the next replay fill; no active trade is open yet." for line in trade_lines)
+    assert any(line == "A market entry is already staged for the current one-trade replay loop." for line in workflow_lines)
+    assert any(line == "Trade lifecycle in progress: market_entry_pending" for line in finalization_lines)
+    assert any(line == "A staged entry is still in progress." for line in blocker_lines)
+    assert button_map["buy"] is False
+    assert button_map["sell"] is False
+
+
+def test_desktop_shell_readiness_and_pause_reports_surface_recovered_market_entry_pending_state() -> None:
+    storage_dir = _reset_dir(TMP_ROOT / "market_entry_pending_readiness")
+    controller = DesktopShellController(dataset_handle=FIXTURE, storage_dir=storage_dir)
+    controller.buy_market()
+    controller.play()
+
+    config = DesktopLaunchConfig(dataset_handle=str(FIXTURE), storage_dir=storage_dir, replay_mode="training")
+    readiness = build_readiness_snapshot(config)
+    readiness_report = format_readiness_report(readiness)
+    pause_point = build_mvp_pause_point_snapshot(config)
+    pause_report = format_mvp_pause_point_report(pause_point)
+
+    assert readiness.recovered is True
+    assert readiness.lifecycle_label == "market_entry_pending"
+    assert readiness.lifecycle_text == "Market entry is already staged and awaiting the next replay fill; no active trade is open yet."
+    assert "Trade lifecycle: market_entry_pending" in readiness_report
+    assert "Lifecycle text: Market entry is already staged and awaiting the next replay fill; no active trade is open yet." in readiness_report
+    assert "Trade lifecycle: market_entry_pending" in pause_report
+    assert "Lifecycle text: Market entry is already staged and awaiting the next replay fill; no active trade is open yet." in pause_report

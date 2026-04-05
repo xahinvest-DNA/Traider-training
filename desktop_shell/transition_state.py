@@ -14,7 +14,7 @@ def build_transition_state_view(
     recovery_note = journal_view.get("dataset_quality_recovery_note") or {}
     recovery_ack = journal_view.get("dataset_quality_recovery_acknowledgment") or {}
 
-    pending_entry = bool(trading_view and trading_view.get("pending_stop_present") and not trading_view.get("active_trade_present"))
+    pending_entry = bool(trading_view and trading_view.get("entry_pending_present") and not trading_view.get("active_trade_present"))`r`n    pending_stop_entry = bool(trading_view and trading_view.get("pending_stop_present") and not trading_view.get("active_trade_present"))
     active_trade = bool(trading_view and trading_view.get("active_trade_present"))
     partially_closed = bool(trading_view and trading_view.get("trade_partially_closed"))
     clean_context = _is_clean_dataset_context(dataset_quality)
@@ -152,3 +152,4 @@ def _build_lifecycle_state_text(
         "idle",
         "No trade lifecycle is currently in progress.",
     )
+
