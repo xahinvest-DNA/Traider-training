@@ -832,3 +832,41 @@ The repository is no longer honestly in a hold state. A real current blocker has
 
 ### Recommended next step
 Implement one bounded `Desktop Startup Pending-Entry Actionability` fix using `05_CODEX/DESKTOP_STARTUP_PENDING_ENTRY_ACTIONABILITY.md`.
+
+## 2026-04-05 - T-121 Desktop Startup Pending-Entry Actionability
+
+### Goal
+Implement one bounded desktop startup-state actionability fix so that when the default local launch recovers a session with a generic pending market entry, existing desktop-facing surfaces describe that state truthfully and actionably instead of looking idle while most trade controls stay disabled.
+
+### Files updated
+- `00_INDEX.md`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+- `desktop_shell/transition_state.py`
+- `desktop_shell/context_surface.py`
+- `desktop_shell/workflow_surface.py`
+- `desktop_shell/readiness.py`
+- `desktop_shell/pause_point.py`
+- `tests/test_desktop_shell.py`
+
+### What was implemented
+- Broadened desktop transition-state handling so generic recovered `entry_pending_present` state is treated as staged entry instead of falling back to idle/no-trade language.
+- Added explicit pending-entry visibility in trade context.
+- Updated workflow guidance so recovered generic market-entry startup state now tells the user to advance/resume replay and wait for fill rather than open a new trade.
+- Kept finalization blockers coherent with staged entry in progress.
+- Extended readiness and MVP pause-point reports with lifecycle label/text so recovered startup summaries no longer imply idle state.
+- Added narrow desktop-shell regression tests for recovered generic pending market-entry startup state and startup reporting.
+
+### Verification
+- `tests/test_desktop_shell.py`: passed
+
+### What was not changed
+- Runtime/domain logic was not changed.
+- `03_MODULES/*` and `04_TECH/*` were not changed.
+- `01_MASTER/DECISIONS.md` was not changed.
+- No new persistence, startup subsystem, or broader feature growth was introduced.
+
+### Recommended next step
+Run one bounded post-implementation validation pass on `T-121 Desktop Startup Pending-Entry Actionability`.

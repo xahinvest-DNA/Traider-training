@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-05
-Current stage: bounded desktop-shell startup-state diagnostic pass is completed; the strongest observed current friction is a recovered pending-entry startup defect that justifies one bounded follow-up candidate
-Active module: `T-120 Desktop Shell Startup-State Diagnostic Pass` is completed
-Active question: how to restore truthful and actionable startup-state guidance when the default local launch recovers a generic pending market entry without drifting into broader startup redesign or feature growth
+Current stage: bounded desktop startup pending-entry actionability slice is completed; the recovered generic pending-entry startup state now stays truthful and actionable across existing desktop surfaces
+Active module: `T-121 Desktop Startup Pending-Entry Actionability` is completed
+Active question: whether the completed startup pending-entry actionability fix is strong enough in real use to return the repository to hold state, or whether one residual startup friction still remains
 
 ## Where the project is now
 
@@ -160,7 +160,7 @@ At this point:
 
 ## Next step
 
-If implementation resumes, activate one bounded follow-up on recovered startup pending-entry actionability; do not widen that step into broader startup redesign, pending-order growth, or new subsystem work.
+Run one bounded post-implementation validation pass on `Desktop Startup Pending-Entry Actionability` before selecting any broader follow-up.
 
 ## What must not be lost in a new chat
 
@@ -175,6 +175,7 @@ If implementation resumes, activate one bounded follow-up on recovered startup p
 - `CURRENT_TRADE_PLAN_CONTEXT.md` now fixes the bounded live-trade plan-recall contract; follow-up work must not silently turn plan visibility into plan management, mentor scoring, note orchestration, or a new plan-summary owner.
 - `PENDING_STOP_ENTRY.md` now fixes the next bounded live-trade frontier; follow-up work must not silently turn pending stop support into a broader pending-order orchestration or risk-management subsystem.
 - Any step beyond the bounded local-first desktop workflow requires a separate Project Brain fixation.
+
 
 
 
