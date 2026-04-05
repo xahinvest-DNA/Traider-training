@@ -25,6 +25,8 @@ class MVPPausePointSnapshot:
     recovery_acknowledgment_status: str
     recovery_acknowledgment_text: str
     recovery_acknowledged_at: str
+    lifecycle_label: str
+    lifecycle_text: str
     is_session_finalized: bool
     next_expansion_gate: str
     preserved_boundaries: tuple[str, ...]
@@ -50,6 +52,8 @@ def build_mvp_pause_point_snapshot(config: DesktopLaunchConfig) -> MVPPausePoint
         recovery_acknowledgment_status=readiness.recovery_acknowledgment_status,
         recovery_acknowledgment_text=readiness.recovery_acknowledgment_text,
         recovery_acknowledged_at=readiness.recovery_acknowledged_at,
+        lifecycle_label=readiness.lifecycle_label,
+        lifecycle_text=readiness.lifecycle_text,
         is_session_finalized=readiness.is_session_finalized,
         next_expansion_gate="requires new bounded slice after MVP freeze",
         preserved_boundaries=(
@@ -92,6 +96,8 @@ def format_mvp_pause_point_report(snapshot: MVPPausePointSnapshot) -> str:
         f"Recovery text: {snapshot.recovery_note_text}\n"
         f"Recovery follow-up: {recovery_followup}\n"
         f"Recovery acknowledged at: {snapshot.recovery_acknowledged_at}\n"
+        f"Trade lifecycle: {snapshot.lifecycle_label}\n"
+        f"Lifecycle text: {snapshot.lifecycle_text}\n"
         f"Session finalized: {finalized}\n"
         f"Expansion gate: {snapshot.next_expansion_gate}\n"
         "Preserved boundaries:\n"
@@ -136,4 +142,3 @@ def _format_recovery_followup(status: str, text_value: str) -> str:
     if status in {"acknowledgment_needed", "acknowledged"}:
         return text_value
     return "none"
-

@@ -14,7 +14,8 @@ def build_transition_state_view(
     recovery_note = journal_view.get("dataset_quality_recovery_note") or {}
     recovery_ack = journal_view.get("dataset_quality_recovery_acknowledgment") or {}
 
-    pending_entry = bool(trading_view and trading_view.get("entry_pending_present") and not trading_view.get("active_trade_present"))`r`n    pending_stop_entry = bool(trading_view and trading_view.get("pending_stop_present") and not trading_view.get("active_trade_present"))
+    pending_entry = bool(trading_view and trading_view.get("entry_pending_present") and not trading_view.get("active_trade_present"))
+    pending_stop_entry = bool(trading_view and trading_view.get("pending_stop_present") and not trading_view.get("active_trade_present"))
     active_trade = bool(trading_view and trading_view.get("active_trade_present"))
     partially_closed = bool(trading_view and trading_view.get("trade_partially_closed"))
     clean_context = _is_clean_dataset_context(dataset_quality)
@@ -46,12 +47,14 @@ def build_transition_state_view(
         finalization=finalization,
         summary=summary,
         pending_entry=pending_entry,
+        pending_stop_entry=pending_stop_entry,
         active_trade=active_trade,
         partially_closed=partially_closed,
     )
 
     return {
         "pending_entry_staged": pending_entry,
+        "pending_stop_entry_staged": pending_stop_entry,
         "active_trade_open": active_trade,
         "trade_partially_closed": partially_closed,
         "lifecycle_label": lifecycle_label,
@@ -115,13 +118,19 @@ def _build_lifecycle_state_text(
     finalization: dict[str, Any],
     summary: dict[str, Any],
     pending_entry: bool,
+    pending_stop_entry: bool,
     active_trade: bool,
     partially_closed: bool,
 ) -> tuple[str, str]:
     if pending_entry:
+        if pending_stop_entry:
+            return (
+                "pending_entry_staged",
+                "Pending entry is staged; no active trade is open yet.",
+            )
         return (
-            "pending_entry_staged",
-            "Pending entry is staged; no active trade is open yet.",
+            "market_entry_pending",
+            "Market entry is already staged and awaiting the next replay fill; no active trade is open yet.",
         )
     if active_trade and partially_closed:
         return (
@@ -152,4 +161,3 @@ def _build_lifecycle_state_text(
         "idle",
         "No trade lifecycle is currently in progress.",
     )
-

@@ -25,6 +25,8 @@ class DesktopReadinessSnapshot:
     recovery_acknowledgment_status: str
     recovery_acknowledgment_text: str
     recovery_acknowledged_at: str
+    lifecycle_label: str
+    lifecycle_text: str
     session_status: str
     summary_status: str
     review_pending_trade_id: str | None
@@ -66,6 +68,8 @@ def build_readiness_snapshot(config: DesktopLaunchConfig) -> DesktopReadinessSna
         recovery_acknowledgment_status=transition_state["recovery_acknowledgment_status"],
         recovery_acknowledgment_text=transition_state["recovery_acknowledgment_text"],
         recovery_acknowledged_at=transition_state["recovery_acknowledged_at"],
+        lifecycle_label=transition_state["lifecycle_label"],
+        lifecycle_text=transition_state["lifecycle_text"],
         session_status=workspace["journal"]["session_status"],
         summary_status=workspace["journal"]["session_review_summary"]["summary_status"],
         review_pending_trade_id=workspace["journal"]["review_pending_trade_id"],
@@ -99,6 +103,8 @@ def format_readiness_report(snapshot: DesktopReadinessSnapshot) -> str:
         f"Recovery text: {snapshot.recovery_note_text}\n"
         f"Recovery follow-up: {recovery_followup}\n"
         f"Recovery acknowledged at: {snapshot.recovery_acknowledged_at}\n"
+        f"Trade lifecycle: {snapshot.lifecycle_label}\n"
+        f"Lifecycle text: {snapshot.lifecycle_text}\n"
         f"Session status: {snapshot.session_status}\n"
         f"Summary status: {snapshot.summary_status}\n"
         f"Pending review trade: {pending_trade}\n"
@@ -140,4 +146,3 @@ def _format_recovery_followup(status: str, text_value: str) -> str:
     if status in {"acknowledgment_needed", "acknowledged"}:
         return text_value
     return "none"
-
