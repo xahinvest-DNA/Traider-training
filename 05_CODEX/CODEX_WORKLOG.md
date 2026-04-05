@@ -732,3 +732,46 @@ The current desktop loop now tells one coherent state story at the exact moments
 
 ### Recommended next step
 Run one bounded post-implementation validation pass on `T-118 Desktop Transition-State Coherence`.
+
+## 2026-04-05 - T-119 Post-Implementation Validation of Desktop Transition-State Coherence
+
+### Goal
+Run one bounded post-implementation validation pass on completed `T-118 Desktop Transition-State Coherence` so the repository can determine whether the strongest recurring desktop friction is truly resolved strongly enough for a hold state, or whether one residual recurring friction still justifies exactly one later bounded follow-up candidate.
+
+### Files updated
+- `00_INDEX.md`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was validated
+- Re-checked realistic desktop scenarios around pending stop staged, pending stop cancelled, pending stop triggered into active trade, partial close with remaining active volume, closed trade awaiting review, finalized clean session, finalized warned session, reopened/recovered clean session, and reopened/recovered warned session.
+- Compared the same existing surfaces that carried the original friction: trade context, workflow guidance, result summary, finalization status/blockers, readiness reporting, pause-point reporting, and control availability where relevant.
+- Verified the broader desktop-shell regression surface with the full `tests/test_desktop_shell.py` suite.
+
+### Resolution assessment
+- Pending-entry contradiction across trade/workflow/finalization surfaces: resolved.
+- Clean dataset warning leakage across finalization/readiness/pause reporting: resolved.
+- Partially closed active-state next-step coherence: resolved.
+- Closed-review-pending next-step coherence: resolved.
+- Finalized/recovered cross-surface coherence for clean and warned sessions: resolved.
+- No new recurring misleading state became the next strongest blocker.
+
+### Residual observations not selected as new friction
+- Readiness and pause-point reports are inherently recovery-oriented because they rebuild from persisted state; validation did not show this as a recurring misleading blocker once the transition wording itself became coherent.
+- Minor wording/formatting preferences remain non-slice-worthy and do not break workflow continuity.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop-shell code was not changed.
+- Tests were not changed.
+- `03_MODULES/*` and `04_TECH/*` were not changed.
+- `01_MASTER/DECISIONS.md` was not changed.
+- No new candidate document was created because no residual recurring friction was strong enough to justify one.
+
+### Conclusion
+`T-118` is validated strongly enough. The repository now honestly returns to a hold state instead of activating another adjacent slice by inertia.
+
+### Recommended next step
+Keep the repository in hold state until a stronger recurring desktop friction is observed in a separate bounded validation or audit pass.
