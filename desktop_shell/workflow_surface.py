@@ -324,7 +324,7 @@ def build_finalization_blocker_lines(
     if finalization["replay_running"]:
         blockers.append("Replay is still running.")
     if transition_state["pending_entry_staged"]:
-        blockers.append("A pending entry is still staged.")
+        blockers.append("A staged entry is still in progress.")
     elif transition_state["active_trade_open"] and transition_state["trade_partially_closed"]:
         blockers.append("The remaining active trade volume must be closed before finalizing.")
     elif transition_state["active_trade_open"]:
@@ -410,6 +410,7 @@ def _append_recovery_acknowledgment_blocker_lines(lines: list[str], recovery_ack
         lines.append("Recovery follow-up: review needed")
     elif status == "acknowledged":
         lines.append("Recovery follow-up: already reviewed")
+
 
 
 
