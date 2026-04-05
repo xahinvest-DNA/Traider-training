@@ -13,11 +13,13 @@ from desktop_shell import (
     MVPPausePointSnapshot,
     DesktopShellController,
     build_action_feedback_lines,
+    build_primary_workflow_snapshot_lines,
     build_alligator_lines,
     build_ao_histogram_segments,
     build_ao_values,
     build_bar_segments,
     build_chart_visual_summary,
+    build_primary_chart_footer_lines,
     build_fractal_markers,
     build_authoring_status_lines,
     build_button_state_map,
@@ -3427,6 +3429,31 @@ def test_desktop_main_screen_layout_spec_makes_chart_primary_and_debug_secondary
     assert layout["zones"]["chart_area"]["dominance"] == "largest"
     assert layout["zones"]["chart_area"]["weight"] > layout["zones"]["right_workspace_rail"]["weight"]
     assert layout["zones"]["secondary_debug"]["placement"] == "below_primary_workspace"
+    assert "compact_action_snapshot" in layout["primary_surface_allows"]
+    assert "long_readiness_prose" in layout["primary_surface_excludes"]
+    assert "raw_chart_bar_dump" in layout["primary_surface_excludes"]
+    assert "debug_chart_detail" in layout["zones"]["secondary_debug"]["includes"]
+    assert layout["zones"]["chart_area"]["primary_footer"] == "compact_chart_summary_only"
+
+
+def test_desktop_primary_chart_footer_stays_compact_while_debug_keeps_recent_bars() -> None:
+    controller = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=_reset_dir(TMP_ROOT / "primary_chart_footer"),
+    )
+
+    controller.play()
+    for _ in range(12):
+        controller.advance_frame()
+    chart_context = controller.get_workspace_view()["replay"]["chart_context"]
+
+    primary_footer = build_primary_chart_footer_lines(chart_context)
+    debug_lines = build_tick_table_lines(chart_context, limit=4)
+
+    assert any(line.startswith("Bars:") for line in primary_footer)
+    assert any(line.startswith("AO pane:") for line in primary_footer)
+    assert all("Recent bars:" not in line for line in primary_footer)
+    assert debug_lines[0] == "Recent bars:"
 
 
 def test_desktop_workspace_bar_lines_surface_compact_replay_and_trade_state() -> None:
@@ -3446,6 +3473,27 @@ def test_desktop_workspace_bar_lines_surface_compact_replay_and_trade_state() ->
     assert "Replay:" in bar_lines[1]
     assert "Speed:" in bar_lines[1]
     assert "Trade:" in bar_lines[1]
+
+
+def test_desktop_primary_workflow_snapshot_stays_short_and_actionable() -> None:
+    controller = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=_reset_dir(TMP_ROOT / "primary_workflow_snapshot"),
+    )
+
+    snapshot_lines = build_primary_workflow_snapshot_lines(
+        controller.get_workspace_view()["replay"],
+        controller.get_workspace_view()["trading"],
+        controller.get_workspace_view()["journal"],
+        {"level": "info", "summary": "Workspace ready", "detail": "Verbose details stay secondary."},
+    )
+
+    assert snapshot_lines[0] == "Action snapshot:"
+    assert len(snapshot_lines) <= 4
+    assert any(line.startswith("Ready:") or line.startswith("Recent action:") for line in snapshot_lines[1:])
+    assert all("Workflow guidance:" not in line for line in snapshot_lines)
+    assert all("Dataset quality context:" not in line for line in snapshot_lines)
+    assert all("Verbose details stay secondary." not in line for line in snapshot_lines)
 
 
 def test_desktop_compact_context_and_review_entry_stay_factual() -> None:

@@ -128,6 +128,10 @@ def build_chart_visual_summary(chart_context: dict[str, Any]) -> list[str]:
     ]
 
 
+def build_primary_chart_footer_lines(chart_context: dict[str, Any]) -> list[str]:
+    return build_chart_visual_summary(chart_context)
+
+
 def build_mid_price_line_points(
     recent_points: list[dict[str, Any]],
     width: int,

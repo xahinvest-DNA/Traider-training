@@ -18,6 +18,7 @@ from .chart_surface import (
     build_ao_values,
     build_bar_segments,
     build_chart_visual_summary,
+    build_primary_chart_footer_lines,
     build_fractal_canvas_markers,
     build_fractal_markers,
     build_mid_price_line_points,
@@ -73,6 +74,7 @@ from .readiness import (
 )
 from .workflow_surface import (
     build_action_feedback_lines,
+    build_primary_workflow_snapshot_lines,
     build_finalization_blocker_lines,
     build_workflow_guidance_lines,
 )
@@ -92,6 +94,7 @@ __all__ = [
     "DesktopShellController",
     "MVPPausePointSnapshot",
     "build_action_feedback_lines",
+    "build_primary_workflow_snapshot_lines",
     "build_alligator_lines",
     "build_ao_histogram_segments",
     "build_ao_values",
@@ -99,6 +102,7 @@ __all__ = [
     "build_button_state_map",
     "build_bar_segments",
     "build_chart_visual_summary",
+    "build_primary_chart_footer_lines",
     "build_compact_context_lines",
     "build_control_hint_lines",
     "build_controller_from_launch_config",

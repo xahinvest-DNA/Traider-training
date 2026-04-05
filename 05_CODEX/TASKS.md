@@ -900,3 +900,13 @@
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/REPLAY_ENGINE.md`, `03_MODULES/TRADING_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`, `05_CODEX/NEXT_TASK.md`, current `desktop_shell/*`, and related chart tests.
 - Expected result: bounded chart/rendering changes inside the existing desktop workspace so the main chart becomes bar-only with Alligator and Fractals overlays plus a separate AO pane, with tests proving the mandatory boundary and state files synchronized.
 - Outcome: replaced the generic replay trace with a bounded Bill Williams chart model and rendering path, expanded chart context only enough to support that boundary, and added a separate AO pane while keeping the existing workspace structure, replay/trading/journal ownership, and non-chart flows intact.
+
+
+### T-127
+
+- Status: completed
+- Module: Desktop Main-Surface Text Reduction and Secondary-Debug Separation
+- Goal: reduce shell-style prose pressure on the primary workspace so the accepted chart-first trainer surface stays visually dominated by market/trading actions while verbose diagnostics remain available in secondary/debug zones.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/REPLAY_ENGINE.md`, `03_MODULES/TRADING_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md`, `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`, `05_CODEX/NEXT_TASK.md`, current `desktop_shell/*`, and related desktop shell tests.
+- Expected result: bounded desktop-shell surface changes that keep only compact action-supporting context on the primary screen, move verbose lifecycle/raw text into secondary/debug areas, and verify the separation with focused tests plus state sync updates.
+- Outcome: kept the primary chart footer compact, added a short action snapshot beside compact context, introduced an explicit debug/raw tab for recent chart detail, and preserved full workflow/raw diagnostics below the workspace without changing replay/trading/journal ownership.

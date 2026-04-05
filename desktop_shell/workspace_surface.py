@@ -70,6 +70,23 @@ def build_main_screen_layout_spec() -> dict[str, Any]:
             "review_entry",
             "secondary_debug",
         ],
+        "primary_surface_allows": [
+            "compact_replay_state",
+            "compact_trade_session_state",
+            "compact_review_availability",
+            "compact_action_warning",
+            "compact_action_snapshot",
+            "chart_first_emphasis",
+        ],
+        "primary_surface_excludes": [
+            "long_readiness_prose",
+            "long_recovery_prose",
+            "long_finalization_prose",
+            "repeated_workflow_narration",
+            "verbose_derived_explanations",
+            "debug_like_text_blocks",
+            "raw_chart_bar_dump",
+        ],
         "zones": {
             "top_bar": {
                 "role": "replay_session_bar",
@@ -88,6 +105,7 @@ def build_main_screen_layout_spec() -> dict[str, Any]:
                 "role": "primary",
                 "dominance": "largest",
                 "weight": 5,
+                "primary_footer": "compact_chart_summary_only",
             },
             "right_workspace_rail": {
                 "role": "supporting_primary",
@@ -105,6 +123,7 @@ def build_main_screen_layout_spec() -> dict[str, Any]:
                     "workflow_diagnostics",
                     "history_timeline",
                     "authoring_review_forms",
+                    "debug_chart_detail",
                     "raw_state_tabs",
                 ],
             },

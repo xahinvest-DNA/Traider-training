@@ -24,6 +24,7 @@ from .chart_surface import (
     build_ao_values,
     build_bar_segments,
     build_chart_visual_summary,
+    build_primary_chart_footer_lines,
     build_fractal_canvas_markers,
     build_fractal_markers,
     build_overlay_line_points,
@@ -48,6 +49,7 @@ from .history_surface import (
 from .workflow_surface import (
     build_action_feedback_lines,
     build_finalization_blocker_lines,
+    build_primary_workflow_snapshot_lines,
     build_workflow_guidance_lines,
 )
 from .workspace_surface import (
@@ -225,8 +227,10 @@ class TraderTrainerDesktopApp:
         self.compact_context_frame = ttk.LabelFrame(sidebar, text="Compact Context", padding=8)
         self.compact_context_frame.grid(row=1, column=0, sticky="nsew", pady=(0, 8))
         self.compact_context_frame.columnconfigure(0, weight=1)
+        self.primary_status_label = ttk.Label(self.compact_context_frame, justify="left", anchor="w")
+        self.primary_status_label.grid(row=0, column=0, sticky="ew", pady=(0, 8))
         self.compact_context_label = ttk.Label(self.compact_context_frame, justify="left", anchor="w")
-        self.compact_context_label.grid(row=0, column=0, sticky="nsew")
+        self.compact_context_label.grid(row=1, column=0, sticky="nsew")
 
         review_frame = ttk.LabelFrame(sidebar, text="Review Entry", padding=8)
         review_frame.grid(row=2, column=0, sticky="nsew")
@@ -303,6 +307,14 @@ class TraderTrainerDesktopApp:
         self.latest_result_label.grid(row=2, column=1, sticky="nsew")
         secondary.add(history_frame, text="History / Timeline")
         self.secondary_tabs["history"] = history_frame
+
+        debug_frame = ttk.Frame(secondary, padding=8)
+        debug_frame.columnconfigure(0, weight=1)
+        debug_frame.rowconfigure(0, weight=1)
+        self.chart_debug_label = ttk.Label(debug_frame, justify="left", anchor="nw")
+        self.chart_debug_label.grid(row=0, column=0, sticky="nsew")
+        secondary.add(debug_frame, text="Debug / Raw State")
+        self.secondary_tabs["debug"] = debug_frame
 
         replay_frame = ttk.Frame(secondary, padding=8)
         replay_frame.columnconfigure(0, weight=1)
@@ -425,9 +437,11 @@ class TraderTrainerDesktopApp:
         alligator = build_alligator_lines(bars)
         fractals = build_fractal_markers(bars)
         ao_values = build_ao_values(bars)
-        footer_lines = build_chart_visual_summary(chart_context) + build_tick_table_lines(chart_context, limit=4)
+        footer_lines = build_primary_chart_footer_lines(chart_context)
+        debug_lines = ["Chart debug detail:"] + build_tick_table_lines(chart_context, limit=8) + ["", "Raw state tabs: Replay State | Trading State | Journal / Result"]
         self.chart_header.configure(text="\n".join(header_lines))
         self.chart_footer.configure(text="\n".join(footer_lines))
+        self.chart_debug_label.configure(text="\n".join(debug_lines))
 
         width = max(640, self.chart_canvas.winfo_width())
         height = max(420, self.chart_canvas.winfo_height())
@@ -514,6 +528,7 @@ class TraderTrainerDesktopApp:
         self.timeline_preview_label.configure(text="\n".join(build_timeline_preview_lines(journal_view)))
 
     def _render_workflow_surface(self, replay_view: dict, trading_view: dict, journal_view: dict) -> None:
+        self.primary_status_label.configure(text="\n".join(build_primary_workflow_snapshot_lines(replay_view, trading_view, journal_view, self.last_action_feedback)))
         self.workflow_guidance_label.configure(text="\n".join(build_workflow_guidance_lines(replay_view, trading_view, journal_view)))
         self.blocker_status_label.configure(text="\n".join(build_finalization_blocker_lines(journal_view, trading_view)))
         self.action_feedback_label.configure(text="\n".join(build_action_feedback_lines(self.last_action_feedback, journal_view)))

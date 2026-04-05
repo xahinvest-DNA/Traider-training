@@ -2,19 +2,19 @@
 
 Last updated: 2026-04-05
 Status: ready
-Task ID: T-127
+Task ID: T-128
 Task type: implementation
 
 ## Goal
-Implement one bounded `Desktop Main-Surface Text Reduction and Secondary-Debug Separation` slice so the accepted chart-first workspace keeps the new Bill Williams chart boundary visually primary while long workflow/readiness/recovery/finalization prose is further demoted into secondary or debug surfaces without deleting useful diagnostics.
+Implement one bounded `Desktop Trader Panel and Compact Context Surface` slice so the accepted chart-first workspace presents trading actions and nearby factual trade/session context as one coherent trader-facing surface without reopening startup, chart-boundary, review-form, or ownership scope.
 
 ## Why this is next
-`T-126` completed the mandatory chart boundary, so the next remaining desktop-reset gap from `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md` is protecting the primary surface from shell-text regression.
+`T-127` protected the primary workspace from shell-text regression, so the next remaining desktop-reset gap from `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md` is tightening the trader panel and compact context surface around the now-stable chart-first workspace.
 
 ## What should change
-1. Reduce long text blocks on the primary workspace surface.
-2. Keep compact factual context near chart and trading, but push verbose lifecycle/prose into secondary or debug areas.
-3. Preserve diagnostic visibility and current ownership boundaries.
+1. Make the trading interaction area read as one coherent trader panel instead of a control cluster carried forward from the shell.
+2. Keep only the accepted factual trade/session context next to chart and trading actions.
+3. Preserve the existing chart boundary, startup chooser, review entry, and secondary/debug visibility.
 
 ## What must stay unchanged
 - no chart-boundary redesign again
@@ -24,7 +24,7 @@ Implement one bounded `Desktop Main-Surface Text Reduction and Secondary-Debug S
 - no dashboard/mobile/sync/mentor/platform scope
 
 ## Recommended validation
-Run one bounded desktop-shell test pass that confirms the primary surface stays chart-first and compact while verbose diagnostics remain accessible in secondary/debug zones.
+Run one bounded desktop-shell test pass that confirms the trading panel and compact context remain coherent, factual, and adjacent to the chart-first workspace without disturbing secondary/debug separation.
 
 ## Required handoff format
 Use `05_CODEX/HANDOFF_TEMPLATE.md` exactly.

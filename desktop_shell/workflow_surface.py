@@ -368,6 +368,53 @@ def build_action_feedback_lines(feedback: dict[str, str] | None, journal_view: d
     return lines
 
 
+def build_primary_workflow_snapshot_lines(
+    replay_view: dict[str, Any],
+    trading_view: dict[str, Any],
+    journal_view: dict[str, Any],
+    feedback: dict[str, str] | None = None,
+) -> list[str]:
+    summary = journal_view["session_review_summary"]
+    finalization = journal_view["session_finalization"]
+    transition_state = build_transition_state_view(journal_view, trading_view)
+    lines = ["Action snapshot:"]
+
+    if finalization["is_session_finalized"]:
+        lines.append("Session finalized: review history or start a new local session.")
+    elif trading_view.get("pending_stop_present"):
+        side = trading_view.get("pending_stop_side") or "-"
+        trigger = trading_view.get("pending_stop_trigger_price")
+        lines.append(
+            f"Pending stop: {side} @ {trigger if trigger is not None else '-'}; wait for trigger or cancel entry."
+        )
+    elif transition_state["pending_entry_staged"]:
+        lines.append("Pending entry: advance replay or resume playback to reach the fill.")
+    elif trading_view["active_trade_present"] and trading_view.get("trade_partially_closed"):
+        lines.append(
+            f"Active trade: manage the remaining {trading_view.get('current_open_volume', 0.0)} volume."
+        )
+    elif trading_view["active_trade_present"]:
+        lines.append("Active trade: manage the open position from the trading panel.")
+    elif summary.get("pending_review_trade_count", 0) > 0:
+        pending_trade_id = journal_view.get("review_pending_trade_id") or summary.get("latest_pending_review_trade_id") or "-"
+        lines.append(f"Review pending: open PostTradeReview for {pending_trade_id}.")
+    elif journal_view.get("pre_trade_note_count", 0) > 0:
+        lines.append("Ready: pre-trade context exists; open a trade or continue replay observation.")
+    else:
+        lines.append("Ready: add PreTradeNote or continue replay observation.")
+
+    if transition_state.get("recovery_acknowledgment_status") == "acknowledgment_needed":
+        lines.append("Recovery warning: review needed before treating the session as clean.")
+    elif finalization.get("replay_running"):
+        lines.append("Replay running: pause before finalization or close-state actions.")
+
+    active_feedback = feedback or _build_recovery_feedback(journal_view)
+    if active_feedback:
+        lines.append(f"Recent action: {active_feedback.get('summary', '-')}")
+
+    return lines[:4]
+
+
 def _build_recovery_feedback(journal_view: dict[str, Any] | None) -> dict[str, str] | None:
     if not journal_view:
         return None

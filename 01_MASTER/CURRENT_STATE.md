@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-05
-Current stage: bounded desktop trainer mandatory chart boundary slice is completed; the desktop workspace now shows the first product-credible Bill Williams chart minimum while text-heavy secondary/debug separation remains the next bounded gap
-Active module: `T-126 Desktop Trainer Mandatory Chart Boundary` is completed
-Active question: whether the next desktop-reset frontier should now reduce main-surface text pressure and further demote secondary/debug surfaces without disturbing the accepted chart-first workspace and Bill Williams chart boundary
+Current stage: bounded desktop main-surface text reduction and secondary-debug separation slice is completed; the desktop workspace now keeps the Bill Williams chart-first surface primary while verbose diagnostics remain available below as secondary/debug support
+Active module: `T-127 Desktop Main-Surface Text Reduction and Secondary-Debug Separation` is completed
+Active question: whether the next desktop-reset frontier should now tighten the trader panel and compact factual context around the accepted chart-first surface without reopening chart/startup/review scope
 
 ## Where the project is now
 
@@ -11,6 +11,7 @@ The project is in the sequential implementation stage of the first working proto
 
 At this point:
 
+- bounded desktop main-surface text reduction and secondary/debug separation is implemented in `desktop_shell/`, so the primary workspace now keeps only compact action-supporting status near chart and trading while verbose workflow and raw/debug details stay accessible below in secondary/debug surfaces;
 - bounded desktop trainer mandatory chart boundary is implemented in `desktop_shell/`, so the main chart area now renders `bar chart only` with `Alligator` and `Fractals` overlays plus a separate lower `AO` pane inside the existing chart-first workspace;
 - bounded desktop trainer start flow clarification is implemented in `desktop_shell/launch.py`, so prepared dataset, raw import, new session, and resume last local session are now explicit startup paths instead of implicit launch behavior;
 - the accepted chart-first desktop trainer workspace boundary and implementation sequence are now present in `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md` and `05_CODEX/DESKTOP_TRAINER_WORKSPACE_IMPLEMENTATION_SEQUENCE.md`;
@@ -164,7 +165,7 @@ At this point:
 
 ## Next step
 
-Run one bounded post-implementation validation pass on `Desktop Startup Pending-Entry Actionability` before selecting any broader follow-up.
+Open one bounded coding packet for `T-128 Desktop Trader Panel and Compact Context Surface` so the accepted chart-first workspace can tighten the trading interaction area and compact factual trade context without reopening startup, chart-boundary, or review-form redesign.
 
 ## What must not be lost in a new chat
 
