@@ -390,3 +390,39 @@ The live/current trade loop now keeps the trader anchored to the trader's own de
 
 ### Recommended next step
 Run `T-112: Post-Current-Trade-Plan-Context Next-Slice Audit`.
+
+## 2026-04-05 - T-112 Post-Current-Trade-Plan-Context Next-Slice Audit
+
+### Goal
+Run one bounded managerial/product audit after Current Trade Plan Context so the repository selects the next strongest local desktop product-facing slice without mechanically expanding plan visibility into plan management, reopening protection-lane growth, backfilling review-loop micro-slices, or drifting into mentor, dashboard/media, workflow-engine, mobile, sync, or new-persistence scope.
+
+### Files created
+- `05_CODEX/PENDING_STOP_ENTRY.md`
+
+### Files updated
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Audited the frontier after `T-111` against user-visible gain, desktop-first/local-first boundaries, and anti-drift rules instead of continuing the plan-context lane by inertia.
+- Explicitly rejected weak candidates: plan management, plan scoring, richer note workflow, checklist logic, acknowledgment/orchestration behavior, protection-lane continuation, add-on/partial-close expansion, pending-order orchestration drift, review/digest/evidence backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync/new-persistence drift.
+- Selected `Pending Stop Entry` as the strongest next bounded slice because the live trade loop still lacks the accepted trigger-based entry path already implied by the trading and desktop contracts, making it a stronger gain than any further plan-recall extension.
+- Added one new implementation-facing boundary document for the selected slice and promoted it into the active task packet as `T-113`.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop shell code was not changed.
+- Tests were not changed.
+- Module documents and tech schemas were not changed.
+- `DECISIONS.md` was not changed because no project-level decision was required.
+
+### Why this matters
+The strongest next gain is no longer another recall or guidance layer. It is expanding the executable live trade loop with one accepted trigger-based entry path. That improves the product more directly than continuing plan visibility, while still staying inside the current one-trade local desktop boundary.
+
+### Remaining gap after this step
+- `Pending Stop Entry` is now defined but not yet implemented in runtime, desktop projections, or tests.
+
+### Recommended next step
+Implement `T-113: Pending Stop Entry Slice`.

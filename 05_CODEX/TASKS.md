@@ -900,8 +900,17 @@
 
 ### T-112
 
-- Status: active
+- Status: completed
 - Module: Post-Current-Trade-Plan-Context Next-Slice Audit
 - Goal: run one bounded managerial/product audit after Current Trade Plan Context so the repository selects the next strongest local desktop product-facing slice without mechanically expanding plan visibility into plan management, reopening protection-lane growth, backfilling review-loop micro-slices, or drifting into mentor, dashboard/media, workflow-engine, mobile, sync, or new-persistence scope.
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/CURRENT_TRADE_PLAN_CONTEXT.md`
 - Expected result: one explicit bounded next-step decision plus one new implementation-facing document only if the audit finds a clearly justified next slice.
+- Outcome: rejected plan management/scoring, richer note workflow, checklist or acknowledgment logic, protection-lane continuation, add-on/partial-close/pending-order orchestration drift, review backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync/new-persistence drift; selected Pending Stop Entry as the strongest next bounded local desktop slice because the live trade loop still lacks the accepted trigger-based entry path already implied by the trading and desktop contracts.
+
+### T-113
+
+- Status: active
+- Module: Pending Stop Entry Slice
+- Goal: implement one bounded pending stop entry slice so the current desktop-first/local-first product can support accepted BuyStop / SellStop trigger-based entry inside the one-trade replay workflow without turning the product into pending-order orchestration, broader risk management, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/PENDING_STOP_ENTRY.md`
+- Expected result: one bounded pending stop entry path across existing trading/context/result/workflow surfaces only.

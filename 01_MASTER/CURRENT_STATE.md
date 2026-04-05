@@ -1,9 +1,9 @@
 # Current State
 
-Last updated: 2026-04-04
-Current stage: Current Trade Plan Context implemented; next bounded frontier must now be selected without turning plan visibility into plan management, mentor logic, or workflow-engine drift
-Active module: post-Current-Trade-Plan-Context audit is the next active packet after bounded factual plan recall
-Active question: after bounded current-trade plan recall is implemented, which one next local desktop product-facing slice gives the strongest user-visible gain without reopening review-loop layering, protection-lane expansion, or broader orchestration scope
+Last updated: 2026-04-05
+Current stage: post-Current-Trade-Plan-Context audit completed; Pending Stop Entry selected as the next bounded local desktop frontier
+Active module: Pending Stop Entry is the next implementation slice after bounded current-trade plan recall
+Active question: how should the current desktop-first/local-first product add one bounded pending stop entry path inside the one-trade replay workflow without turning the product into pending-order orchestration, broader risk management, mentor logic, or a new persistence layer
 
 ## Where the project is now
 
@@ -97,8 +97,8 @@ At this point:
 - the broader post-review-loop audit rejects further review-derived layering, replay garnish, import hardening as the main next frontier, add-on/partial-close expansion, and replay-mode polishing as weaker candidates, and selects Initial Trade Protection as the strongest next local desktop product lane because it improves active trade discipline inside the core training loop;
 - bounded Initial Trade Protection is implemented across runtime trading contracts, desktop trading/context/result surfaces, and restart recovery so the current one-trade replay workflow now supports optional initial `stopLoss` / `takeProfit` without creating a broader risk engine, new persistence, or a new workflow owner;
 - the bounded post-Initial-Trade-Protection audit rejects further protection-lane continuation such as trailing stops, break-even automation, SL/TP edit history, pending-order orchestration, add-on or partial-close expansion, review-loop backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync drift, and selects Current Trade Plan Context as the strongest next local desktop slice because the live trade loop still loses the user's own declared setup/thesis/risk plan after entry;
-- bounded Current Trade Plan Context is implemented as a derive-on-read layer over linked PreTradeNote and trade facts, and is surfaced only through existing desktop context, esult, and workflow projections so active/current and just-closed trades keep declared setup/thesis/risk-plan facts visible without creating a new owner of truth, persisted summary, mentor layer, or workflow engine;
-- the bounded post-evidence-follow-up audit rejects further evidence-chain continuation, recovery-tail micro-polish, dashboard/media expansion, mentor logic, queue/blocker orchestration, and mobile/sync drift as the wrong current frontier for the local desktop review loop;
+- bounded Current Trade Plan Context is implemented as a derive-on-read layer over linked `PreTradeNote` and trade facts, and is surfaced only through existing desktop `context`, `result`, and `workflow` projections so active/current and just-closed trades keep declared setup/thesis/risk-plan facts visible without creating a new owner of truth, persisted summary, mentor layer, or workflow engine;
+- the bounded post-Current-Trade-Plan-Context audit rejects further plan management, plan scoring, richer note workflow, checklist or acknowledgment logic, protection-lane continuation, review/digest/evidence backfill, cosmetic polish, mentor/dashboard/media/mobile/sync drift, and selects Pending Stop Entry as the strongest next local desktop slice because the live trade loop still lacks the accepted trigger-based entry path already implied by the trading and desktop contracts;
 - the audit selects Current Trade Review Digest as the strongest next slice because the main remaining product gap is no longer evidence diagnosis or evidence actionability, but fragmented review feedback across many small signals;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
 - desktop launch now accepts raw dataset files, auto-imports them into local normalized artifacts before controller bootstrap, auto-relaunches through the ASCII-path Tk-capable interpreter `C:\Python311\python.exe` when the current Python cannot initialize Tk/Tcl, and still falls back to a non-GUI readiness report if no working Tk runtime is available;
@@ -155,7 +155,7 @@ At this point:
 
 ## Next step
 
-The next working step is to run one bounded post-Current-Trade-Plan-Context audit so the repository selects the next strongest local desktop product-facing slice without mechanically extending plan visibility, reopening protection management, or drifting into mentor logic, dashboard/media scope, mobile, sync, or new persistence.
+The next working step is to implement one bounded Pending Stop Entry slice so the current desktop-first/local-first product can support one accepted trigger-based entry path inside the one-trade replay workflow without expanding into pending-order orchestration, broader risk management, mentor logic, mobile, sync, or new persistence.
 
 ## What must not be lost in a new chat
 
@@ -168,6 +168,7 @@ The next working step is to run one bounded post-Current-Trade-Plan-Context audi
 - `desktop_shell/` already exists as a thin UI layer over accepted runtime projections; the next step must not turn it into a new domain layer or large UI platform.
 - `INITIAL_TRADE_PROTECTION.md` now fixes the bounded live-trade protection contract; follow-up work must not silently turn that slice into a broader risk-management subsystem.
 - `CURRENT_TRADE_PLAN_CONTEXT.md` now fixes the bounded live-trade plan-recall contract; follow-up work must not silently turn plan visibility into plan management, mentor scoring, note orchestration, or a new plan-summary owner.
+- `PENDING_STOP_ENTRY.md` now fixes the next bounded live-trade frontier; follow-up work must not silently turn pending stop support into a broader pending-order orchestration or risk-management subsystem.
 - Any step beyond the bounded local-first desktop workflow requires a separate Project Brain fixation.
 
 
