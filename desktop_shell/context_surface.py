@@ -26,7 +26,10 @@ def build_trade_context_lines(trading_view: dict[str, Any], journal_view: dict[s
     execution_label = last_execution["execution_type"] if last_execution else "none"
     dataset_quality = trading_view.get("dataset_quality_context") or {}
     plan_context = (journal_view or {}).get("current_trade_plan_context") or {}
-    transition_state = build_transition_state_view(journal_view or {"session_finalization": {"is_session_finalized": False, "replay_running": False}, "session_review_summary": {}}, trading_view) if journal_view else None
+    transition_state = build_transition_state_view(
+        journal_view or {"session_finalization": {"is_session_finalized": False, "replay_running": False}, "session_review_summary": {}},
+        trading_view,
+    ) if journal_view else None
     pending_trigger_price = trading_view.get("pending_stop_trigger_price")
     pending_stop_loss = trading_view.get("pending_stop_stop_loss")
     pending_take_profit = trading_view.get("pending_stop_take_profit")
@@ -36,6 +39,7 @@ def build_trade_context_lines(trading_view: dict[str, Any], journal_view: dict[s
         f"Active trade: {'yes' if trading_view['active_trade_present'] else 'no'}",
         f"Trade lifecycle focus: {transition_state['lifecycle_label'] if transition_state else ('active_trade_open' if trading_view['active_trade_present'] else 'idle')}",
         f"Trade lifecycle text: {transition_state['lifecycle_text'] if transition_state else ('Active trade is open.' if trading_view['active_trade_present'] else 'No trade lifecycle is currently in progress.')}",
+        f"Pending entry: {'yes' if trading_view.get('entry_pending_present') else 'no'}",
         f"Pending stop: {'yes' if trading_view.get('pending_stop_present') else 'no'}",
         f"Pending stop side: {trading_view.get('pending_stop_side') or '-'}",
         f"Pending stop trigger: {pending_trigger_price if pending_trigger_price is not None else '-'}",
@@ -244,126 +248,6 @@ def build_review_summary_lines(journal_view: dict[str, Any]) -> list[str]:
     ]
 
 
-def build_finalization_lines(journal_view: dict[str, Any], trading_view: dict[str, Any] | None = None) -> list[str]:
-    finalization = journal_view["session_finalization"]
-    transition_state = build_transition_state_view(journal_view, trading_view)
-    pending_ids = ", ".join(finalization["pending_review_trade_ids"]) or "none"
-    return [
-        f"Finalized: {'yes' if finalization['is_session_finalized'] else 'no'}",
-        f"Reason: {finalization['finalization_reason'] or '-'}",
-        f"Replay running: {'yes' if finalization['replay_running'] else 'no'}",
-        f"Trade lifecycle in progress: {transition_state['lifecycle_label']}",
-        f"Lifecycle text: {transition_state['lifecycle_text']}",
-        f"Pending review ids: {pending_ids}",
-        f"Can finalize: {'yes' if finalization['can_finalize_without_force'] else 'no'}",
-        f"Can force finalize: {'yes' if finalization['can_finalize_with_force'] else 'no'}",
-        f"Finalization dataset link: {transition_state['finalization_link_status']}",
-        f"Finalization dataset text: {transition_state['finalization_link_text']}",
-        f"Recovery follow-up: {transition_state['recovery_acknowledgment_text'] if transition_state['recovery_acknowledgment_text'] != 'none' else '-'}",
-    ]
-
-
-def build_latest_result_lines(journal_view: dict[str, Any], trading_view: dict[str, Any] | None = None) -> list[str]:
-    latest_trade_result = journal_view["derived_review_output"]["latest_trade_result"]
-    if latest_trade_result is None:
-        if trading_view and trading_view.get("trade_partially_closed"):
-            last_execution = trading_view.get("last_execution_outcome") or {}
-            return [
-                "Latest result: active trade is partially closed",
-                f"Remaining open volume: {trading_view.get('current_open_volume', 0.0)}",
-                f"Realized PnL so far: {trading_view.get('realised_pnl', 0.0)}",
-                f"Last execution: {last_execution.get('execution_type') or '-'}",
-            ]
-        return ["Latest result: no closed trades yet"]
-    facets = latest_trade_result["method_facets"]
-    delta = latest_trade_result["intent_delta"]
-    completeness = latest_trade_result["review_completeness"]
-    review_sequence = latest_trade_result["review_sequence"]
-    review_rule_context = latest_trade_result.get("review_rule_context", {})
-    review_discipline_cue = latest_trade_result.get("review_discipline_cue", {})
-    review_discipline_badge = latest_trade_result.get("review_discipline_badge", {})
-    review_discipline_token = latest_trade_result.get("review_discipline_token", {})
-    review_discipline_marker = latest_trade_result.get("review_discipline_marker", {})
-    review_discipline_glyph = latest_trade_result.get("review_discipline_glyph", {})
-    review_discipline_sigil = latest_trade_result.get("review_discipline_sigil", {})
-    review_discipline_seal = latest_trade_result.get("review_discipline_seal", {})
-    review_discipline_crest = latest_trade_result.get("review_discipline_crest", {})
-    review_discipline_emblem = latest_trade_result.get("review_discipline_emblem", {})
-    review_discipline_reason = latest_trade_result.get("review_discipline_reason", {})
-    review_dataset_quality_link = latest_trade_result.get("review_dataset_quality_link", {})
-    review_evidence_status = latest_trade_result.get("bill_williams_review_evidence_status") or "-"
-    review_evidence_text = latest_trade_result.get("bill_williams_review_evidence_text") or "-"
-    review_follow_up_status = latest_trade_result.get("bill_williams_review_evidence_follow_up_status") or "-"
-    review_follow_up_text = latest_trade_result.get("bill_williams_review_evidence_follow_up_text") or "-"
-    digest_status = latest_trade_result.get("current_trade_review_digest_status") or "not_applicable"
-    digest_headline = latest_trade_result.get("current_trade_review_digest_headline") or "-"
-    digest_primary_gap = latest_trade_result.get("current_trade_review_digest_primary_gap") or "-"
-    digest_next_step = latest_trade_result.get("current_trade_review_digest_next_step") or "-"
-    plan_context = latest_trade_result.get("current_trade_plan_context") or {}
-    dataset_quality = journal_view.get("dataset_quality_context") or {}
-    missing_parts = ", ".join(completeness["missing_parts"]) or "none"
-    recommended_order = " -> ".join(review_sequence["recommended_missing_order"]) or "none"
-    return [
-        f"Latest trade: {latest_trade_result['trade_id']}",
-        f"Outcome: {latest_trade_result['outcome_label']}",
-        f"PnL: {latest_trade_result['realised_pnl']}",
-        f"Holding seconds: {latest_trade_result['holding_time_seconds']}",
-        f"Close reason: {latest_trade_result['close_reason'] or '-'}",
-        f"Protection present: {'yes' if latest_trade_result.get('has_initial_trade_protection') else 'no'}",
-        f"Stop loss / take profit: {latest_trade_result.get('stop_loss') if latest_trade_result.get('stop_loss') is not None else '-'} / {latest_trade_result.get('take_profit') if latest_trade_result.get('take_profit') is not None else '-'}",
-        f"Declared plan: {'present' if plan_context.get('plan_present') else 'absent'}",
-        f"Declared setup: {plan_context.get('declared_setup_tag') or '-'}",
-        f"Thesis summary: {plan_context.get('thesis_summary') or '-'}",
-        f"Risk plan: {plan_context.get('risk_plan') or '-'}",
-        f"Setup: {latest_trade_result['setup_tag'] or '-'}",
-        f"Compliance: {latest_trade_result['compliance_label'] or '-'}",
-        f"Intent delta: {delta['delta_status']}",
-        f"Declared/reviewed: {delta['declared_setup_tag'] or '-'} / {delta['reviewed_setup_tag'] or '-'}",
-        f"Review completeness: {completeness['completeness_status']} ({completeness['filled_part_count']}/{completeness['total_part_count']})",
-        f"Next review field: {review_sequence['next_field'] or '-'}",
-        f"Recommended order: {recommended_order}",
-        f"Missing review parts: {missing_parts}",
-        f"Variant: {facets['setup_variant'] or '-'}",
-        f"Entry/context: {facets['entry_timing_label'] or '-'} / {facets['market_context_label'] or '-'}",
-        f"Exit/clarity: {facets['exit_quality_label'] or '-'} / {facets['review_clarity_label'] or '-'}",
-        f"Rule context: {review_rule_context.get('context_status') or '-'}",
-        f"Rule context text: {review_rule_context.get('context_text') or '-'}",
-        f"Review discipline cue: {review_discipline_cue.get('cue_status') or '-'}",
-        f"Discipline cue text: {review_discipline_cue.get('cue_text') or '-'}",
-        f"Review discipline badge: {review_discipline_badge.get('badge_status') or '-'}",
-        f"Discipline badge text: {review_discipline_badge.get('badge_text') or '-'}",
-        f"Review discipline token: {review_discipline_token.get('token_status') or '-'}",
-        f"Discipline token text: {review_discipline_token.get('token_text') or '-'}",
-        f"Review discipline marker: {review_discipline_marker.get('marker_status') or '-'}",
-        f"Discipline marker text: {review_discipline_marker.get('marker_text') or '-'}",
-        f"Review discipline glyph: {review_discipline_glyph.get('glyph_status') or '-'}",
-        f"Discipline glyph text: {review_discipline_glyph.get('glyph_text') or '-'}",
-        f"Review discipline sigil: {review_discipline_sigil.get('sigil_status') or '-'}",
-        f"Discipline sigil text: {review_discipline_sigil.get('sigil_text') or '-'}",
-        f"Review discipline seal: {review_discipline_seal.get('seal_status') or '-'}",
-        f"Discipline seal text: {review_discipline_seal.get('seal_text') or '-'}",
-        f"Review discipline crest: {review_discipline_crest.get('crest_status') or '-'}",
-        f"Discipline crest text: {review_discipline_crest.get('crest_text') or '-'}",
-        f"Review discipline emblem: {review_discipline_emblem.get('emblem_status') or '-'}",
-        f"Discipline emblem text: {review_discipline_emblem.get('emblem_text') or '-'}",
-        f"Review discipline reason: {review_discipline_reason.get('reason_status') or '-'}",
-        f"Discipline reason text: {review_discipline_reason.get('reason_text') or '-'}",
-        f"Review dataset link: {review_dataset_quality_link.get('link_status') or '-'}",
-        f"Review dataset link text: {review_dataset_quality_link.get('link_text') or '-'}",
-        f"Review digest: {digest_status}",
-        f"Digest headline: {digest_headline}",
-        f"Digest primary gap: {digest_primary_gap}",
-        f"Digest next step: {digest_next_step}",
-        f"Review evidence: {review_evidence_status}",
-        f"Review evidence text: {review_evidence_text}",
-        f"Review evidence follow-up: {review_follow_up_status}",
-        f"Review evidence next step: {review_follow_up_text}",
-        f"Dataset quality context: {dataset_quality.get('context_status') or '-'}",
-        f"Dataset quality text: {dataset_quality.get('context_text') or '-'}",
-        f"Review status: {latest_trade_result['review_status']}",
-    ]
-
-
 
 def _build_plan_context_lines(plan_context: dict[str, Any] | None) -> list[str]:
     if plan_context is None or not plan_context:
@@ -374,7 +258,3 @@ def _build_plan_context_lines(plan_context: dict[str, Any] | None) -> list[str]:
         f"Thesis summary: {plan_context.get('thesis_summary') or '-'}",
         f"Risk plan: {plan_context.get('risk_plan') or '-'}",
     ]
-
-
-
-
