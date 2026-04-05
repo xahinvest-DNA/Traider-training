@@ -3142,3 +3142,90 @@ def test_desktop_shell_surfaces_pending_stop_entry_and_restart_recovery() -> Non
     assert any(line == "Active trade: yes" for line in recovered_triggered_trade_lines)
     assert any(line == "Pending stop result: triggered" for line in recovered_triggered_trade_lines)
     assert any(line == "Last execution reason: pending_stop_trigger" for line in recovered_triggered_trade_lines)
+
+
+def _install_desktop_memory_storage(monkeypatch: pytest.MonkeyPatch, storage_dir: Path) -> Path:
+    storage_path = storage_dir / "local_runtime_state.json"
+    payloads: dict[str, str] = {}
+    real_exists = Path.exists
+    real_mkdir = Path.mkdir
+    real_write_text = Path.write_text
+    real_read_text = Path.read_text
+
+    def patched_exists(self: Path) -> bool:
+        if self == storage_dir:
+            return True
+        if self == storage_path:
+            return storage_path.as_posix() in payloads
+        return real_exists(self)
+
+    def patched_mkdir(self: Path, mode: int = 0o777, parents: bool = False, exist_ok: bool = False) -> None:
+        if self == storage_dir:
+            return None
+        return real_mkdir(self, mode=mode, parents=parents, exist_ok=exist_ok)
+
+    def patched_write_text(self: Path, data: str, encoding: str | None = None, errors: str | None = None, newline: str | None = None) -> int:
+        if self == storage_path:
+            payloads[storage_path.as_posix()] = data
+            return len(data)
+        return real_write_text(self, data, encoding=encoding, errors=errors, newline=newline)
+
+    def patched_read_text(self: Path, encoding: str | None = None, errors: str | None = None) -> str:
+        if self == storage_path:
+            return payloads[storage_path.as_posix()]
+        return real_read_text(self, encoding=encoding, errors=errors)
+
+    monkeypatch.setattr(Path, "exists", patched_exists)
+    monkeypatch.setattr(Path, "mkdir", patched_mkdir)
+    monkeypatch.setattr(Path, "write_text", patched_write_text)
+    monkeypatch.setattr(Path, "read_text", patched_read_text)
+    return storage_dir
+
+
+def test_desktop_shell_surfaces_partial_close_and_restart_recovery(monkeypatch: pytest.MonkeyPatch) -> None:
+    storage_dir = _install_desktop_memory_storage(monkeypatch, Path("memory/desktop-partial-close"))
+    controller = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=storage_dir,
+    )
+
+    controller.buy_market(stop_loss=1.10351)
+    controller.play()
+    controller.advance_frame()
+    controller.partial_close(0.5)
+    workspace = controller.advance_frame()
+
+    trading_view = workspace["trading"]
+    journal_view = workspace["journal"]
+    trade_lines = build_trade_context_lines(trading_view, journal_view)
+    latest_result_lines = build_latest_result_lines(journal_view, trading_view)
+    workflow_lines = build_workflow_guidance_lines(workspace["replay"], trading_view, journal_view)
+    button_map = build_button_state_map(workspace["replay"], trading_view, journal_view)
+
+    assert trading_view["trade_status"] == "partially_closed"
+    assert trading_view["trade_partially_closed"] is True
+    assert trading_view["current_open_volume"] == pytest.approx(0.5)
+    assert any(line == "Trade partially closed: yes" for line in trade_lines)
+    assert any(line == "Partial close available: yes" for line in trade_lines)
+    assert latest_result_lines[0] == "Latest result: active trade is partially closed"
+    assert any(line == "Remaining open volume: 0.5" for line in latest_result_lines)
+    assert any("partial close" in line.lower() for line in workflow_lines)
+    assert button_map["partial_close"] is True
+
+    recovered = DesktopShellController(
+        dataset_handle=FIXTURE,
+        storage_dir=storage_dir,
+    )
+    recovered_workspace = recovered.get_workspace_view()
+    recovered_trading = recovered_workspace["trading"]
+    recovered_journal = recovered_workspace["journal"]
+
+    assert recovered_journal["recovered"] is True
+    assert recovered_trading["trade_status"] == "partially_closed"
+    assert recovered_trading["current_open_volume"] == pytest.approx(0.5)
+
+    recovered.play()
+    recovered.advance_frame()
+    final_workspace = recovered.get_workspace_view()
+    assert final_workspace["trading"]["trade_status"] == "closed"
+    assert final_workspace["trading"]["last_close_reason"] == "stop_loss_hit"

@@ -927,9 +927,11 @@
 
 ### T-115
 
-- Status: active
+- Status: completed
 - Module: Partial Close Slice
 - Goal: implement one bounded partial-close slice so the current desktop-first/local-first product can support accepted active-trade volume reduction inside the one-trade replay workflow without turning the product into broader position management, richer risk automation, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/TRADING_ENGINE.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/TASKS.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, `05_CODEX/PARTIAL_CLOSE.md`
 - Expected result: one bounded partial-close path across existing trading/context/result/workflow surfaces only.
+- Outcome: implemented one bounded manual partial-close path inside the current one-trade lifecycle with execution trace, realised-PnL accumulation, same-trade ownership continuity, later manual/protective close support, compact desktop-surface visibility, and restart recovery from the same local facts only.
+
 

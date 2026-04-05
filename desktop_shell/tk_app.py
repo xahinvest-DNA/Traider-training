@@ -70,6 +70,7 @@ class TraderTrainerDesktopApp:
         self.pending_stop_trigger_value = tk.StringVar()
         self.initial_stop_loss_value = tk.StringVar()
         self.initial_take_profit_value = tk.StringVar()
+        self.partial_close_volume_value = tk.StringVar(value="0.5")
         self.pending_note_snapshot_id: str | None = None
         self.pending_review_snapshot_ids: list[str] = []
         self.last_action_feedback: dict[str, str] | None = {
@@ -119,6 +120,7 @@ class TraderTrainerDesktopApp:
             ("buy_stop", "BuyStop", self._action_buy_stop),
             ("sell_stop", "SellStop", self._action_sell_stop),
             ("cancel_entry", "Cancel Entry", self._action_cancel_entry),
+            ("partial_close", "Partial Close", self._action_partial_close),
             ("close", "Close", self._action_close),
             ("finalize", "Finalize", self._action_finalize),
             ("force_finalize", "Force Finalize", self._action_force_finalize),
@@ -140,10 +142,11 @@ class TraderTrainerDesktopApp:
         ttk.Entry(controls, textvariable=self.initial_stop_loss_value, width=12).grid(row=0, column=len(button_specs) + 6, padx=4)
         ttk.Label(controls, text="Initial TP").grid(row=0, column=len(button_specs) + 7, padx=(12, 4))
         ttk.Entry(controls, textvariable=self.initial_take_profit_value, width=12).grid(row=0, column=len(button_specs) + 8, padx=4)
+        ttk.Label(controls, text="Close vol").grid(row=0, column=len(button_specs) + 9, padx=(12, 4))
+        ttk.Entry(controls, textvariable=self.partial_close_volume_value, width=10).grid(row=0, column=len(button_specs) + 10, padx=4)
 
         self.control_hint_label = ttk.Label(controls, justify="left", anchor="w")
-        self.control_hint_label.grid(row=1, column=0, columnspan=len(button_specs) + 9, sticky="ew", pady=(6, 0))
-
+        self.control_hint_label.grid(row=1, column=0, columnspan=len(button_specs) + 11, sticky="ew", pady=(6, 0))
         left_top = ttk.LabelFrame(root, text="Chart / Replay Surface", padding=8)
         left_top.grid(row=1, column=0, sticky="nsew", padx=8, pady=8)
         left_top.columnconfigure(0, weight=1)
@@ -349,7 +352,7 @@ class TraderTrainerDesktopApp:
         self.trade_context_label.configure(text="\n".join(build_trade_context_lines(trading_view, journal_view)))
         self.review_summary_label.configure(text="\n".join(build_review_summary_lines(journal_view)))
         self.finalization_label.configure(text="\n".join(build_finalization_lines(journal_view)))
-        self.latest_result_label.configure(text="\n".join(build_latest_result_lines(journal_view)))
+        self.latest_result_label.configure(text="\n".join(build_latest_result_lines(journal_view, trading_view)))
 
     def _render_authoring_surface(self, journal_view: dict) -> None:
         self.authoring_status_label.configure(text="\n".join(build_authoring_status_lines(journal_view)))
@@ -488,6 +491,13 @@ class TraderTrainerDesktopApp:
     def _action_cancel_entry(self) -> None:
         self._run_action(self.controller.cancel_pending_entry, "Pending stop cancelled")
 
+    def _action_partial_close(self) -> None:
+        self._run_action(
+            lambda: self.controller.partial_close(float(self.partial_close_volume_value.get() or "0")),
+            f"Partial close requested: {self.partial_close_volume_value.get() or '0'}",
+        )
+
+
     def _action_close(self) -> None:
         self._run_action(self.controller.manual_close, "Manual close requested")
 
@@ -594,3 +604,6 @@ class TraderTrainerDesktopApp:
             }
             self.refresh()
             messagebox.showerror("Trader Trainer", str(exc))
+
+
+

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -175,7 +175,7 @@ def build_current_trade_plan_context(
     trades: list[TradeRecord],
     pre_trade_notes: list[PreTradeNoteRecord],
 ) -> dict | None:
-    active_trade = next((trade for trade in reversed(trades) if trade.status == "open"), None)
+    active_trade = next((trade for trade in reversed(trades) if trade.status in {"open", "partially_closed"}), None)
     target_trade = active_trade or next((trade for trade in reversed(trades) if trade.status == "closed"), None)
     if target_trade is None:
         return None
@@ -186,7 +186,7 @@ def build_current_trade_plan_context(
         **_build_trade_plan_context(latest_note),
         "trade_id": target_trade.trade_id,
         "trade_status": target_trade.status,
-        "is_active_trade": target_trade.status == "open",
+        "is_active_trade": target_trade.status in {"open", "partially_closed"},
         "close_reason": target_trade.close_reason,
     }
 
@@ -2242,3 +2242,4 @@ def _parse_utc(timestamp: str) -> datetime:
     if timestamp.endswith("Z"):
         timestamp = timestamp[:-1] + "+00:00"
     return datetime.fromisoformat(timestamp).astimezone(timezone.utc)
+

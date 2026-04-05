@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from typing import Any
 
@@ -28,6 +28,7 @@ def build_button_state_map(
         "sell_stop": entry_available and replay_status != "finished" and not is_finalized,
         "cancel_entry": trading_view.get("pending_entry_cancel_available", False) and not is_finalized,
         "close": trading_view["manual_close_available"] and not is_finalized,
+        "partial_close": trading_view.get("partial_close_available", False) and not is_finalized,
         "finalize": finalization["can_finalize_without_force"] and not is_finalized,
         "force_finalize": finalization["can_finalize_with_force"] and not is_finalized,
         "acknowledge_recovery": recovery_ack.get("acknowledgment_status") == "acknowledgment_needed",
@@ -45,7 +46,7 @@ def build_control_hint_lines(button_state_map: dict[str, bool]) -> list[str]:
     return [
         "Control availability:",
         f"Replay -> Play {yn('play')} | Pause {yn('pause')} | Advance {yn('advance')} | Speed {yn('set_speed')}",
-        f"Trade -> Buy {yn('buy')} | Sell {yn('sell')} | BuyStop {yn('buy_stop')} | SellStop {yn('sell_stop')} | Cancel pending {yn('cancel_entry')} | Close {yn('close')}",
+        f"Trade -> Buy {yn('buy')} | Sell {yn('sell')} | BuyStop {yn('buy_stop')} | SellStop {yn('sell_stop')} | Cancel pending {yn('cancel_entry')} | Partial close {yn('partial_close')} | Close {yn('close')}",
         f"Review -> Note {yn('add_note')} | Review {yn('add_review')} | Flag {yn('add_flag')} | Violation {yn('add_violation')}",
         f"Session -> Finalize {yn('finalize')} | Force finalize {yn('force_finalize')} | Review warning {yn('acknowledge_recovery')}",
     ]

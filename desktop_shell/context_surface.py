@@ -38,9 +38,12 @@ def build_trade_context_lines(trading_view: dict[str, Any], journal_view: dict[s
         f"Pending stop result: {trading_view.get('latest_pending_stop_result') or '-'}",
         f"Side: {trading_view['trade_side'] or '-'}",
         f"Open volume: {trading_view['current_open_volume']}",
+        f"Opened / closed volume: {trading_view.get('total_opened_volume', 0.0)} / {trading_view.get('total_closed_volume', 0.0)}",
+        f"Trade partially closed: {'yes' if trading_view.get('trade_partially_closed') else 'no'}",
         f"Protection present: {'yes' if trading_view.get('protection_present') else 'no'}",
         f"Stop loss / take profit: {trading_view.get('current_stop_loss') if trading_view.get('current_stop_loss') is not None else '-'} / {trading_view.get('current_take_profit') if trading_view.get('current_take_profit') is not None else '-'}",
         f"Manual close available: {'yes' if trading_view['manual_close_available'] else 'no'}",
+        f"Partial close available: {'yes' if trading_view.get('partial_close_available') else 'no'}",
         f"Last execution: {execution_label}",
         f"Last execution reason: {last_execution.get('reason') if last_execution else '-'}",
         f"Last close reason: {trading_view.get('last_close_reason') or '-'}",
@@ -254,9 +257,17 @@ def build_finalization_lines(journal_view: dict[str, Any]) -> list[str]:
     ]
 
 
-def build_latest_result_lines(journal_view: dict[str, Any]) -> list[str]:
+def build_latest_result_lines(journal_view: dict[str, Any], trading_view: dict[str, Any] | None = None) -> list[str]:
     latest_trade_result = journal_view["derived_review_output"]["latest_trade_result"]
     if latest_trade_result is None:
+        if trading_view and trading_view.get("trade_partially_closed"):
+            last_execution = trading_view.get("last_execution_outcome") or {}
+            return [
+                "Latest result: active trade is partially closed",
+                f"Remaining open volume: {trading_view.get('current_open_volume', 0.0)}",
+                f"Realized PnL so far: {trading_view.get('realised_pnl', 0.0)}",
+                f"Last execution: {last_execution.get('execution_type') or '-'}",
+            ]
         return ["Latest result: no closed trades yet"]
     facets = latest_trade_result["method_facets"]
     delta = latest_trade_result["intent_delta"]
@@ -357,3 +368,5 @@ def _build_plan_context_lines(plan_context: dict[str, Any] | None) -> list[str]:
         f"Thesis summary: {plan_context.get('thesis_summary') or '-'}",
         f"Risk plan: {plan_context.get('risk_plan') or '-'}",
     ]
+
+

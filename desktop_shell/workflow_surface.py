@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from typing import Any
 
@@ -44,18 +44,35 @@ def build_workflow_guidance_lines(
 
     if trading_view["active_trade_present"]:
         plan_context = journal_view.get("current_trade_plan_context")
+        is_partially_closed = trading_view.get("trade_partially_closed", False)
         if replay_view["status"] == "paused":
             lines = [
                 "Workflow guidance:",
-                "Active trade is open. Advance replay or resume playback to manage it.",
-                "Close the trade before trying to finalize the session.",
+                (
+                    "Active trade is partially closed. Advance replay or resume playback to manage the remaining volume."
+                    if is_partially_closed
+                    else "Active trade is open. Advance replay or resume playback to manage it."
+                ),
+                (
+                    f"Remaining open volume: {trading_view.get('current_open_volume', 0.0)}. Use partial close or full close before trying to finalize the session."
+                    if is_partially_closed
+                    else "Close the trade before trying to finalize the session."
+                ),
             ]
             _append_plan_context_lines(lines, plan_context)
             return _append_dataset_quality_context(lines, dataset_quality)
         lines = [
             "Workflow guidance:",
-            "Active trade is open while replay is running.",
-            "Monitor the trade and use manual close when you are ready.",
+            (
+                "Active trade is partially closed while replay is running."
+                if is_partially_closed
+                else "Active trade is open while replay is running."
+            ),
+            (
+                f"Monitor the remaining {trading_view.get('current_open_volume', 0.0)} volume and use partial close or manual close when you are ready."
+                if is_partially_closed
+                else "Monitor the trade and use manual close when you are ready."
+            ),
         ]
         _append_plan_context_lines(lines, plan_context)
         return _append_dataset_quality_context(lines, dataset_quality)
@@ -369,3 +386,5 @@ def _append_recovery_acknowledgment_blocker_lines(lines: list[str], recovery_ack
         lines.append("Recovery follow-up: review needed")
     elif status == "acknowledged":
         lines.append("Recovery follow-up: already reviewed")
+
+

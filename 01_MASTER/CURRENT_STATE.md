@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-05
-Current stage: post-Pending-Stop-Entry audit completed; Partial Close selected as the next bounded local desktop frontier
-Active module: Partial Close is the next implementation slice after bounded pending stop entry
-Active question: how should the current desktop-first/local-first product add one bounded partial-close path inside the one-trade replay workflow without turning the product into broader position management, richer risk automation, mentor logic, dashboard/media scope, mobile, sync, or new persistence
+Current stage: Partial Close implemented as the current bounded live-trade management slice; next frontier selection is pending a post-implementation audit
+Active module: Partial Close is implemented inside the current one-trade replay lifecycle
+Active question: what is the next strongest bounded local desktop slice after Partial Close without drifting into broader position management, richer risk automation, mentor logic, dashboard/media scope, mobile, sync, or new persistence
 
 ## Where the project is now
 
@@ -100,6 +100,7 @@ At this point:
 - bounded Current Trade Plan Context is implemented as a derive-on-read layer over linked `PreTradeNote` and trade facts, and is surfaced only through existing desktop `context`, `result`, and `workflow` projections so active/current and just-closed trades keep declared setup/thesis/risk-plan facts visible without creating a new owner of truth, persisted summary, mentor layer, or workflow engine;
 - the bounded post-Current-Trade-Plan-Context audit rejects further plan management, plan scoring, richer note workflow, checklist or acknowledgment logic, protection-lane continuation, review/digest/evidence backfill, cosmetic polish, mentor/dashboard/media/mobile/sync drift, and selects Pending Stop Entry as the strongest next local desktop slice because the live trade loop still lacks the accepted trigger-based entry path already implied by the trading and desktop contracts;
 - bounded Pending Stop Entry is implemented across runtime trading contracts, desktop trading/context/workflow surfaces, and restart recovery so the one-trade replay workflow now supports one visible `BuyStop` / `SellStop` trigger-based entry path plus minimal manual cancel before trigger, without creating pending-order orchestration, multiple pending orders, expiry logic, or new persistence;
+- bounded Partial Close is implemented across runtime trading contracts, desktop trading/context/result/workflow surfaces, and restart recovery so the one-trade replay workflow now supports accepted active-trade volume reduction inside the same trade lifecycle without creating a broader position-management subsystem, richer risk automation, or new persistence;
 - the bounded post-Pending-Stop-Entry audit rejects further pending-order management, protection-lane continuation, plan-management drift, review backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync/new-persistence drift, and selects Partial Close as the strongest next bounded local desktop slice because the live trade loop still lacks accepted active-trade volume reduction inside the existing one-trade lifecycle;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
 - desktop launch now accepts raw dataset files, auto-imports them into local normalized artifacts before controller bootstrap, auto-relaunches through the ASCII-path Tk-capable interpreter `C:\Python311\python.exe` when the current Python cannot initialize Tk/Tcl, and still falls back to a non-GUI readiness report if no working Tk runtime is available;
@@ -156,7 +157,7 @@ At this point:
 
 ## Next step
 
-The next working step is to implement one bounded Partial Close slice so the current desktop-first/local-first product can support accepted active-trade volume reduction inside the one-trade replay workflow without expanding into broader position management, richer risk automation, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
+The next working step is to run one bounded post-Partial-Close next-slice audit so the repository selects the strongest follow-up frontier without mechanically extending position management, pending-order handling, protection automation, mentor/dashboard/media scope, mobile, sync, or new persistence.
 
 ## What must not be lost in a new chat
 
@@ -171,6 +172,7 @@ The next working step is to implement one bounded Partial Close slice so the cur
 - `CURRENT_TRADE_PLAN_CONTEXT.md` now fixes the bounded live-trade plan-recall contract; follow-up work must not silently turn plan visibility into plan management, mentor scoring, note orchestration, or a new plan-summary owner.
 - `PENDING_STOP_ENTRY.md` now fixes the next bounded live-trade frontier; follow-up work must not silently turn pending stop support into a broader pending-order orchestration or risk-management subsystem.
 - Any step beyond the bounded local-first desktop workflow requires a separate Project Brain fixation.
+
 
 
 

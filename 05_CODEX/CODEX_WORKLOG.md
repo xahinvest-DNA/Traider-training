@@ -522,3 +522,46 @@ The repository had real operating drift: different top-level documents named dif
 
 ### Recommended next step
 Read the active T-115 source-of-truth set and implement the bounded Partial Close slice.
+
+## 2026-04-05 - T-115 Partial Close Slice
+
+### Goal
+Implement one bounded partial-close slice so the current desktop-first/local-first product can support accepted active-trade volume reduction inside the one-trade replay workflow without turning the product into broader position management, richer risk automation, mentor logic, dashboard/media scope, mobile, sync, or new persistence.
+
+### Files updated
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+- `runtime_bootstrap/trading_loop.py`
+- `runtime_bootstrap/journal_runtime.py`
+- `runtime_bootstrap/review_projection.py`
+- `desktop_shell/controller.py`
+- `desktop_shell/control_surface.py`
+- `desktop_shell/context_surface.py`
+- `desktop_shell/tk_app.py`
+- `desktop_shell/workflow_surface.py`
+- `tests/test_replay_bootstrap.py`
+- `tests/test_desktop_shell.py`
+
+### What was done
+- Added one bounded manual partial-close path in the trading loop so an active trade can close a requested positive sub-volume up to the current open volume while staying inside the same `TradeRecord` / `PositionRecord` / `ExecutionRecord` ownership model.
+- Recorded dedicated partial-close execution trace, accumulated realised PnL on the closed portion, preserved the remaining active volume, and kept later manual full close plus protective close working on the remainder.
+- Extended bounded desktop-facing projections and existing shell surfaces so partial-close availability, remaining/opened/closed volume, partially closed state, and current result/workflow guidance are visible without adding a new subsystem.
+- Added coverage for partial-close execution, later full close, protective close after partial, restart recovery of partially closed state, and desktop-shell visibility/recovery.
+- Synchronized operating docs from active `T-115` to completed `T-115`, with the next recommended move set to a bounded post-Partial-Close audit rather than another implementation lane by inertia.
+
+### What was not changed
+- `03_MODULES/*` was not changed.
+- `04_TECH/*` was not changed.
+- `01_MASTER/DECISIONS.md` was not changed.
+- No broader position-management lane, ladders, preset fractions, add-on, trailing stop, break-even automation, mentor/dashboard/media/mobile/sync scope, or new persistence was introduced.
+
+### Why this matters
+The live one-trade replay loop no longer collapses active-trade management to all-or-nothing exits. The product now supports one accepted partial-close step inside the existing lifecycle while preserving conservative ownership, recovery, and existing desktop surfaces.
+
+### Remaining gap after this step
+- The strongest next bounded frontier still needs to be selected explicitly instead of continuing trade-management growth by inertia.
+
+### Recommended next step
+Run one bounded post-Partial-Close next-slice audit.

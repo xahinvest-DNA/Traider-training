@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import shutil
 from pathlib import Path
@@ -3545,3 +3545,123 @@ def test_pending_stop_entry_supports_trigger_cancel_and_restart_recovery() -> No
     assert closed_result["stop_loss"] == 1.10340
     assert closed_result["take_profit"] == 1.10370
     assert closed_result["has_initial_trade_protection"] is True
+
+
+def _install_memory_storage(monkeypatch: pytest.MonkeyPatch, storage_dir: Path) -> Path:
+    storage_path = storage_dir / "local_runtime_state.json"
+    payloads: dict[str, str] = {}
+    real_exists = Path.exists
+    real_mkdir = Path.mkdir
+    real_write_text = Path.write_text
+    real_read_text = Path.read_text
+
+    def patched_exists(self: Path) -> bool:
+        if self == storage_dir:
+            return True
+        if self == storage_path:
+            return storage_path.as_posix() in payloads
+        return real_exists(self)
+
+    def patched_mkdir(self: Path, mode: int = 0o777, parents: bool = False, exist_ok: bool = False) -> None:
+        if self == storage_dir:
+            return None
+        return real_mkdir(self, mode=mode, parents=parents, exist_ok=exist_ok)
+
+    def patched_write_text(self: Path, data: str, encoding: str | None = None, errors: str | None = None, newline: str | None = None) -> int:
+        if self == storage_path:
+            payloads[storage_path.as_posix()] = data
+            return len(data)
+        return real_write_text(self, data, encoding=encoding, errors=errors, newline=newline)
+
+    def patched_read_text(self: Path, encoding: str | None = None, errors: str | None = None) -> str:
+        if self == storage_path:
+            return payloads[storage_path.as_posix()]
+        return real_read_text(self, encoding=encoding, errors=errors)
+
+    monkeypatch.setattr(Path, "exists", patched_exists)
+    monkeypatch.setattr(Path, "mkdir", patched_mkdir)
+    monkeypatch.setattr(Path, "write_text", patched_write_text)
+    monkeypatch.setattr(Path, "read_text", patched_read_text)
+    return storage_dir
+
+
+def test_partial_close_reduces_open_volume_and_allows_later_full_close(monkeypatch: pytest.MonkeyPatch) -> None:
+    session = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading = MinimalTradingLoop(session)
+    storage_dir = _install_memory_storage(monkeypatch, Path("memory/partial-close-manual"))
+    LocalJournalRuntime(session, trading, storage_dir)
+
+    trading.buy_market(volume=1.0)
+    session.play()
+    session.advance_frame()
+
+    close_order = trading.partial_close(0.4)
+    assert close_order.order_type == "ManualPartialClose"
+    assert close_order.requested_volume == pytest.approx(0.4)
+    session.advance_frame()
+
+    position = trading.state.position
+    trade = trading.state.trades[-1]
+    assert position is not None
+    assert position.status == "partially_closed"
+    assert position.current_open_volume == pytest.approx(0.6)
+    assert trade.status == "partially_closed"
+    assert trade.volume_closed == pytest.approx(0.4)
+    assert trade.realised_pnl == pytest.approx((1.10352 - 1.10360) * 0.4)
+    assert trading.state.executions[-1].execution_type == "partial_close_fill"
+    assert trading.state.executions[-1].reason == "manual_partial_close"
+
+    trading.manual_close()
+    session.advance_frame()
+
+    assert trading.state.lifecycle_state == "Terminal"
+    assert position.status == "closed"
+    assert position.current_open_volume == pytest.approx(0.0)
+    assert trade.status == "closed"
+    assert trade.volume_closed == pytest.approx(1.0)
+    assert trade.close_reason == "manual_close"
+    assert trade.average_exit_price == pytest.approx(((1.10352 * 0.4) + (1.10350 * 0.6)) / 1.0)
+    assert trade.realised_pnl == pytest.approx(((1.10352 - 1.10360) * 0.4) + ((1.10350 - 1.10360) * 0.6))
+    assert trading.state.executions[-1].execution_type == "manual_close_fill"
+
+
+def test_partial_close_survives_restart_and_allows_protective_close(monkeypatch: pytest.MonkeyPatch) -> None:
+    storage_dir = _install_memory_storage(monkeypatch, Path("memory/partial-close-recovery"))
+
+    session_1 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_1 = MinimalTradingLoop(session_1)
+    LocalJournalRuntime(session_1, trading_1, storage_dir)
+
+    trading_1.buy_market(volume=1.0, stop_loss=1.10351)
+    session_1.play()
+    session_1.advance_frame()
+    trading_1.partial_close(0.5)
+    session_1.advance_frame()
+
+    trading_view_1 = build_desktop_trading_view(trading_1)
+    assert trading_view_1["trade_status"] == "partially_closed"
+    assert trading_view_1["current_open_volume"] == pytest.approx(0.5)
+    assert trading_view_1["trade_partially_closed"] is True
+
+    session_2 = create_replay_session(str(FIXTURE), replay_mode="training")
+    trading_2 = MinimalTradingLoop(session_2)
+    journal_2 = LocalJournalRuntime(session_2, trading_2, storage_dir)
+
+    recovered_view = build_desktop_trading_view(trading_2)
+    assert journal_2.recovered is True
+    assert recovered_view["active_trade_present"] is True
+    assert recovered_view["trade_status"] == "partially_closed"
+    assert recovered_view["current_open_volume"] == pytest.approx(0.5)
+    assert recovered_view["total_closed_volume"] == pytest.approx(0.5)
+
+    session_2.play()
+    session_2.advance_frame()
+
+    final_trade = trading_2.state.trades[-1]
+    final_position = trading_2.state.position
+    assert final_position is not None
+    assert final_position.status == "closed"
+    assert final_trade.status == "closed"
+    assert final_trade.close_reason == "stop_loss_hit"
+    assert final_trade.volume_closed == pytest.approx(1.0)
+    assert trading_2.state.executions[-1].execution_type == "protective_close_fill"

@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from dataclasses import asdict
+﻿from dataclasses import asdict
 from itertools import count
 from typing import Any, Callable
 
@@ -24,6 +22,7 @@ from .types import (
 TradingSubscriber = Callable[[dict[str, Any]], None]
 PENDING_STOP_ORDER_TYPES = {"BuyStop", "SellStop"}
 MARKET_ENTRY_ORDER_TYPES = {"BuyMarket", "SellMarket"}
+ACTIVE_POSITION_STATUSES = {"open", "partially_closed"}
 
 
 class MinimalTradingLoop:
@@ -127,41 +126,27 @@ class MinimalTradingLoop:
         return order
 
     def manual_close(self) -> OrderRecord:
-        self._validate_close_allowed()
-        assert self.state.position is not None
-        order = OrderRecord(
-            order_id=self._next_id("order"),
-            session_id=self.session_id,
-            trade_id=self.state.active_trade_id,
-            instrument_id=self.replay_session.state.instrument_id,
-            order_type="ManualClose",
-            side=self.state.position.side,
-            status="placed",
-            requested_volume=self.state.position.current_open_volume,
-            created_at=self.replay_session.state.simulation_time,
-            replay_mode=self.replay_session.state.replay_mode,
-        )
-        self.state.orders.append(order)
-        self.state.pending_close_order_id = order.order_id
-        self.state.lifecycle_state = "CloseRequested"
-        self._publish("OrderPlaced", {"order_id": order.order_id, "order_type": order.order_type})
-        return order
+        return self._request_close(order_type="ManualClose", requested_volume=None)
+
+    def partial_close(self, volume: float) -> OrderRecord:
+        return self._request_close(order_type="ManualPartialClose", requested_volume=volume)
 
     def get_active_trade_count(self) -> int:
-        return 1 if self.state.position and self.state.position.status == "open" else 0
+        return 1 if self.state.position and self.state.position.status in ACTIVE_POSITION_STATUSES else 0
 
     def build_desktop_projection(self) -> dict[str, Any]:
         position = self.state.position
         latest_trade = self.state.trades[-1] if self.state.trades else None
         trade_status = latest_trade.status if latest_trade else "idle"
         pending_entry_order = self._find_order(self.state.pending_order_id) if self.state.pending_order_id else None
+        pending_close_order = self._find_order(self.state.pending_close_order_id) if self.state.pending_close_order_id else None
         pending_stop_order = (
             pending_entry_order if pending_entry_order and pending_entry_order.order_type in PENDING_STOP_ORDER_TYPES else None
         )
         latest_stop_order = self._latest_stop_order()
         protection_present = bool(
             position
-            and position.status == "open"
+            and position.status in ACTIVE_POSITION_STATUSES
             and (position.stop_loss is not None or position.take_profit is not None)
         )
         latest_pending_stop_result = None
@@ -174,7 +159,7 @@ class MinimalTradingLoop:
                 latest_pending_stop_result = "cancelled"
         return {
             "lifecycle_state": self.state.lifecycle_state,
-            "active_trade_present": position is not None and position.status == "open",
+            "active_trade_present": position is not None and position.status in ACTIVE_POSITION_STATUSES,
             "active_trade_id": self.state.active_trade_id,
             "entry_pending_present": pending_entry_order is not None,
             "pending_stop_present": pending_stop_order is not None,
@@ -188,16 +173,23 @@ class MinimalTradingLoop:
             "latest_pending_stop_result": latest_pending_stop_result,
             "trade_side": position.side if position else None,
             "current_open_volume": position.current_open_volume if position else 0.0,
+            "total_opened_volume": position.total_opened_volume if position else 0.0,
+            "total_closed_volume": (position.total_opened_volume - position.current_open_volume) if position else 0.0,
             "average_entry_price": position.average_entry_price if position else None,
-            "current_stop_loss": position.stop_loss if position and position.status == "open" else None,
-            "current_take_profit": position.take_profit if position and position.status == "open" else None,
+            "current_stop_loss": position.stop_loss if position and position.status in ACTIVE_POSITION_STATUSES else None,
+            "current_take_profit": position.take_profit if position and position.status in ACTIVE_POSITION_STATUSES else None,
             "protection_present": protection_present,
             "trade_status": trade_status,
+            "trade_partially_closed": trade_status == "partially_closed",
             "last_execution_outcome": asdict(self.state.last_execution) if self.state.last_execution else None,
             "last_close_reason": latest_trade.close_reason if latest_trade else None,
-            "manual_close_available": position is not None and position.status == "open",
+            "manual_close_available": position is not None and position.status in ACTIVE_POSITION_STATUSES,
+            "partial_close_available": position is not None and position.status in ACTIVE_POSITION_STATUSES,
+            "pending_close_requested_volume": pending_close_order.requested_volume if pending_close_order else None,
+            "pending_close_order_type": pending_close_order.order_type if pending_close_order else None,
             "pending_entry_cancel_available": pending_stop_order is not None,
             "replay_mode": self.replay_session.state.replay_mode,
+            "realised_pnl": latest_trade.realised_pnl if latest_trade else 0.0,
             "session_context": {
                 "session_id": self.session_id,
                 "instrument_id": self.replay_session.state.instrument_id,
@@ -276,6 +268,34 @@ class MinimalTradingLoop:
         self._publish("OrderPlaced", {"order_id": order.order_id, "order_type": order.order_type})
         return order
 
+    def _request_close(self, order_type: str, requested_volume: float | None) -> OrderRecord:
+        self._validate_close_allowed()
+        assert self.state.position is not None
+        position = self.state.position
+        volume_to_close = position.current_open_volume if requested_volume is None else float(requested_volume)
+        if volume_to_close <= 0:
+            raise InvalidTradeCommandError("Close volume must be positive")
+        if volume_to_close > position.current_open_volume:
+            raise InvalidTradeCommandError("Close volume cannot exceed current open volume")
+
+        order = OrderRecord(
+            order_id=self._next_id("order"),
+            session_id=self.session_id,
+            trade_id=self.state.active_trade_id,
+            instrument_id=self.replay_session.state.instrument_id,
+            order_type=order_type,
+            side=position.side,
+            status="placed",
+            requested_volume=volume_to_close,
+            created_at=self.replay_session.state.simulation_time,
+            replay_mode=self.replay_session.state.replay_mode,
+        )
+        self.state.orders.append(order)
+        self.state.pending_close_order_id = order.order_id
+        self.state.lifecycle_state = "CloseRequested"
+        self._publish("OrderPlaced", {"order_id": order.order_id, "order_type": order.order_type})
+        return order
+
     def _validate_entry_allowed(self) -> None:
         if self.replay_session.state.replay_mode == "review_replay":
             raise TradingModeRestrictionError("Trading actions are not allowed in review replay mode")
@@ -283,7 +303,7 @@ class MinimalTradingLoop:
             raise InvalidTradeCommandError("Cannot open a trade on finished replay state")
         if self.state.lifecycle_state not in {"Idle", "Terminal", "Recovered"}:
             raise ActiveTradeExistsError("Only one active trade lifecycle is allowed")
-        if self.state.position and self.state.position.status == "open":
+        if self.state.position and self.state.position.status in ACTIVE_POSITION_STATUSES:
             raise ActiveTradeExistsError("Only one active position is allowed")
 
     def _validate_close_allowed(self) -> None:
@@ -293,6 +313,10 @@ class MinimalTradingLoop:
             raise InvalidTradeCommandError("Cannot close a trade after replay finished")
         if self.state.lifecycle_state != "PositionOpened" or not self.state.position:
             raise NoActivePositionError("Manual close requires an open position")
+        if self.state.position.status not in ACTIVE_POSITION_STATUSES:
+            raise NoActivePositionError("Manual close requires an open position")
+        if self.state.pending_close_order_id is not None:
+            raise InvalidTradeCommandError("Close is already pending for the active position")
 
     def _validate_pending_cancel_allowed(self) -> None:
         if self.replay_session.state.replay_mode == "review_replay":
@@ -356,9 +380,11 @@ class MinimalTradingLoop:
             order = self._find_order(self.state.pending_order_id)
             if order.order_type not in PENDING_STOP_ORDER_TYPES or self._pending_stop_trigger_reached(order, snapshot):
                 self._fill_entry(snapshot)
-        elif self.state.pending_close_order_id:
-            self._fill_close(snapshot)
-        elif self.state.position and self.state.position.status == "open":
+            return
+        if self.state.pending_close_order_id:
+            self._fill_pending_close(snapshot)
+            return
+        if self.state.position and self.state.position.status in ACTIVE_POSITION_STATUSES:
             protective_reason = self._protective_reason(self.state.position, snapshot)
             if protective_reason is not None:
                 self._fill_protective_close(snapshot, protective_reason)
@@ -432,9 +458,13 @@ class MinimalTradingLoop:
         self.state.lifecycle_state = "PositionOpened"
         self._publish("PositionOpened", {"trade_id": trade_id, "position_id": position_id})
 
-    def _fill_close(self, snapshot: ExecutionSnapshot) -> None:
+    def _fill_pending_close(self, snapshot: ExecutionSnapshot) -> None:
         assert self.state.pending_close_order_id is not None
         order = self._find_order(self.state.pending_close_order_id)
+        assert self.state.position is not None
+        if order.requested_volume < self.state.position.current_open_volume:
+            self._partial_close_position(snapshot=snapshot, order=order)
+            return
         self._close_position(
             snapshot=snapshot,
             order=order,
@@ -442,6 +472,59 @@ class MinimalTradingLoop:
             reason="manual_close",
             close_reason="manual_close",
             clear_pending_close=True,
+        )
+
+    def _partial_close_position(self, snapshot: ExecutionSnapshot, order: OrderRecord) -> None:
+        assert self.state.position is not None
+        position = self.state.position
+        trade = self.state.trades[-1]
+        volume_to_close = order.requested_volume
+        fill_price = snapshot.bid if position.side == "buy" else snapshot.ask
+
+        order.status = "filled"
+        order.filled_at = snapshot.timestamp
+        execution = self._build_execution(
+            trade_id=trade.trade_id,
+            order_id=order.order_id,
+            side=position.side,
+            volume=volume_to_close,
+            fill_price=fill_price,
+            snapshot=snapshot,
+            execution_type="partial_close_fill",
+            reason="manual_partial_close",
+        )
+        realised_pnl = self._calculate_realised_pnl(position.side, position.average_entry_price, fill_price, volume_to_close)
+
+        trade.status = "partially_closed"
+        trade.volume_closed += volume_to_close
+        trade.realised_pnl += realised_pnl
+        trade.total_trade_cost += self._spread(snapshot)
+        trade.average_exit_price = self._weighted_average(
+            trade.average_exit_price,
+            trade.volume_closed - volume_to_close,
+            fill_price,
+            volume_to_close,
+        )
+        trade.exit_price = fill_price
+
+        position.status = "partially_closed"
+        position.current_open_volume -= volume_to_close
+        position.average_exit_price = trade.average_exit_price
+        position.last_snapshot_timestamp = snapshot.timestamp
+        position.last_snapshot_tick_index = snapshot.dataset_position
+
+        self.state.executions.append(execution)
+        self.state.last_execution = execution
+        self.state.pending_close_order_id = None
+        self.state.lifecycle_state = "PositionOpened"
+        self._publish(
+            "PositionPartiallyClosed",
+            {
+                "trade_id": trade.trade_id,
+                "order_id": order.order_id,
+                "remaining_open_volume": position.current_open_volume,
+                "closed_volume": volume_to_close,
+            },
         )
 
     def _fill_protective_close(self, snapshot: ExecutionSnapshot, protective_reason: str) -> None:
@@ -498,17 +581,23 @@ class MinimalTradingLoop:
             reason=reason,
         )
         realised_pnl = self._calculate_realised_pnl(position.side, position.average_entry_price, fill_price, volume_to_close)
+        already_closed_volume = trade.volume_closed
         trade.status = "closed"
-        trade.volume_closed = volume_to_close
-        trade.realised_pnl = realised_pnl
+        trade.volume_closed += volume_to_close
+        trade.realised_pnl += realised_pnl
         trade.total_trade_cost += self._spread(snapshot)
         trade.exit_price = fill_price
-        trade.average_exit_price = fill_price
+        trade.average_exit_price = self._weighted_average(
+            trade.average_exit_price,
+            already_closed_volume,
+            fill_price,
+            volume_to_close,
+        )
         trade.close_reason = close_reason
         trade.closed_at = snapshot.timestamp
 
         position.status = "closed"
-        position.average_exit_price = fill_price
+        position.average_exit_price = trade.average_exit_price
         position.close_reason = close_reason
         position.closed_at = snapshot.timestamp
         position.last_snapshot_timestamp = snapshot.timestamp
@@ -599,7 +688,7 @@ class MinimalTradingLoop:
 
     def _calculate_unrealized_pnl(self) -> float | None:
         position = self.state.position
-        if not position or position.status != "open":
+        if not position or position.status not in ACTIVE_POSITION_STATUSES:
             return None
         snapshot = self.replay_session.get_execution_snapshot()
         close_price = snapshot.bid if position.side == "buy" else snapshot.ask
@@ -618,6 +707,20 @@ class MinimalTradingLoop:
         if side == "buy":
             return (exit_price - entry_price) * volume
         return (entry_price - exit_price) * volume
+
+    @staticmethod
+    def _weighted_average(
+        current_average: float | None,
+        current_volume: float,
+        next_price: float,
+        next_volume: float,
+    ) -> float:
+        if current_average is None or current_volume <= 0:
+            return next_price
+        combined_volume = current_volume + next_volume
+        if combined_volume <= 0:
+            return next_price
+        return ((current_average * current_volume) + (next_price * next_volume)) / combined_volume
 
     @staticmethod
     def _spread(snapshot: ExecutionSnapshot) -> float:

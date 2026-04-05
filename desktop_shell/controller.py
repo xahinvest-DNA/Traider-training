@@ -114,6 +114,10 @@ class DesktopShellController:
         self.trading_loop.manual_close()
         return self.get_workspace_view()
 
+    def partial_close(self, volume: float) -> dict[str, Any]:
+        self.trading_loop.partial_close(volume)
+        return self.get_workspace_view()
+
     def create_chart_snapshot(
         self,
         artifact_ref: str,
