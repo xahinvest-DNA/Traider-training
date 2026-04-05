@@ -1,9 +1,9 @@
 ﻿# Trader Trainer Project Brain
 
-Last updated: 2026-04-05
-Project status: replay bootstrap, minimal trading loop, local-first session/journal loop, minimum Bill Williams review hooks, manual flags/violations, derived review output, session result metrics, session timeline projection, chart snapshot references, snapshot timeline exposure, snapshot-aware review output, session finalization, compact session review summary, MVP acceptance pass, desktop shell implementation boundary, first desktop shell coding slice, chart/replay refinement, session/trade context refinement, notes/review authoring refinement, current-session history/result refinement, workflow guidance/action feedback refinement, desktop shell layout/usability polish, desktop MVP acceptance/smoke pass, desktop launch path, desktop handoff/readiness, MVP pause point, first post-MVP direction selection, Bill Williams review-depth boundary, Bill Williams review-depth coding slice, Bill Williams review-delta slice, Bill Williams review-completeness slice, Bill Williams review-prompts slice, Bill Williams review-coverage slice, Bill Williams review-sequence slice, Bill Williams review-weak-spots slice, Bill Williams review-progress slice, Bill Williams review-momentum slice, Bill Williams review-stability slice, Bill Williams review-swings slice, Bill Williams review-floor slice, Bill Williams review-ceiling slice, Bill Williams review-band slice, Bill Williams review-headroom slice, Bill Williams review-pressure slice, Bill Williams review-target slice, Bill Williams review-focus slice, Bill Williams review-cue slice, Bill Williams review-badge slice, Bill Williams review-pill slice, Bill Williams review-chip slice, Bill Williams review-tag slice, Bill Williams review-token slice, Bill Williams review-marker slice, Bill Williams review-glyph slice, Bill Williams review-sigil slice, Bill Williams review-seal slice, Bill Williams review-crest slice, Bill Williams review-emblem slice, Bill Williams review-insignia slice, Bill Williams review-standard slice, Bill Williams review-banner slice, Bill Williams review-pennant slice, Bill Williams review-streamer slice, raw-dataset import, dataset-import hardening, dataset-quality context, dataset-quality review link, dataset-quality finalization link, dataset-quality restart-recovery note, dataset-quality recovery feedback, dataset-quality recovery acknowledgment, desktop chart snapshot authoring, review-discipline-reason, current-trade review digest, initial trade protection, current trade plan context, and pending stop entry are implemented
-Active module: bounded Desktop Startup Pending-Entry Actionability slice is completed; recovered generic pending-entry startup state is now surfaced coherently across existing desktop surfaces
-Current focus: run one bounded post-implementation validation pass on the completed startup pending-entry actionability slice before selecting any further frontier
+Last updated: 2026-04-04
+Project status: replay bootstrap, minimal trading loop, local-first session/journal loop, minimum Bill Williams review hooks, manual flags/violations, derived review output, session result metrics, session timeline projection, chart snapshot references, snapshot timeline exposure, snapshot-aware review output, session finalization, compact session review summary, MVP acceptance pass, desktop shell implementation boundary, first desktop shell coding slice, chart/replay refinement, session/trade context refinement, notes/review authoring refinement, current-session history/result refinement, workflow guidance/action feedback refinement, desktop shell layout/usability polish, desktop MVP acceptance/smoke pass, desktop launch path, desktop handoff/readiness, MVP pause point, first post-MVP direction selection, Bill Williams review-depth boundary, Bill Williams review-depth coding slice, Bill Williams review-delta slice, Bill Williams review-completeness slice, Bill Williams review-prompts slice, Bill Williams review-coverage slice, Bill Williams review-sequence slice, Bill Williams review-weak-spots slice, Bill Williams review-progress slice, Bill Williams review-momentum slice, Bill Williams review-stability slice, Bill Williams review-swings slice, Bill Williams review-floor slice, Bill Williams review-ceiling slice, Bill Williams review-band slice, Bill Williams review-headroom slice, Bill Williams review-pressure slice, Bill Williams review-target slice, Bill Williams review-focus slice, Bill Williams review-cue slice, Bill Williams review-badge slice, Bill Williams review-pill slice, Bill Williams review-chip slice, Bill Williams review-tag slice, Bill Williams review-token slice, Bill Williams review-marker slice, Bill Williams review-glyph slice, Bill Williams review-sigil slice, Bill Williams review-seal slice, Bill Williams review-crest slice, Bill Williams review-emblem slice, Bill Williams review-insignia slice, Bill Williams review-standard slice, Bill Williams review-banner slice, Bill Williams review-pennant slice, and Bill Williams review-streamer slice are implemented; bounded raw-dataset import, dataset-import hardening, dataset-quality context, dataset-quality review link, dataset-quality finalization link, dataset-quality restart-recovery note, dataset-quality recovery feedback, dataset-quality recovery acknowledgment, desktop chart snapshot authoring, and review-discipline-reason slices are implemented
+Active module: Bill Williams review evidence follow-up implemented; current-trade review digest selected as the next bounded product-facing slice
+Current focus: implement one bounded current-trade review digest so the current desktop-first/local-first review workflow turns many fragmented review signals into one compact user-facing takeaway instead of continuing the evidence chain by inertia or drifting into dashboard, mentor, mobile, or sync scope
 
 ## Purpose
 
@@ -57,6 +57,7 @@ This index is the main entry point into the Trader Trainer project. It is used f
 - [05_CODEX/SESSION_FINALIZATION.md](05_CODEX/SESSION_FINALIZATION.md)
 - [05_CODEX/SESSION_REVIEW_SUMMARY.md](05_CODEX/SESSION_REVIEW_SUMMARY.md)
 - [05_CODEX/MVP_ACCEPTANCE_PASS.md](05_CODEX/MVP_ACCEPTANCE_PASS.md)
+- [05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md](05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md)
 - [05_CODEX/DESKTOP_SHELL_IMPLEMENTATION.md](05_CODEX/DESKTOP_SHELL_IMPLEMENTATION.md)
 - [05_CODEX/DESKTOP_CHART_REPLAY_REFINEMENT.md](05_CODEX/DESKTOP_CHART_REPLAY_REFINEMENT.md)
 - [05_CODEX/DESKTOP_SESSION_TRADE_CONTEXT_REFINEMENT.md](05_CODEX/DESKTOP_SESSION_TRADE_CONTEXT_REFINEMENT.md)
@@ -121,9 +122,7 @@ This index is the main entry point into the Trader Trainer project. It is used f
 - [05_CODEX/BILL_WILLIAMS_REVIEW_DISCIPLINE_REASON.md](05_CODEX/BILL_WILLIAMS_REVIEW_DISCIPLINE_REASON.md)
 
 - [05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_FOLLOW_UP.md](05_CODEX/BILL_WILLIAMS_REVIEW_EVIDENCE_FOLLOW_UP.md)
-- [05_CODEX/PARTIAL_CLOSE.md](05_CODEX/PARTIAL_CLOSE.md)
-- [05_CODEX/DESKTOP_TRANSITION_STATE_COHERENCE.md](05_CODEX/DESKTOP_TRANSITION_STATE_COHERENCE.md)
-- [05_CODEX/DESKTOP_STARTUP_PENDING_ENTRY_ACTIONABILITY.md](05_CODEX/DESKTOP_STARTUP_PENDING_ENTRY_ACTIONABILITY.md)
+- [05_CODEX/CURRENT_TRADE_REVIEW_DIGEST.md](05_CODEX/CURRENT_TRADE_REVIEW_DIGEST.md)
 - [05_CODEX/TASKS.md](05_CODEX/TASKS.md)
 
 ## Working implementation
@@ -153,12 +152,10 @@ A new chat must start by reading:
 
 ## Next steps
 
-1. Keep the repository in hold state after validating `T-118 Desktop Transition-State Coherence`; do not activate a new implementation frontier until a stronger recurring desktop friction is observed.
-2. Treat the remaining observations as non-slice-worthy unless they start breaking workflow continuity again; do not turn them into broader pending-order growth, protection automation, position-management growth, mentor/dashboard/media/mobile/sync scope, or new persistence.
-3. Preserve the current desktop-first/local-first boundary and existing source-of-truth ownership while the repository remains in post-T-119 validation state.
-
-
-
+1. Implement the bounded current-trade review digest slice selected by the post-evidence-follow-up audit.
+2. Do not continue the evidence chain with more labels, follow-up states, or snapshot/recovery micro-polish unless a later audit proves real product value.
+3. Keep snapshot support local-first and reference-only; do not reopen screenshot automation, gallery/media workflow, validation, sync, or dashboard scope.
+4. Do not break replay-centered bootstrap, the working trading loop, local journal runtime, thin desktop-shell boundary, accepted launch/readiness behavior, or the current recovery/finalization and snapshot-aware review flows.
 
 
 
