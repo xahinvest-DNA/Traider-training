@@ -1,49 +1,59 @@
-# NEXT TASK
+﻿# NEXT TASK
 
 Last updated: 2026-04-05
 Status: completed
-Task ID: T-119
-Task type: validation
+Task ID: T-120
+Task type: diagnostic
 
 ## Goal
-Run one bounded post-implementation validation pass on the completed `T-118 Desktop Transition-State Coherence` slice and determine whether the strongest recurring desktop friction has been resolved strongly enough to justify a hold state, or one further bounded follow-up candidate only if a real residual recurring friction is still present.
+Run one bounded diagnostic pass on the current desktop shell launch so the repository can determine why real runs can open into a practically non-tradable state with most trade controls disabled, and distinguish launch misuse from persisted session state, controller/projection mismatch, gating logic bug, or a real startup-state product defect.
 
 ## Result
-`T-119 Post-Implementation Validation of Desktop Transition-State Coherence` is completed. The original strongest recurring friction identified in `T-117` is now resolved strongly enough across realistic desktop scenarios, and no residual recurring friction is strong enough yet to justify a new bounded follow-up slice.
+`T-120 Desktop Shell Startup-State Diagnostic Pass` is completed. The strongest diagnosis is a real product-facing startup-state defect: the default launch recovers a persisted generic market-entry `EntryRequested` state from `desktop_shell/.local_state`, control gating correctly blocks new entry actions because `entry_pending_present` is true, but existing trade/workflow/finalization surfaces still tell an idle/no-trade story instead of a staged-entry story.
 
-## Validation coverage
-1. Pending stop staged.
-2. Pending stop cancelled.
-3. Pending stop triggered into active trade.
-4. Partial close with remaining active volume.
-5. Closed trade awaiting review.
-6. Finalized clean session.
-7. Finalized warned session.
-8. Reopened/finalized recovered clean session.
-9. Reopened/finalized recovered warned session.
-10. Cross-check of trade context, workflow guidance, result summary, finalization block/status, readiness reporting, pause-point reporting, and control availability where relevant.
+## Diagnostic coverage
+1. Default launch config and default storage path.
+2. Actual recovered state under `desktop_shell/.local_state/local_runtime_state.json`.
+3. Controller bootstrap and workspace view on the recovered default state.
+4. Trade-control gating in `desktop_shell/control_surface.py`.
+5. Journal finalization gating in `runtime_bootstrap/journal_runtime.py`.
+6. Transition/workflow coherence for recovered startup state.
+7. Fresh clean storage bootstrap for comparison.
+8. Recovered-state replay advance to confirm the stuck-looking startup is still a live lifecycle state rather than a dead shell.
 
-## Resolution assessment
-- Pending-entry contradiction across trade/workflow/finalization surfaces: resolved
-- Clean dataset warning leakage in finalization/readiness/pause reporting: resolved
-- Partially closed active-state next-step coherence: resolved
-- Closed-but-review-pending next-step coherence: resolved
-- Finalized/recovered cross-surface coherence for clean and warned sessions: resolved
-- New strongest blocker introduced by T-118: not found
+## Root cause assessment
+- Wrong launch mode / wrong startup path: rejected
+- Dataset quality issue: rejected
+- Controller/projection mismatch: partially involved but not the strongest root cause
+- Gating logic bug: strongest
+- Broader startup UX problem: secondary consequence, not the primary root cause
 
-## Residual friction
-- No residual recurring friction is strong enough yet to justify one more bounded follow-up candidate.
-- One subtle observation remains: readiness/pause reporting is recovery-oriented because those reports rebuild from persisted state, but validation did not show this as a recurring misleading blocker once the transition wording itself became coherent.
+## Evidence
+1. Default launch always uses `desktop_shell/.local_state` via `desktop_shell/launch.py`, so prior local session state is recovered automatically when `local_runtime_state.json` exists.
+2. The observed persisted state contains:
+   - `lifecycle_state: EntryRequested`
+   - `pending_order_id: order-0001`
+   - one placed `BuyMarket` order
+   - no active trade yet
+3. `desktop_shell/control_surface.py` disables `Buy/Sell/BuyStop/SellStop` whenever `entry_pending_present` is true.
+4. `runtime_bootstrap/journal_runtime.py` treats `pending_order_id` as an active finalization blocker.
+5. `desktop_shell/transition_state.py` only treats pending stop entry as staged entry, not generic market-entry pending state.
+6. In the observed startup state, desktop surfaces therefore disagree:
+   - control availability blocks new entries
+   - finalization sees active blocking state
+   - trade context reports idle/no-trade
+   - workflow guidance says to open a trade
+7. A clean storage bootstrap is tradable immediately with `Buy/Sell/BuyStop/SellStop` active.
+8. The recovered default state becomes active-trade state after replay advances, confirming this is not a dead dataset or wrong mode.
 
-## Rejected non-issues
-1. Minor wording preference differences across valid clean vs warned recovery messages.
-2. Formatting discomfort such as scientific-notation PnL where workflow continuity is not broken.
-3. Learning-curve friction from rich but valid review language.
-4. Adjacent feature desires in pending-order growth, protection automation, position-management growth, dashboard/media scope, mentor logic, mobile, sync, or new persistence.
-5. Hidden architecture or subsystem temptation.
+## Practical user answer
+- Yes, the trainer can be used right now in intended `training` mode.
+- It is immediately tradable when the shell boots from a fresh local storage state, or when the recovered session is already in a genuinely idle state.
+- The observed run landed outside that condition because default launch recovered an old local session that already had a pending market entry at tick 0.
+- Trading actions looked unavailable because new entry actions were correctly blocked by that pending order, but existing desktop surfaces failed to explain that a staged generic entry was already in progress.
 
 ## Strongest conclusion
-`T-118` is validated strongly enough and no bounded follow-up slice is justified yet.
+This is primarily a product bug / startup-state defect worth fixing, not merely a wrong launch or user-usage issue.
 
 ## Constraints kept
 - no runtime files changed
@@ -54,16 +64,16 @@ Run one bounded post-implementation validation pass on the completed `T-118 Desk
 - `01_MASTER/DECISIONS.md` not changed
 
 ## Acceptance criteria status
-- The completed `T-118` result is validated through realistic bounded scenario coverage: completed
-- The validation explicitly checks whether the original strongest friction was resolved: completed
-- The output distinguishes resolved friction, residual friction, and noise: completed
-- Weak adjacent ideas are explicitly rejected when they are not justified by validation evidence: completed
-- The result ends with exactly one strongest conclusion: completed
-- No runtime, desktop, test, module, or tech-schema files are changed: completed
-- `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` are synchronized to the validation result: completed
+- The current non-tradable startup behavior is investigated through the real launch/gating path: completed
+- The result identifies the strongest root cause with concrete evidence: completed
+- The result clearly distinguishes expected behavior, poor UX, and actual bug if applicable: completed
+- The result answers the practical question of why trading actions are unavailable in the observed run: completed
+- The pass ends with exactly one strongest conclusion: completed
+- No unrelated scope drift is introduced: completed
+- `CURRENT_STATE.md`, `TASKS.md`, `NEXT_TASK.md`, and `CODEX_WORKLOG.md` are synchronized to the diagnostic result: completed
 
 ## Recommended next step
-Keep the repository in hold state until a stronger recurring desktop friction is observed in a separate bounded validation or audit pass.
+Implement one bounded `Desktop Startup Pending-Entry Actionability` fix using `05_CODEX/DESKTOP_STARTUP_PENDING_ENTRY_ACTIONABILITY.md`.
 
 ## Required handoff format
 Use `05_CODEX/HANDOFF_TEMPLATE.md` exactly.

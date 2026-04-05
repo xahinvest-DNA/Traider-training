@@ -1,4 +1,4 @@
-# CODEX WORKLOG
+﻿# CODEX WORKLOG
 
 Purpose: append one compact entry after each Codex pass so future sessions can reconstruct what changed without relying on chat history.
 
@@ -775,3 +775,60 @@ Run one bounded post-implementation validation pass on completed `T-118 Desktop 
 
 ### Recommended next step
 Keep the repository in hold state until a stronger recurring desktop friction is observed in a separate bounded validation or audit pass.
+
+## 2026-04-05 - T-120 Desktop Shell Startup-State Diagnostic Pass
+
+### Goal
+Run one bounded diagnostic pass on the current desktop shell launch so the repository can determine why real runs can open into a practically non-tradable state with most trade controls disabled, and distinguish launch misuse from persisted session state, controller/projection mismatch, gating logic bug, or a real startup-state product defect.
+
+### Files created
+- `05_CODEX/DESKTOP_STARTUP_PENDING_ENTRY_ACTIONABILITY.md`
+
+### Files updated
+- `00_INDEX.md`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was diagnosed
+- Inspected the default launch path in `desktop_shell/launch.py` and confirmed it always points to `desktop_shell/.local_state`.
+- Inspected the actual recovered persisted state in `desktop_shell/.local_state/local_runtime_state.json` and found a generic market-entry `EntryRequested` state with one placed `BuyMarket` order at tick 0.
+- Rebuilt the default workspace through the current controller and confirmed the practical symptom: replay controls partly active, most trade controls disabled, finalization unavailable, and no active position yet.
+- Compared the gating chain:
+  - `desktop_shell/control_surface.py` blocks new entry actions because `entry_pending_present` is true
+  - `runtime_bootstrap/journal_runtime.py` treats `pending_order_id` as an active finalization blocker
+  - `desktop_shell/transition_state.py` recognizes only pending stop entry as staged entry, not generic market-entry pending state
+  - `desktop_shell/workflow_surface.py` and `desktop_shell/context_surface.py` therefore fall back to idle/no-trade messaging in the observed startup state
+- Rechecked the same shell against a fresh clean storage directory and confirmed it is immediately tradable there.
+- Replayed one tick over a copied recovered state and confirmed the pending market entry fills into an active trade, proving the shell is not dead or in the wrong mode.
+
+### Strongest diagnosis
+- The practical startup problem is not the wrong launch mode and not the dataset.
+- The strongest diagnosis is a real desktop startup-state defect: default launch recovers a persisted generic pending market entry, but existing desktop transition/workflow/finalization surfaces do not surface that recovered state truthfully or actionably.
+- Broader startup UX friction exists, but it is downstream of this narrower product bug.
+
+### Evidence that mattered most
+- Default recovered state:
+  - `lifecycle_state: EntryRequested`
+  - `pending_order_id: order-0001`
+  - one placed `BuyMarket` order
+  - no active trade yet
+- Observed desktop mismatch:
+  - controls block new entries
+  - finalization is blocked by active lifecycle state
+  - trade/workflow messaging still says idle/no active trade
+- Fresh clean storage boot enables `Buy`, `Sell`, `BuyStop`, and `SellStop` immediately.
+
+### What was not changed
+- Runtime code was not changed.
+- Desktop-shell code was not changed.
+- Tests were not changed.
+- `03_MODULES/*` and `04_TECH/*` were not changed.
+- `01_MASTER/DECISIONS.md` was not changed.
+
+### Why this matters
+The repository is no longer honestly in a hold state. A real current blocker has now been observed in the default local launch path, and it is strong enough to justify one bounded follow-up candidate focused on startup pending-entry actionability rather than broad startup redesign.
+
+### Recommended next step
+Implement one bounded `Desktop Startup Pending-Entry Actionability` fix using `05_CODEX/DESKTOP_STARTUP_PENDING_ENTRY_ACTIONABILITY.md`.

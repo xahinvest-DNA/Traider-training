@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-05
-Current stage: bounded post-implementation validation of desktop transition-state coherence is completed; the strongest recurring friction is no longer strong enough to justify a new bounded follow-up slice
-Active module: `T-119 Post-Implementation Validation of Desktop Transition-State Coherence` is completed
-Active question: whether any future recurring desktop friction becomes strong enough to justify a new bounded slice without drifting into adjacent feature lanes by inertia
+Current stage: bounded desktop-shell startup-state diagnostic pass is completed; the strongest observed current friction is a recovered pending-entry startup defect that justifies one bounded follow-up candidate
+Active module: `T-120 Desktop Shell Startup-State Diagnostic Pass` is completed
+Active question: how to restore truthful and actionable startup-state guidance when the default local launch recovers a generic pending market entry without drifting into broader startup redesign or feature growth
 
 ## Where the project is now
 
@@ -104,6 +104,7 @@ At this point:
 - the bounded post-Pending-Stop-Entry audit rejects further pending-order management, protection-lane continuation, plan-management drift, review backfill, cosmetic polish, and mentor/dashboard/media/mobile/sync/new-persistence drift, and selects Partial Close as the strongest next bounded local desktop slice because the live trade loop still lacks accepted active-trade volume reduction inside the existing one-trade lifecycle;
 - bounded desktop transition-state coherence is implemented across existing `trade`, `workflow`, `result`, `finalization`, `readiness`, `pause-point`, and control-availability surfaces so pending-entry, partially-closed active, closed-review-pending, finalized, and recovered states now tell one semantically aligned next-step story without changing runtime/domain ownership;
 - the bounded post-implementation validation pass confirms that pending-entry, partial-close, review-pending, finalized, and recovered transition stories are now strongly coherent across existing desktop surfaces, and no residual recurring friction is strong enough yet to justify a further bounded follow-up slice;
+- the bounded desktop-shell startup-state diagnostic pass finds one real practical blocker in the default launch path: persisted local recovery can reopen a generic market-entry EntryRequested state that disables new entry controls while existing trade/workflow/finalization surfaces still describe the session as idle or no-trade, so one bounded follow-up candidate is now justified for startup pending-entry actionability;
 - a bounded raw-dataset import path is implemented in `runtime_bootstrap/import_pipeline.py` for CSV/TSV/JSON tick files into normalized local dataset artifacts with explicit warning counts/previews plus hard rejection for non-finite or inverted-spread ticks;
 - desktop launch now accepts raw dataset files, auto-imports them into local normalized artifacts before controller bootstrap, auto-relaunches through the ASCII-path Tk-capable interpreter `C:\Python311\python.exe` when the current Python cannot initialize Tk/Tcl, and still falls back to a non-GUI readiness report if no working Tk runtime is available;
 - compact dataset-quality status and raw-import warning previews are now surfaced in replay headers and non-GUI readiness reports without adding new persistence or provider-management layers;
@@ -159,7 +160,7 @@ At this point:
 
 ## Next step
 
-Hold the repository after the completed `Desktop Transition-State Coherence` validation result until a stronger recurring desktop friction is observed.
+If implementation resumes, activate one bounded follow-up on recovered startup pending-entry actionability; do not widen that step into broader startup redesign, pending-order growth, or new subsystem work.
 
 ## What must not be lost in a new chat
 
@@ -174,6 +175,7 @@ Hold the repository after the completed `Desktop Transition-State Coherence` val
 - `CURRENT_TRADE_PLAN_CONTEXT.md` now fixes the bounded live-trade plan-recall contract; follow-up work must not silently turn plan visibility into plan management, mentor scoring, note orchestration, or a new plan-summary owner.
 - `PENDING_STOP_ENTRY.md` now fixes the next bounded live-trade frontier; follow-up work must not silently turn pending stop support into a broader pending-order orchestration or risk-management subsystem.
 - Any step beyond the bounded local-first desktop workflow requires a separate Project Brain fixation.
+
 
 
 
