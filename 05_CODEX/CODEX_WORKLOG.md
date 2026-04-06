@@ -594,3 +594,39 @@ The repository now has a structural anti-drift safeguard: `00_INDEX.md` no longe
 
 ### Recommended next step
 - Continue with the already selected `T-131 Post-Acceptance Desktop Frontier Selection` planning pass.
+
+
+## 2026-04-06 - T-131 Post-Acceptance Desktop Frontier Selection
+
+### Goal
+Choose one strongest next product-facing frontier from the already accepted desktop trainer workspace baseline instead of continuing by cleanup momentum or reopening solved acceptance work.
+
+### Files updated
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Compared a small serious candidate set from the accepted desktop workspace baseline: active-trade protection adjustment, setup/plan-surface expansion, review-quality continuation, and replay/mode-expansion.
+- Rejected the weaker candidates because they were either already sufficiently served by the accepted baseline, too close to review-loop continuation, or more likely to reopen platform-like workflow scope before improving the live trading loop.
+- Selected `T-132 Active Trade Protection Adjustment` as the strongest next packet because it adds real product value to the live `trade -> manage -> close` stage while fitting the current trader rail, accepted chart-first workspace, and existing ownership contracts.
+- Moved repository state forward from frontier-selection mode into one explicit next coding packet.
+
+### What was not changed
+- No new implementation was started.
+- No anti-drift files were reopened.
+- No replay/trading/journal/domain contracts were rewritten.
+- No mentor/mobile/sync/dashboard/platform expansion was introduced.
+
+### Verification
+- Manual repository planning audit across current state, roadmap, scope, desktop workspace contract, replay/trading contracts, and accepted desktop-shell validation coverage.
+
+### Why this matters
+The repository now has one deliberate next move after workspace acceptance instead of drifting into more cleanup or vague strategy talk. The next packet improves the trainer where the live decision loop is still thinnest: active trade discipline during management.
+
+### Remaining gap after this step
+- The selected next frontier still needs implementation as one bounded coding packet.
+
+### Recommended next step
+- Open one bounded coding packet for `T-132 Active Trade Protection Adjustment`.

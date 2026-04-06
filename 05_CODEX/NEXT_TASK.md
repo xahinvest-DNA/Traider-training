@@ -2,27 +2,28 @@
 
 Last updated: 2026-04-06
 Status: ready
-Task ID: T-131
-Task type: planning
+Task ID: T-132
+Task type: coding
 
 ## Goal
-Run one bounded `Post-Acceptance Desktop Frontier Selection` pass so the repository can choose the next strongest product-facing frontier now that the assembled desktop trainer workspace has passed acceptance as a coherent loop.
+Implement one bounded `Active Trade Protection Adjustment` slice so the accepted desktop trainer workspace can support trader-visible live protection adjustment on an already active trade without reopening workspace reset, startup, chart-boundary, or review-flow scope.
 
 ## Why this is next
-`T-130` confirmed that the current desktop workspace is accepted as a coherent `dataset -> chart -> replay -> trade -> close -> review` trainer loop, so the next step should be choosing the next frontier deliberately rather than continuing incremental UI work by momentum.
+`T-131` compared post-acceptance frontier candidates from the accepted `dataset -> chart -> replay -> trade -> close -> review` workspace baseline and selected active-trade protection adjustment as the strongest next product-facing gain. It improves the live `manage` part of the core trainer loop, fits the existing trader rail, and stays more product-meaningful than another review layer, another cleanup pass, or a platform-like replay/mode expansion.
 
 ## What should change
-1. Identify the strongest next product-facing frontier from the accepted desktop workspace baseline.
-2. Reject weaker follow-ups that are cosmetic, platform-like, or validation-complete.
-3. Produce one bounded recommendation for the next coding or planning slice.
+1. Add one bounded active-trade protection-adjustment path for the current live trade inside the accepted desktop trainer workspace.
+2. Keep protection state and the available next action legible beside the existing trader panel and compact context.
+3. Preserve replay/trading/journal ownership while extending the accepted workspace through one real product-facing manage-trade slice.
 
 ## What must stay unchanged
-- no new implementation inside the selection pass
-- no chart/startup/trader-panel/review-subsystem rewrite
-- no dashboard/mobile/sync/mentor/platform scope
+- no chart/startup/trader-rail/review-form redesign
+- no trailing-stop automation, break-even automation, or protection-history subsystem
+- no broker-terminal, dashboard, mentor, mobile, sync, or platform expansion
+- no replay/trading/journal ownership rewrite
 
 ## Recommended validation
-Use the accepted desktop workspace boundary plus current state/docs to compare candidate next frontiers and select one bounded next step only.
+Use bounded runtime and desktop-shell tests to prove that an active trade can expose, update, and retain compact protection facts and actionability without reopening the accepted workspace baseline or creating broader risk-engine behavior.
 
 ## Required handoff format
 Use `05_CODEX/HANDOFF_TEMPLATE.md` exactly.

@@ -1,9 +1,9 @@
 ﻿# Current State
 
 Last updated: 2026-04-06
-Current stage: bounded desktop trainer workspace acceptance pass is completed; the assembled desktop workspace is accepted as a coherent chart-first trainer loop covering dataset -> chart -> replay -> trade -> close -> review
-Active module: `T-130 Desktop Trainer Workspace Acceptance Pass` is completed
-Active question: which next product frontier should be selected now that the assembled desktop trainer workspace has passed acceptance as a coherent loop
+Current stage: bounded post-acceptance frontier selection is completed; the assembled desktop workspace remains accepted as a coherent chart-first trainer loop, and the strongest next product-facing frontier is now selected as active-trade protection adjustment
+Active module: `T-131 Post-Acceptance Desktop Frontier Selection` is completed
+Active question: how to implement one bounded active-trade protection-adjustment slice without drifting into a broader risk engine, broker-terminal behavior, or trader-rail redesign
 
 ## Where the project is now
 
@@ -11,6 +11,7 @@ The project is in the sequential implementation stage of the first working proto
 
 At this point:
 
+- bounded post-acceptance desktop frontier selection is completed, and the strongest next frontier is fixed as one narrow active-trade protection-adjustment slice because it deepens the live `trade -> manage -> close` part of the accepted trainer loop without reopening chart/startup/review/reset work or drifting into platform-like expansion;
 - bounded desktop trainer workspace acceptance pass is completed in `tests/test_desktop_shell.py`, so the assembled desktop workspace is now validated as one coherent `dataset -> chart -> replay -> trade -> close -> review` loop without shell regression or ownership drift;
 - repository anti-drift SSOT alignment is completed across `00_INDEX.md`, `01_MASTER/SSOT_MAP.md`, and `05_CODEX/IMPLEMENTATION_RULES.md`, so `00_INDEX.md` now stays navigation-only while live state remains owned by `CURRENT_STATE.md` and `NEXT_TASK.md`;
 - bounded desktop review entry path and post-close flow is implemented in `desktop_shell/`, so closed-trade review-needed and review-available states now surface as compact action-oriented cues with a direct workspace route into `PostTradeReview` or the next relevant review action;
@@ -169,7 +170,7 @@ At this point:
 
 ## Next step
 
-Open one bounded planning packet for `T-131 Post-Acceptance Desktop Frontier Selection` so the repository can choose the next strongest product-facing frontier from an accepted workspace baseline instead of continuing ad hoc feature growth.
+Open one bounded coding packet for `T-132 Active Trade Protection Adjustment` so the accepted desktop trainer workspace can improve live trade-discipline value inside the existing chart-first/trader-rail baseline without drifting into trailing-stop automation, break-even logic, protection-history ledgers, or a broader risk-engine layer.
 
 ## What must not be lost in a new chat
 

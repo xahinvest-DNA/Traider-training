@@ -950,3 +950,13 @@
 - Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/SSOT_MAP.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/TASKS.md`, `05_CODEX/CODEX_WORKLOG.md`, `05_CODEX/HANDOFF_TEMPLATE.md`.
 - Expected result: a navigation-only `00_INDEX.md`, explicit anti-drift SSOT rules, and synchronized operational state files without inventing a new feature frontier.
 - Outcome: removed stale operational claims from `00_INDEX.md`, fixed SSOT ownership rules so live state stays in `CURRENT_STATE.md` and `NEXT_TASK.md`, and recorded the anti-drift safeguard in authority docs without changing product or runtime scope.
+
+
+### T-131
+
+- Status: completed
+- Module: Post-Acceptance Desktop Frontier Selection
+- Goal: run one bounded planning pass from the accepted desktop trainer workspace baseline and choose exactly one strongest next product-facing frontier instead of continuing by cleanup momentum.
+- Input documents: `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/DECISIONS.md`, `01_MASTER/ROADMAP.md`, `01_MASTER/PRODUCT_SCOPE.md`, `01_MASTER/MVP_vs_FULL.md`, `01_MASTER/SSOT_MAP.md`, `03_MODULES/DESKTOP_WORKSPACE.md`, `03_MODULES/REPLAY_ENGINE.md`, `03_MODULES/TRADING_ENGINE.md`, `04_TECH/DATA_SCHEMA.md`, `04_TECH/JOURNAL_SCHEMA.md`, `05_CODEX/NEXT_TASK.md`, `05_CODEX/IMPLEMENTATION_RULES.md`, `05_CODEX/HANDOFF_TEMPLATE.md`, current `desktop_shell/*`, and related desktop-shell tests for validation context only.
+- Expected result: one explicit next-frontier decision with weaker candidates rejected, plus synchronized state files so the repository moves forward with one chosen next packet instead of multiple vague directions.
+- Outcome: rejected review-quality continuation, setup/plan-surface expansion, and replay/mode-expansion as weaker next steps, and selected `T-132 Active Trade Protection Adjustment` as the strongest next bounded product-facing frontier because it most directly improves the live `trade -> manage -> close` part of the accepted trainer loop without reopening solved workspace boundaries or drifting into platform scope.
