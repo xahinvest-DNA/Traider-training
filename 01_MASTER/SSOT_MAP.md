@@ -1,6 +1,6 @@
 # SSOT Map
 
-Last updated: 2026-04-04
+Last updated: 2026-04-06
 Status: active
 Purpose: define which document is the source of truth for each project question so ChatGPT, Codex, and future sessions do not drift across duplicated context.
 
@@ -16,12 +16,12 @@ Purpose: define which document is the source of truth for each project question 
 ### Project entry and navigation
 - Primary SSOT: `00_INDEX.md`
 - Scope: main entry point, navigation, reading order, key links.
-- Notes: this is the first file for new sessions.
+- Notes: this is the first file for new sessions and owns navigation only. It must not restate live project state or the active Codex packet as independent truth.
 
 ### Current project state
 - Primary SSOT: `01_MASTER/CURRENT_STATE.md`
 - Scope: what is implemented now, accepted current focus, open items, next step.
-- Notes: this is the first operational file to read after `00_INDEX.md`.
+- Notes: this is the owner of live current project state. Weaker navigation files must point here instead of duplicating current operational claims.
 
 ### Accepted architectural and product decisions
 - Primary SSOT: `01_MASTER/DECISIONS.md`
@@ -94,7 +94,7 @@ Purpose: define which document is the source of truth for each project question 
 ### Current active task packet
 - Primary SSOT: `05_CODEX/NEXT_TASK.md`
 - Scope: exactly one current task for Codex, with boundaries, allowed files, forbidden changes, and acceptance criteria.
-- Notes: this file should be updated before each new implementation pass.
+- Notes: this file is the owner of the one active Codex packet. Navigation files must point here instead of maintaining a shadow current-task ledger.
 
 ### Codex handoff and session log
 - Primary SSOT: `05_CODEX/CODEX_WORKLOG.md`
@@ -126,3 +126,12 @@ A new chat should begin with:
 5. This file: `01_MASTER/SSOT_MAP.md`
 6. `05_CODEX/NEXT_TASK.md` if the purpose is implementation
 7. The relevant module/schema documents for the active slice
+
+
+## Navigation anti-drift rule
+
+- `00_INDEX.md` owns navigation only.
+- Active project state is owned by `01_MASTER/CURRENT_STATE.md`.
+- Active Codex packet is owned by `05_CODEX/NEXT_TASK.md`.
+- Navigation files must not restate the active frontier, current task, or other live operational state as independent truth.
+- When overlap exists, the weaker navigation file must point back to the stronger SSOT instead of duplicating live state.

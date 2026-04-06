@@ -556,3 +556,41 @@ The repository now has a clear managerial answer: the current desktop trainer wo
 
 ### Recommended next step
 - Open one bounded planning packet for `T-131 Post-Acceptance Desktop Frontier Selection`.
+
+
+## 2026-04-06 - Repository State Anti-Drift Alignment Pass
+
+### Goal
+Eliminate the recurring drift where `00_INDEX.md` duplicates live operational state and falls out of sync with `CURRENT_STATE.md` and `NEXT_TASK.md`, then lock in permanent anti-drift SSOT rules.
+
+### Files updated
+- `00_INDEX.md`
+- `01_MASTER/SSOT_MAP.md`
+- `05_CODEX/IMPLEMENTATION_RULES.md`
+- `01_MASTER/CURRENT_STATE.md`
+- `05_CODEX/NEXT_TASK.md`
+- `05_CODEX/TASKS.md`
+- `05_CODEX/CODEX_WORKLOG.md`
+
+### What was done
+- Reduced `00_INDEX.md` to a navigation-only entry document and removed stale claims about active frontier, current task, and other live operational status.
+- Added explicit anti-drift SSOT rules so `CURRENT_STATE.md` owns live current project state, `NEXT_TASK.md` owns the one active Codex packet, and navigation files must point back instead of duplicating live state.
+- Strengthened implementation rules so state sync is considered incomplete if `00_INDEX.md` still carries stale operational claims after `CURRENT_STATE.md` or `NEXT_TASK.md` move forward.
+- Rechecked the operational state files and updated them only as needed to reflect the repository-level alignment change without inventing a new task frontier.
+
+### What was not changed
+- No product scope, feature planning, runtime/domain behavior, or accepted architectural boundaries were changed.
+- No new implementation frontier was invented during this pass.
+- No broad cleanup outside the authority/status drift problem was started.
+
+### Verification
+- Manual document authority audit across `00_INDEX.md`, `01_MASTER/CURRENT_STATE.md`, `01_MASTER/SSOT_MAP.md`, `05_CODEX/NEXT_TASK.md`, and `05_CODEX/IMPLEMENTATION_RULES.md`.
+
+### Why this matters
+The repository now has a structural anti-drift safeguard: `00_INDEX.md` no longer becomes a stale shadow ledger for live project state, which makes new-chat recovery more reliable and reduces the chance that operational truth splits across multiple documents again.
+
+### Remaining gap after this step
+- Remaining work is product/frontier selection from the accepted workspace baseline, not another repository-state correction.
+
+### Recommended next step
+- Continue with the already selected `T-131 Post-Acceptance Desktop Frontier Selection` planning pass.

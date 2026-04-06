@@ -1,6 +1,6 @@
 # Codex Implementation Rules
 
-Last updated: 2026-04-04
+Last updated: 2026-04-06
 Status: active
 Purpose: define how Codex should read project context, interpret tasks, change files, and report work inside this repository.
 
@@ -51,6 +51,15 @@ A Codex pass is not complete unless it updates the repository state where requir
 - Use `01_MASTER/SSOT_MAP.md` to determine which document owns each question.
 - If two files overlap, preserve the primary SSOT and reduce drift in the weaker file.
 - Do not redefine schema, domain, or product boundaries inside implementation documents.
+
+## Navigation anti-drift rules
+- Do not duplicate the active task, current frontier, or current packet inside navigation files.
+- If such information is needed in navigation, point to the owning SSOT instead of restating it.
+- `00_INDEX.md` is the navigation entry point, not the owner of live operational state.
+- Current state lives in `01_MASTER/CURRENT_STATE.md`.
+- Current Codex packet lives in `05_CODEX/NEXT_TASK.md`.
+- If drift exists, reduce the weaker document so it points back to the stronger SSOT.
+- A task is not considered state-synchronized if `CURRENT_STATE.md` and `NEXT_TASK.md` moved forward but `00_INDEX.md` still contains stale operational claims.
 
 ## Handoff rules
 At the end of every completed task, respond in the structure defined by `05_CODEX/HANDOFF_TEMPLATE.md`.

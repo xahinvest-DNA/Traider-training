@@ -1,13 +1,25 @@
 ﻿# Trader Trainer Project Brain
 
-Last updated: 2026-04-05
-Project status: replay bootstrap, minimal trading loop, local-first session/journal loop, minimum Bill Williams review hooks, manual flags/violations, derived review output, session result metrics, session timeline projection, chart snapshot references, snapshot timeline exposure, snapshot-aware review output, session finalization, compact session review summary, MVP acceptance pass, desktop shell implementation boundary, first desktop shell coding slice, chart/replay refinement, session/trade context refinement, notes/review authoring refinement, current-session history/result refinement, workflow guidance/action feedback refinement, desktop shell layout/usability polish, desktop MVP acceptance/smoke pass, desktop launch path, desktop handoff/readiness, MVP pause point, first post-MVP direction selection, Bill Williams review-depth boundary, Bill Williams review-depth coding slice, Bill Williams review-delta slice, Bill Williams review-completeness slice, Bill Williams review-prompts slice, Bill Williams review-coverage slice, Bill Williams review-sequence slice, Bill Williams review-weak-spots slice, Bill Williams review-progress slice, Bill Williams review-momentum slice, Bill Williams review-stability slice, Bill Williams review-swings slice, Bill Williams review-floor slice, Bill Williams review-ceiling slice, Bill Williams review-band slice, Bill Williams review-headroom slice, Bill Williams review-pressure slice, Bill Williams review-target slice, Bill Williams review-focus slice, Bill Williams review-cue slice, Bill Williams review-badge slice, Bill Williams review-pill slice, Bill Williams review-chip slice, Bill Williams review-tag slice, Bill Williams review-token slice, Bill Williams review-marker slice, Bill Williams review-glyph slice, Bill Williams review-sigil slice, Bill Williams review-seal slice, Bill Williams review-crest slice, Bill Williams review-emblem slice, Bill Williams review-insignia slice, Bill Williams review-standard slice, Bill Williams review-banner slice, Bill Williams review-pennant slice, and Bill Williams review-streamer slice are implemented; bounded raw-dataset import, dataset-import hardening, dataset-quality context, dataset-quality review link, dataset-quality finalization link, dataset-quality restart-recovery note, dataset-quality recovery feedback, dataset-quality recovery acknowledgment, desktop chart snapshot authoring, and review-discipline-reason slices are implemented
-Active implementation frontier: T-106 Current Trade Review Digest Slice remains the active coding packet.
-Accepted boundary addition: T-122 Desktop Trainer Workspace Boundary is added as an accepted product-facing document in `05_CODEX/DESKTOP_TRAINER_WORKSPACE_V1.md`; it does not replace T-106 and is not yet implemented in code.
-Current focus: keep the active coding frontier on one bounded current-trade review digest while the repository also records the new accepted chart-first desktop workspace boundary for later implementation planning.
 ## Purpose
 
-This index is the main entry point into the Trader Trainer project. It is used for navigation across master documents, modules, research, Codex tasks, and the current project state.
+This file is the main navigation entry point into the Trader Trainer project.
+
+It owns navigation only. It must not restate the live active frontier, current task packet, or other date-sensitive operational state as independent truth.
+
+## Operational Orientation
+
+- For current project state, read `01_MASTER/CURRENT_STATE.md`.
+- For the active Codex packet, read `05_CODEX/NEXT_TASK.md`.
+- For document authority and anti-drift rules, read `01_MASTER/SSOT_MAP.md`.
+
+## Stable reading order
+
+1. `01_MASTER/CURRENT_STATE.md`
+2. `01_MASTER/DECISIONS.md`
+3. `01_MASTER/ROADMAP.md`
+4. `01_MASTER/SSOT_MAP.md`
+5. `05_CODEX/NEXT_TASK.md` when the purpose is implementation
+6. Relevant module/schema documents for the active question
 
 ## Core documents
 
@@ -140,22 +152,7 @@ This index is the main entry point into the Trader Trainer project. It is used f
 
 ## Working rule
 
-A new chat must start by reading:
-
-1. [01_MASTER/CURRENT_STATE.md](01_MASTER/CURRENT_STATE.md)
-2. [01_MASTER/DECISIONS.md](01_MASTER/DECISIONS.md)
-3. [01_MASTER/ROADMAP.md](01_MASTER/ROADMAP.md)
-4. [05_CODEX/DATASET_REPLAY_BOOTSTRAP.md](05_CODEX/DATASET_REPLAY_BOOTSTRAP.md) when the issue touches replay bootstrap
-5. [03_MODULES/TRADING_ENGINE.md](03_MODULES/TRADING_ENGINE.md) when the issue moves into one-trade lifecycle
-6. The required module document
-7. The concrete question of the current session
-
-## Next steps
-
-1. Implement the bounded current-trade review digest slice selected by the post-evidence-follow-up audit.
-2. Do not continue the evidence chain with more labels, follow-up states, or snapshot/recovery micro-polish unless a later audit proves real product value.
-3. Keep snapshot support local-first and reference-only; do not reopen screenshot automation, gallery/media workflow, validation, sync, or dashboard scope.
-4. Do not break replay-centered bootstrap, the working trading loop, local journal runtime, thin desktop-shell boundary, accepted launch/readiness behavior, or the current recovery/finalization and snapshot-aware review flows.
+A new chat must start from the operational SSOT documents listed above, then move into the relevant module/schema files for the active question.
 
 
 
