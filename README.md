@@ -88,6 +88,7 @@ Repository-scoped Codex skills are under `.agents/skills/`. Project hooks are un
 - Active Codex task: `05_CODEX/NEXT_TASK.md`
 - Implementation rules: `05_CODEX/IMPLEMENTATION_RULES.md`
 - Full diagnosis: `05_CODEX/PROJECT_DIAGNOSTIC_2026-07-10.md`
+- GitHub administration settings: `05_CODEX/REPOSITORY_SETTINGS.md`
 
 ## Pull request policy
 
