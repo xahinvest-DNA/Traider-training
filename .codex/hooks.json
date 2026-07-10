@@ -1,0 +1,31 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start.py\"",
+            "commandWindows": "powershell -NoProfile -Command \"$root = git rev-parse --show-toplevel; py -3.11 \\\"$root/.codex/hooks/session_start.py\\\"\"",
+            "timeout": 15,
+            "statusMessage": "Loading Trader Trainer active task"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/stop_guard.py\"",
+            "commandWindows": "powershell -NoProfile -Command \"$root = git rev-parse --show-toplevel; py -3.11 \\\"$root/.codex/hooks/stop_guard.py\\\"\"",
+            "timeout": 15,
+            "statusMessage": "Checking Trader Trainer handoff readiness"
+          }
+        ]
+      }
+    ]
+  }
+}
