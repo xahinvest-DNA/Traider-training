@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.python-version
+
+# Test and quality tools
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Trader Trainer local state
+desktop_shell/.local_state/
+**/local_runtime_state.json
+tests/.tmp_*/
+tests/.tmp*/
+
+# Local Tk workaround/runtime must not grow through new commits
+.tcl_runtime/
+
+# Imported datasets and generated artifacts
+.local_datasets/
+artifacts/
+*.log

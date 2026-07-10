@@ -1,137 +1,173 @@
 # SSOT Map
 
-Last updated: 2026-04-06
+Last updated: 2026-07-10
 Status: active
-Purpose: define which document is the source of truth for each project question so ChatGPT, Codex, and future sessions do not drift across duplicated context.
+Purpose: define which repository artifact owns each project question so contributors, ChatGPT, Codex, and future sessions do not create competing truth.
 
-## How to use this file
+## Usage
 
-1. Start from `00_INDEX.md` for navigation.
-2. Use this file to determine which document has authority for the specific question.
-3. If two documents overlap, prefer the one listed here as the primary source of truth.
-4. If a document is changed in a way that affects its authority, update this map in the same task.
+1. Start from `AGENTS.md` and `00_INDEX.md`.
+2. Use this map to identify the owner of the question being changed.
+3. Prefer the primary SSOT over implementation notes, reports, tests, or chat context.
+4. If authority changes, update this map in the same pull request.
+5. If a proposed task conflicts with a master SSOT, re-scope before coding.
 
-## Primary project-entry documents
+## Repository operating authority
 
-### Project entry and navigation
+### Contributor and Codex working rules
+
+- Primary SSOT: `AGENTS.md`
+- Scoped overrides: nested `AGENTS.md` files.
+- Scope: reading order, invariants, validation, branch/PR rules, completion requirements.
+- Supporting automation: `.agents/skills/` and `.codex/hooks.json`.
+- Notes: skills and hooks assist execution; they do not override master product/domain documents.
+
+### Navigation
+
 - Primary SSOT: `00_INDEX.md`
-- Scope: main entry point, navigation, reading order, key links.
-- Notes: this is the first file for new sessions and owns navigation only. It must not restate live project state or the active Codex packet as independent truth.
+- Scope: stable entry points and links only.
+- Notes: it must not own live current state or duplicate the active task packet.
 
-### Current project state
+### Current state
+
 - Primary SSOT: `01_MASTER/CURRENT_STATE.md`
-- Scope: what is implemented now, accepted current focus, open items, next step.
-- Notes: this is the owner of live current project state. Weaker navigation files must point here instead of duplicating current operational claims.
+- Scope: what exists now, current risks, active frontier, open decisions, and immediate sequence.
 
-### Accepted architectural and product decisions
+### Accepted decisions
+
 - Primary SSOT: `01_MASTER/DECISIONS.md`
-- Scope: fixed decisions, rationale, consequences, boundaries.
-- Notes: if a proposed task conflicts with this file, the task must be re-scoped before coding.
+- Scope: fixed project decisions, rationale, and consequences.
 
-### High-level direction and sequencing
+### Direction and sequencing
+
 - Primary SSOT: `01_MASTER/ROADMAP.md`
-- Scope: implementation order, phases, direction of travel.
-- Notes: use to validate whether the next step fits the intended sequence.
+- Scope: high-level phases and implementation order.
+
+### Product correctness gates
+
+- Primary SSOT: `01_MASTER/PRODUCT_TRUTH_GATE.md`
+- Scope: correctness freeze, gates, acceptance evidence, and post-T-132 order before new feature breadth.
+- Notes: this document has priority over older feature-expansion momentum where the two conflict.
 
 ### Product boundary
+
 - Primary SSOT: `01_MASTER/PRODUCT_SCOPE.md`
 - Secondary SSOT: `01_MASTER/MVP_vs_FULL.md`
-- Scope: MVP boundary, later-phase separation, scope creep control.
-- Notes: use before proposing any new surface, platform, or expansion slice.
+- Scope: MVP, later phases, and hard exclusions.
 
 ### Constraints and non-goals
+
 - Primary SSOT: `01_MASTER/CONSTRAINTS.md`
-- Scope: what must not be done, avoided drift, implementation boundaries.
-- Notes: use together with `DECISIONS.md` for safety rails.
+- Scope: implementation safety rails and forbidden drift.
 
-## Domain source-of-truth documents
+## Domain authority
 
-### Replay runtime behavior
+### Replay behavior
+
 - Primary SSOT: `03_MODULES/REPLAY_ENGINE.md`
-- Scope: replay semantics, cursor/time behavior, control rules, execution-facing replay model.
-
-### Trading behavior
-- Primary SSOT: `03_MODULES/TRADING_ENGINE.md`
-- Scope: trading lifecycle, position model, execution policy, trade-side rules.
-
-### Desktop operating surface
-- Primary SSOT: `03_MODULES/DESKTOP_WORKSPACE.md`
-- Scope: desktop responsibilities, interaction boundaries, MVP operating surface.
-
-### Journal and analytics behavior
-- Primary SSOT: `03_MODULES/JOURNAL_ANALYTICS.md`
-- Scope: derive-on-read analytics ownership, review outputs, summary boundaries.
-
-### Bill Williams classification layer
-- Primary SSOT: `03_MODULES/BILL_WILLIAMS_LAYER.md`
-- Scope: Bill Williams runtime/review classification boundaries and methodology layer.
+- Scope: simulation time, event cursor, replay modes, controls, seek, and execution-facing snapshot behavior.
 
 ### Market model
+
 - Primary SSOT: `03_MODULES/MARKET_MODEL.md`
-- Scope: instrument/market profile assumptions and execution-facing market rules.
+- Scope: instrument properties, market profiles, pricing, volume, costs, and session rules.
 
-### Data import behavior
+### Data import
+
 - Primary SSOT: `03_MODULES/DATA_IMPORT.md`
-- Scope: raw import boundary, normalized dataset assumptions, quality-policy role.
+- Scope: raw input, normalization, dataset quality, and internal artifact boundary.
 
-## Technical schema source-of-truth documents
+### Trading behavior
+
+- Primary SSOT: `03_MODULES/TRADING_ENGINE.md`
+- Scope: order, lifecycle, position, execution, risk-guard, and close behavior.
+
+### Desktop workspace
+
+- Primary SSOT: `03_MODULES/DESKTOP_WORKSPACE.md`
+- Scope: user surfaces, commands, projection boundaries, and desktop workflow.
+
+### Journal and analytics
+
+- Primary SSOT: `03_MODULES/JOURNAL_ANALYTICS.md`
+- Scope: source facts, derive-on-read ownership, review output, and analytics boundaries.
+
+### Bill Williams layer
+
+- Primary SSOT: `03_MODULES/BILL_WILLIAMS_LAYER.md`
+- Research/reference SSOT: `02_RESEARCH/BILL_WILLIAMS_RULES.md`
+- Scope: method vocabulary, runtime/review classification boundaries, and later automation limits.
+
+## Technical schema authority
 
 ### Trade persistence
+
 - Primary SSOT: `04_TECH/DATA_SCHEMA.md`
-- Scope: trade storage entities, IDs, cardinality, mutable/immutable policy, recovery links.
+- Scope: order, position, trade, execution, IDs, mutability, trace, and recovery relationships.
 
 ### Session and journal persistence
+
 - Primary SSOT: `04_TECH/JOURNAL_SCHEMA.md`
-- Scope: `TrainingSession`, notes, reviews, snapshots, flags, violations, session-bound persistence rules.
+- Scope: TrainingSession, notes, reviews, snapshots, flags, violations, and journal recovery.
 
-## Codex execution source-of-truth documents
+## Codex execution authority
 
-### Backlog and task history
-- Primary SSOT: `05_CODEX/TASKS.md`
-- Scope: task registry, completed slices, paused slices, historical task lineage.
-- Notes: remains the long-form task ledger.
+### Active task
 
-### Current active task packet
 - Primary SSOT: `05_CODEX/NEXT_TASK.md`
-- Scope: exactly one current task for Codex, with boundaries, allowed files, forbidden changes, and acceptance criteria.
-- Notes: this file is the owner of the one active Codex packet. Navigation files must point here instead of maintaining a shadow current-task ledger.
+- Scope: exactly one current implementation or planning packet.
+- Notes: no other file activates work.
 
-### Codex handoff and session log
-- Primary SSOT: `05_CODEX/CODEX_WORKLOG.md`
-- Scope: what Codex changed, what remains incomplete, risks, and recommended next step.
-- Notes: every completed Codex pass should append one entry here.
+### Task history
 
-### Codex implementation rules
+- Primary SSOT: `05_CODEX/TASKS.md`
+- Scope: completed, paused, and historical task lineage.
+
+### Implementation process
+
 - Primary SSOT: `05_CODEX/IMPLEMENTATION_RULES.md`
-- Scope: rules for how Codex must interpret tasks and update documentation.
+- Scope: task interpretation, scope control, Git workflow, validation, and repository updates.
 
-### Codex response format
+### Handoff format
+
 - Primary SSOT: `05_CODEX/HANDOFF_TEMPLATE.md`
-- Scope: mandatory handoff structure after each task.
+- Scope: mandatory completion response.
 
-## Conflict-resolution rule
+### Completed work record
 
-If two documents seem to overlap:
-1. Prefer the document listed here as primary SSOT.
-2. If overlap remains unresolved, update the weaker document so it points back to the primary one.
-3. If the conflict changes project meaning, record the resolution in `01_MASTER/DECISIONS.md`.
+- Primary SSOT: `05_CODEX/CODEX_WORKLOG.md`
+- Scope: completed pass details, validation, residual risks, and recommended next step.
 
-## Working rule for new chats
+### Diagnostic evidence
 
-A new chat should begin with:
-1. `00_INDEX.md`
-2. `01_MASTER/CURRENT_STATE.md`
-3. `01_MASTER/DECISIONS.md`
-4. `01_MASTER/ROADMAP.md`
-5. This file: `01_MASTER/SSOT_MAP.md`
-6. `05_CODEX/NEXT_TASK.md` if the purpose is implementation
-7. The relevant module/schema documents for the active slice
+- Current repository-wide report: `05_CODEX/PROJECT_DIAGNOSTIC_2026-07-10.md`
+- Scope: findings and rationale supporting the Product Truth Gate.
+- Notes: a diagnostic report does not override master contracts; it proposes or explains changes recorded in master SSOTs.
 
+## Executable evidence
 
-## Navigation anti-drift rule
+- Automated tests live under `tests/`.
+- Cross-platform validation workflow: `.github/workflows/ci.yml`.
+- Tests prove behavior but do not own product meaning.
+- Constant status labels do not constitute acceptance unless produced from executable evidence.
 
-- `00_INDEX.md` owns navigation only.
-- Active project state is owned by `01_MASTER/CURRENT_STATE.md`.
-- Active Codex packet is owned by `05_CODEX/NEXT_TASK.md`.
-- Navigation files must not restate the active frontier, current task, or other live operational state as independent truth.
-- When overlap exists, the weaker navigation file must point back to the stronger SSOT instead of duplicating live state.
+## Conflict resolution
+
+1. Prefer the primary SSOT listed here.
+2. Reduce the weaker artifact to an implementation note or link.
+3. If the resolution changes project meaning, update `DECISIONS.md` and the relevant master document.
+4. Never resolve a conflict silently inside UI code or tests.
+
+## New-session order
+
+1. `AGENTS.md`
+2. `00_INDEX.md`
+3. `01_MASTER/CURRENT_STATE.md`
+4. `01_MASTER/DECISIONS.md`
+5. `01_MASTER/ROADMAP.md`
+6. `01_MASTER/SSOT_MAP.md`
+7. `01_MASTER/PRODUCT_TRUTH_GATE.md`
+8. `05_CODEX/NEXT_TASK.md` for implementation
+9. Relevant domain and schema owners
+
+Chat history is supporting context only and never overrides this chain.
