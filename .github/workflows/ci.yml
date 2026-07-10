@@ -14,13 +14,35 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    name: Python 3.11 / ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+  runtime-linux:
+    name: Runtime core / Ubuntu / Python 3.11
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install project
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+
+      - name: Compile runtime
+        run: python -m compileall runtime_bootstrap
+
+      - name: Correctness lint
+        run: python -m ruff check .
+
+      - name: Run runtime tests
+        run: python -m pytest tests/test_replay_bootstrap.py
+
+  full-windows:
+    name: Full suite / Windows / Python 3.11
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -41,5 +63,5 @@ jobs:
       - name: Correctness lint
         run: python -m ruff check .
 
-      - name: Run tests
+      - name: Run full test suite
         run: python -m pytest
